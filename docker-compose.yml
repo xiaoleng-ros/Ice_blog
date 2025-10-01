@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  # 前端博客 - ThriveX-Blog (Next.js)
+  thrivex-blog:
+    image: xioaleng/thrivex-blog:dev
+    container_name: thrivex-blog-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./ThriveX-Blog:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - ESLINT_NO_DEV_ERRORS=true
+      - SKIP_ENV_VALIDATION=true
+    networks:
+      - thrivex-network
+    restart: unless-stopped
+    depends_on:
+      - thrivex-server
+
+  # 管理后台 - ThriveX-Admin (Vite + React)
+  thrivex-admin:
+    image: xioaleng/thrivex-admin:dev
+    container_name: thrivex-admin-dev
+    ports:
+      - "9100:9100"
+    volumes:
+      - ./ThriveX-Admin:/app
+      - /app/node_modules
+      - /app/dist
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:9003
+      - ESLINT_NO_DEV_ERRORS=true
+    command: sh -c "pnpm run dev --host 0.0.0.0"
+    networks:
+      - thrivex-network
+    restart: unless-stopped
+    depends_on:
+      - thrivex-server
+
+  # 后端服务 - ThriveX-Server (Spring Boot)
+  thrivex-server:
+    image: xioaleng/thrivex-server:dev
+    container_name: thrivex-server-dev
+    ports:
+      - "9003:9003"
+      - "5005:5005"  # Java 远程调试端口
+    volumes:
+      - ./ThriveX-Server:/app/source
+      - maven-cache:/root/.m2
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      # 数据库连接配置
+      - DB_INFO=mysql:3306/thrivex_blog
+      - DB_USERNAME=thrivex
+      - DB_PASSWORD=thrivex123456
+      # Redis 连接配置
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis123456
+    networks:
+      - thrivex-network
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: thrivex-mysql-dev
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123456
+      - MYSQL_DATABASE=thrivex_blog
+      - MYSQL_USER=thrivex
+      - MYSQL_PASSWORD=thrivex123456
+      - TZ=Asia/Shanghai
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./ThriveX-Server/ThriveX.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - thrivex-network
+    restart: unless-stopped
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: thrivex-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --requirepass redis123456
+    networks:
+      - thrivex-network
+    restart: unless-stopped
+
+# 网络配置
+networks:
+  thrivex-network:
+    driver: bridge
+    name: thrivex-dev-network
+
+# 数据卷配置
+volumes:
+  mysql-data:
+    name: thrivex-mysql-data
+  redis-data:
+    name: thrivex-redis-data
+  maven-cache:
+    name: thrivex-maven-cache

@@ -1,0 +1,93 @@
+# Maven 构建输出
+target/
+*/target/
+
+# IDE 文件
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# 编译输出
+*.class
+*.jar
+*.war
+*.ear
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker 文件
+.dockerignore
+docker-compose.yml
+
+# 文档
+README.md
+*.md
+docs/
+
+# 许可证
+LICENSE
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 构建脚本
+build.ps1
+build.sh
+build-docker.ps1
+
+# Node.js (如果存在)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 环境文件
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# 备份文件
+*.bak
+*.backup
+*.old
+
+# 压缩文件
+*.zip
+*.tar.gz
+*.rar
+
+# 环境文件
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 备份文件
+*.bak
+*.backup
+
+# 其他
+*.tgz
+*.tar.gz
