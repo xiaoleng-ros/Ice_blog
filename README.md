@@ -1,4 +1,17 @@
-# ThriveX 博客系统 - 开发环境部署指南
+# ThriveX 博客系统 
+
+## 致谢
+
+本项目基于 [ThriveX](https://github.com/LiuYuYang01/ThriveX) 开源博客系统进行开发和定制。
+
+**原作者**: 宇阳  
+**原项目地址**: https://github.com/LiuYuYang01/ThriveX
+
+感谢原作者的开源贡献，为我们提供了优秀的博客系统基础架构。
+
+---
+
+## 开发环境部署指南
 
 ## 项目简介
 
