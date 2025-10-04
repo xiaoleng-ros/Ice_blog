@@ -27,7 +27,7 @@ public class RoleController {
     @PremName("role:add")
     @PostMapping
     @ApiOperation("新增角色")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 1)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 1)
     public Result<String> add(@RequestBody Role role) {
         boolean res = roleService.save(role);
         return res ? Result.success() : Result.error();
@@ -36,7 +36,7 @@ public class RoleController {
     @PremName("role:del")
     @DeleteMapping("/{id}")
     @ApiOperation("删除角色")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 2)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 2)
     public Result<String> del(@PathVariable Integer id) {
         Role data = roleService.getById(id);
         if (data == null) return Result.error("该数据不存在");
@@ -48,7 +48,7 @@ public class RoleController {
     @PremName("role:del")
     @DeleteMapping("/batch")
     @ApiOperation("批量删除角色")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 3)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 3)
     public Result batchDel(@RequestBody List<Integer> ids) {
         Boolean res = roleService.removeByIds(ids);
         return res ? Result.success() : Result.error();
@@ -57,7 +57,7 @@ public class RoleController {
     @PremName("role:edit")
     @PatchMapping
     @ApiOperation("编辑角色")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 4)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 4)
     public Result<String> edit(@RequestBody Role role) {
         boolean res = roleService.updateById(role);
         return res ? Result.success() : Result.error();
@@ -66,7 +66,7 @@ public class RoleController {
     @PremName("role:info")
     @GetMapping("/{id}")
     @ApiOperation("获取角色")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 5)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 5)
     public Result<Role> get(@PathVariable Integer id) {
         Role data = roleService.getById(id);
         return Result.success(data);
@@ -75,7 +75,7 @@ public class RoleController {
     @PremName("role:list")
     @GetMapping
     @ApiOperation("获取角色列表")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 6)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 6)
     public Result<List<Role>> list() {
         List<Role> data = roleService.list();
         return Result.success(data);
@@ -83,7 +83,7 @@ public class RoleController {
 
     @GetMapping("/route/{id}")
     @ApiOperation("获取指定角色的路由列表")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 7)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 7)
     public Result<List<Route>> getRouteList(@PathVariable Integer id) {
         List<Route> list = roleService.getRouteList(id);
         return Result.success(list);
@@ -91,7 +91,7 @@ public class RoleController {
 
     @GetMapping("/permission/{id}")
     @ApiOperation("获取指定角色的权限列表")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 8)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 8)
     public Result<List<Permission>>getPermissionList (@PathVariable Integer id) {
         List<Permission> list = roleService.getPermissionList(id);
         return Result.success(list);
@@ -100,7 +100,7 @@ public class RoleController {
     @PremName("role:bindingRoute")
     @PatchMapping("/bindingRoute/{id}")
     @ApiOperation("分配角色权限")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 9)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 9)
     public Result<String> bindingRoute(@PathVariable Integer id, @RequestBody BindRouteAndPermission data) {
         roleService.binding(id, data);
         return Result.success();

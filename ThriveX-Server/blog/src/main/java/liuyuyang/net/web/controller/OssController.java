@@ -25,7 +25,7 @@ public class OssController {
     @PremName("oss:add")
     @PostMapping
     @ApiOperation("新增oss配置")
-    @ApiOperationSupport(author = "laifeng", order = 1)
+    @ApiOperationSupport(author = "xiaoleng", order = 1)
     public Result<String> add(@RequestBody Oss oss) {
         ossService.saveOss(oss);
         return Result.success();
@@ -34,7 +34,7 @@ public class OssController {
     @PremName("oss:del")
     @DeleteMapping("/{id}")
     @ApiOperation("删除oss配置")
-    @ApiOperationSupport(author = "laifeng", order = 2)
+    @ApiOperationSupport(author = "xiaoleng", order = 2)
     public Result<String> del(@PathVariable Integer id) {
         Oss oss = ossService.getById(id);
         if (oss == null) return Result.error("删除oss配置失败：该配置不存在");
@@ -46,7 +46,7 @@ public class OssController {
     @PremName("oss:edit")
     @PatchMapping
     @ApiOperation("更新oss配置")
-    @ApiOperationSupport(author = "laifeng", order = 3)
+    @ApiOperationSupport(author = "xiaoleng", order = 3)
     public Result<String> update(@RequestBody Oss oss) {
         ossService.updateOss(oss);
         return Result.success();
@@ -55,7 +55,7 @@ public class OssController {
     @PremName("oss:info")
     @GetMapping("/{id}")
     @ApiOperation("获取oss配置")
-    @ApiOperationSupport(author = "laifeng", order = 4)
+    @ApiOperationSupport(author = "xiaoleng", order = 4)
     public Result<OssVo> get(@PathVariable Integer id) {
         Oss oss = ossService.getById(id);
         if (oss == null) {
@@ -72,7 +72,7 @@ public class OssController {
     @PremName("oss:list")
     @PostMapping("/list")
     @ApiOperation("获取oss配置列表")
-    @ApiOperationSupport(author = "laifeng", order = 5)
+    @ApiOperationSupport(author = "xiaoleng", order = 5)
     public Result<Object> page() {
         List<Oss> list = ossService.list();
         return Result.success(list);
@@ -81,7 +81,7 @@ public class OssController {
     @PremName("oss:enable")
     @PatchMapping("/enable/{id}")
     @ApiOperation("启用oss配置")
-    @ApiOperationSupport(author = "laifeng", order = 6)
+    @ApiOperationSupport(author = "xiaoleng", order = 6)
     public Result enable(@PathVariable Integer id) {
         ossService.enable(id);
         return Result.success();
@@ -90,7 +90,7 @@ public class OssController {
     @PremName("oss:getEnableOss")
     @GetMapping("/getEnableOss")
     @ApiOperation("获取当前启用的oss配置")
-    @ApiOperationSupport(author = "laifeng", order = 8)
+    @ApiOperationSupport(author = "xiaoleng", order = 8)
     public Result<Oss> getEnableOss() {
         return Result.success(ossService.getEnableOss());
     }
@@ -98,7 +98,7 @@ public class OssController {
     @PremName("oss:getPlatform")
     @GetMapping("/platform")
     @ApiOperation("获取目前支持的oss平台")
-    @ApiOperationSupport(author = "宇阳", order = 9)
+    @ApiOperationSupport(author = "xiaoleng", order = 9)
     public Result<List<Map>> getPlatform() {
         return Result.success(ossService.getPlatform());
     }

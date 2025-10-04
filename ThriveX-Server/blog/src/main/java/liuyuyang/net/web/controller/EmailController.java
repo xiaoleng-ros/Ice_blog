@@ -28,7 +28,7 @@ public class EmailController {
     @PremName("email:dismiss")
     @PostMapping("/dismiss")
     @ApiOperation("驳回通知邮件")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 1)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 1)
     public Result dismiss(@RequestBody DismissEmailDTO email) {
         // 处理邮件模板
         Context context = new Context();
@@ -47,7 +47,7 @@ public class EmailController {
     @PremName("email:reply_wall")
     @PostMapping("/reply_wall")
     @ApiOperation("回复留言")
-    @ApiOperationSupport(author = "刘宇阳 | liuyuyang1024@yeah.net", order = 2)
+    @ApiOperationSupport(author = "小冷 | xiaolengros@gmail.com", order = 2)
     public Result replyWall(@RequestBody WallEmailDTO email) {
         // 处理邮件模板
         Context context = new Context();
