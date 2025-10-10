@@ -8,13 +8,17 @@ WORKDIR /thrive
 RUN npm config set registry https://registry.npmmirror.com
 
 # 复制package.json和package-lock.json
-COPY package*.json .
+COPY package*.json ./
 
 # 安装依赖
 RUN npm install
 
 # 复制所有文件到工作目录
 COPY . .
+
+# 设置环境变量（可以在部署时覆盖）
+ENV NEXT_PUBLIC_CACHING_TIME=1
+ENV NEXT_PUBLIC_PROJECT_API=https://ice-server-poyr.onrender.com/api
 
 # 构建Next.js应用
 RUN npm run build
