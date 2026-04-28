@@ -1,0 +1,56 @@
+# 依赖目录
+ThriveX-Blog/node_modules/
+ThriveX-Blog/.next/
+ThriveX-Blog/pnpm-lock.yaml
+ThriveX-Blog/package-lock.json
+ThriveX-Blog/.turbo/
+
+ThriveX-Admin/node_modules/
+ThriveX-Admin/dist/
+ThriveX-Admin/pnpm-lock.yaml
+ThriveX-Admin/package-lock.json
+ThriveX-Admin/.vite/
+
+ThriveX-Server/target/
+ThriveX-Server/*.class
+ThriveX-Server/.mvn/wrapper/maven-wrapper.jar
+ThriveX-Server/.mvn/wrapper/maven-wrapper.properties
+ThriveX-Server/mvnw
+ThriveX-Server/mvnw.cmd
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# 操作系统
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# 环境文件（包含敏感信息）
+.env
+.env.local
+.env.*.local
+
+# 日志
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# 构建产物
+*.exe
+*.dll
+*.so
+*.dylib
+*.class
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# Trae IDE
+.trae/

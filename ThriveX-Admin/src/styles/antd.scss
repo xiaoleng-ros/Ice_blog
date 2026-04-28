@@ -1,0 +1,129 @@
+/* ------------------ 自定义Antd组件样式开始 ------------------ */
+
+// 只取消颜色相关的过渡效果, 其他过渡保持正常 (暗色切换时颜色变化不一致会导致效果不好)
+* {
+    transition-property:
+        opacity, transform, translate, scale, box-shadow, filter, width, height, min-width, min-height, max-width,
+        max-height, margin, margin-top, margin-right, margin-bottom, margin-left, padding, padding-top, padding-right,
+        padding-bottom, padding-left, left, right, top, bottom, inset, font-size, font-weight, letter-spacing,
+        line-height, text-indent, text-shadow, border-width, border-radius, outline-width, outline-offset, flex,
+        flex-grow, flex-shrink, flex-basis, gap, row-gap, column-gap, visibility, z-index, clip-path, backdrop-filter,
+        border-style, outline-style !important;
+}
+
+a {
+    color: inherit;
+    
+    &:hover {
+        color: var(--color-primary) !important;
+    }
+}
+
+/* 表单获取焦点时的阴影效果 */
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-number:focus,
+.ant-input-number-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused,
+.ant-textarea:focus,
+.ant-input-affix-wrapper-focused {
+    box-shadow: 0 0 0 4px rgba(5, 72, 255, 0.06) !important;
+}
+
+/* 表单校验失败时的阴影效果 */
+.ant-input-status-error:focus,
+.ant-input-status-error.ant-input-focused,
+.ant-input-number-status-error:focus,
+.ant-input-number-status-error.ant-input-number-focused,
+.ant-select-status-error.ant-select-focused .ant-select-selector,
+.ant-picker-status-error.ant-picker-focused,
+.ant-textarea-status-error:focus,
+.ant-input-affix-wrapper-status-error.ant-input-affix-wrapper-focused {
+    box-shadow: 0 0 0 4px rgba(255, 77, 79, 0.1) !important;
+}
+
+// 自定义input后置按钮样式
+.customizeAntdInputAddonAfter {
+    .ant-input-group-addon {
+        padding: 0;
+
+        > span {
+            padding: 8px 10px;
+        }
+    }
+}
+
+.ant-form-inline {
+    margin-inline-end: 10px;
+}
+
+.ant-tabs-nav {
+    padding-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+/* ------------------ 自定义Antd组件样式结束 ------------------ */
+
+// ------------------ Antd组件暗色适配 开始 ------------------
+// 使用 CSS 变量而非 @apply 自定义颜色，避免 antd.scss 单独编译时 Tailwind 无法识别 index.css 中的 @theme
+.ant-card {
+    @apply overflow-hidden;
+}
+
+.ant-card-body,
+.ant-pagination-item,
+.ant-drawer-header,
+.ant-drawer-body,
+.ant-table-cell::before {
+    .dark & {
+        background-color: var(--color-boxdark);
+    }
+}
+
+.ant-pagination-item:hover,
+.ant-table-cell,
+.ant-table-row:hover .ant-table-cell,
+.ant-card {
+    .dark & {
+        background-color: var(--color-boxdark) !important;
+        border-color: var(--color-strokedark) !important;
+    }
+}
+
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-picker-outlined,
+.ant-picker-panel-layout,
+.ant-picker-range-arrow::before,
+.ant-select,
+.ant-select-selector,
+.ant-modal-content {
+    .dark & {
+        background-color: var(--color-boxdark-2) !important;
+        border-color: var(--color-strokedark) !important;
+    }
+}
+
+.ant-modal-header {
+    .dark & {
+        background: transparent;
+    }
+}
+
+.ant-transfer-list {
+    .dark & {
+        border-color: var(--color-strokedark);
+    }
+}
+
+/* 暗色下标签统一为柔和样式，提升对比度与一致性 */
+.dark .ant-tag {
+    border: 1px solid var(--tw-stroke-dark, #475f7d) !important;
+    background: rgba(71, 95, 125, 0.25) !important;
+    color: rgba(226, 232, 240, 0.95) !important;
+}
+.dark .ant-tag:hover {
+    background: rgba(71, 95, 125, 0.4) !important;
+    border-color: rgba(71, 95, 125, 0.7) !important;
+}
+// ------------------ Antd组件暗色适配 结束 ------------------
