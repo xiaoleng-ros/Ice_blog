@@ -4,7 +4,7 @@ import { Article } from '@/types/app/article';
 
 // 获取标签列表
 export const getTagListAPI = async () => {
-    return await Request<Tag[]>('POST', `/tag/list`);
+    return await Request<Tag[]>('GET', `/tag`);
 }
 
 // 获取标签列表+文章数量统计

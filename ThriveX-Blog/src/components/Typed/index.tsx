@@ -10,7 +10,7 @@ export default ({ className }: { className?: string }) => {
   const el = useRef(null);
 
   useEffect(() => {
-    if (theme.swiper_text) {
+    if (theme?.swiper_text && theme.swiper_text.length > 0) {
       const typed = new Typed(el.current, {
         strings: theme.swiper_text,
         typeSpeed: 100,

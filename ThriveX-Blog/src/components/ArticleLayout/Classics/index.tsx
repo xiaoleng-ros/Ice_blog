@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getRandom } from '@/utils';
+
 import { Article } from '@/types/app/article';
 import dayjs from 'dayjs';
 
@@ -18,9 +18,10 @@ interface ClassicsProps {
 
 const Classics = async ({ data }: ClassicsProps) => {
   const themeResponse = await getWebConfigDataAPI<{ value: Theme }>('theme');
-  const theme = themeResponse?.data?.value as Theme;
+  const theme = themeResponse?.data?.value as Theme | undefined;
 
-  const covers = theme.covers ?? [];
+  const covers = theme?.covers ?? '';
+  const getCover = () => covers;
 
   // 生成文章摘要，取前100个字
   const genArticleInfo = (data: Article) => {
@@ -40,7 +41,7 @@ const Classics = async ({ data }: ClassicsProps) => {
               className="hidden sm:block relative min-w-[45%] bg-cover bg-no-repeat bg-center scale-100 hover:scale-125 z-10 transition-transform"
               style={{
                 clipPath: 'polygon(0 0, 100% 0, 90% 100%, 0 100%)',
-                backgroundImage: `url(${item.cover ?? covers[getRandom(0, covers.length - 1)]})`,
+                backgroundImage: `url(${item.cover ?? getCover()})`,
               }}
             />
           )}
@@ -79,7 +80,7 @@ const Classics = async ({ data }: ClassicsProps) => {
             className="absolute w-full h-60 bg-cover bg-center"
             style={{
               filter: 'blur(2.5rem) brightness(0.6)',
-              backgroundImage: `url(${item.cover ?? covers[getRandom(0, covers.length - 1)]})`,
+              backgroundImage: `url(${item.cover ?? getCover()})`,
             }}
           />
 
@@ -88,7 +89,7 @@ const Classics = async ({ data }: ClassicsProps) => {
               className="relative min-w-[45%] bg-cover bg-no-repeat bg-center scale-100 z-10 hover:scale-125 transition-transform hidden sm:block"
               style={{
                 clipPath: 'polygon(10% 0, 100% 0, 100% 100%, 0 100%)',
-                backgroundImage: `url(${item.cover ?? covers[getRandom(0, covers.length - 1)]})`,
+                backgroundImage: `url(${item.cover ?? getCover()})`,
               }}
             />
           )}

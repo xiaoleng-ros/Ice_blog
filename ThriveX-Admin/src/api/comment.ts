@@ -17,14 +17,11 @@ export const editCommentDataAPI = (data: Comment) => Request('PATCH', '/comment'
 export const getCommentDataAPI = (id?: number) => Request<Paginate<Comment>>('GET', `/comment/${id}`)
 
 // 获取评论列表
-export const getCommentListAPI = (data?: QueryData) => Request<Comment[]>('POST', `/comment/list`, {
-    data: { ...data, ...data?.query },
+export const getCommentListAPI = (data?: QueryData) => Request<Comment[]>('GET', `/comment`, {
+    params: { ...data?.query },
 })
 
 // 分页获取评论列表
-export const getCommentPagingAPI = (data?: QueryData) => Request<Paginate<Comment[]>>('POST', `/comment/paging`, {
-    data: { ...data?.query },
-    params: {
-        ...data?.pagination
-    }
+export const getCommentPagingAPI = (data?: QueryData & { page?: number; size?: number }) => Request<Paginate<Comment[]>>('GET', `/comment`, {
+    params: { ...data?.query, page: data?.page, size: data?.size }
 })

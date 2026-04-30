@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 获取所有文章
   const res = await getArticleListAPI();
-  const articles = res?.data.result ?? [];
+  const articles = (res?.data as any)?.records ?? [];
 
   // 静态页面
   const staticPages: MetadataRoute.Sitemap = [
@@ -49,9 +49,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // 文章页面
-  const articlePages: MetadataRoute.Sitemap = articles
-    .filter((article) => article.id && article.createTime)
-    .map((article) => ({
+  const articlePages: MetadataRoute.Sitemap = (articles as any[])
+    .filter((article: any) => article.id && article.createTime)
+    .map((article: any) => ({
       url: `${baseUrl}/article/${article.id}`,
       lastModified: new Date(+article.createTime),
       changeFrequency: 'weekly' as const,

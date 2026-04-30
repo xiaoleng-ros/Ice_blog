@@ -13,11 +13,11 @@ interface Props {
 
 export default ({ src, isRipple = true, children }: Props) => {
   const theme = useConfigStore((state) => state.theme);
-  const covers = theme.covers ?? [];
+  const covers = theme?.covers ?? [];
 
-  const sty = {
-    backgroundImage: `url(${src ? src : covers[getRandom(0, covers.length - 1)]})`,
-  };
+  const sty = src || (covers.length > 0 ? covers[getRandom(0, covers.length - 1)] : null)
+    ? { backgroundImage: `url(${src || covers[getRandom(0, covers.length - 1)]})` }
+    : {};
 
   return (
     <>

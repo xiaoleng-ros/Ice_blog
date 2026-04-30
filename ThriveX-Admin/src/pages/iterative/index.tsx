@@ -206,7 +206,7 @@ const IterativePage = () => {
               options={yearList}
               onChange={setYear}
               className="min-w-[100px] font-bold! text-slate-700 dark:text-slate-200 [&_.ant-select-selector]:bg-transparent!"
-              dropdownStyle={{ borderRadius: '12px', padding: '8px' }}
+              styles={{ popup: { root: { borderRadius: '12px', padding: '8px' } } }}
             />
           </div>
         </div>

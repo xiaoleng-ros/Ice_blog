@@ -14,14 +14,11 @@ export const editAlbumImageDataAPI = (data: AlbumImage) => Request('PATCH', '/al
 export const getAlbumImageDataAPI = (id?: number) => Request<AlbumImage>('GET', `/album/image/${id}`)
 
 // 获取照片列表
-export const getAlbumImageListAPI = (data?: QueryData) => Request<AlbumImage[]>('POST', '/album/image/list', {
-  data: { ...data?.query }
+export const getAlbumImageListAPI = (data?: QueryData) => Request<AlbumImage[]>('GET', '/album/image', {
+  params: { ...data?.query }
 });
 
 // 分页获取照片列表
-export const getAlbumImagePagingAPI = (data?: QueryData) => Request<Paginate<AlbumImage[]>>('POST', `/album/image/paging`, {
-  data: { ...data?.query },
-  params: {
-    ...data?.pagination
-  }
+export const getAlbumImagePagingAPI = (data?: QueryData & { page?: number; size?: number }) => Request<Paginate<AlbumImage[]>>('GET', `/album/image`, {
+  params: { ...data?.query, page: data?.page, size: data?.size }
 })

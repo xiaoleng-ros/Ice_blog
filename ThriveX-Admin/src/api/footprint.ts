@@ -14,6 +14,6 @@ export const editFootprintDataAPI = (data: Footprint) => Request('PATCH', '/foot
 export const getFootprintDataAPI = (id?: number) => Request<Footprint>('GET', `/footprint/${id}`)
 
 // 获取足迹列表
-export const getFootprintListAPI = (data?: QueryData) => Request<Footprint[]>('POST', '/footprint/list', {
-    data: { ...data?.query }
+export const getFootprintListAPI = (data?: QueryData) => Request<Footprint[]>('GET', '/footprint', {
+    params: { ...data?.query }
 });

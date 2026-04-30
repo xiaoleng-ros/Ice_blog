@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'antd/es/form/Form';
-import { Button, Form, Input, notification } from 'antd';
+import { App, Button, Form, Input } from 'antd';
 import { UserOutlined, LockOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 import { loginDataAPI } from '@/api/user';
@@ -12,6 +12,7 @@ export default () => {
   const navigate = useNavigate();
   const location = useLocation();
   const store = useUserStore();
+  const { notification } = App.useApp();
 
   const [loading, setLoading] = useState(false);
 
@@ -29,15 +30,19 @@ export default () => {
 
       // 将用户信息和token保存起来
       store.setToken(data.token);
-      store.setUser(data.user);
-      store.setRole(data.role);
+      if (data.user) {
+        store.setUser(data.user);
+      }
+      if (data.role) {
+        store.setRole(data.role);
+      }
 
       // 设置显示登录通知的标记
       setShowLoginNotification();
 
       notification.success({
-        message: '🎉 登录成功',
-        description: `Hello ${data.user.name} 欢迎回来`,
+        title: '🎉 登录成功',
+        description: `Hello ${data.user?.name || '用户'} 欢迎回来`,
       });
 
       setLoading(false);

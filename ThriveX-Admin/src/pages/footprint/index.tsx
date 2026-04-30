@@ -41,8 +41,14 @@ export default () => {
   const { RangePicker } = DatePicker;
 
   const getEnvConfigData = useCallback(async () => {
-    const { data } = await getEnvConfigDataAPI('gaode_coordinate');
-    setGaodeApKey((data.value as { key: string }).key);
+    try {
+      const { data } = await getEnvConfigDataAPI('gaode_coordinate');
+      if (data?.value) {
+        setGaodeApKey((data.value as { key: string }).key);
+      }
+    } catch (err) {
+      console.error('获取高德配置失败:', err);
+    }
   }, []);
 
   const getFootprintList = useCallback(
@@ -149,7 +155,7 @@ export default () => {
       try {
         setLoading(true);
         await delFootprintDataAPI(id);
-        notification.success({ message: '🎉 删除足迹成功' });
+        notification.success({ title: '🎉 删除足迹成功' });
         await getFootprintList();
       } catch (error) {
         console.error(error);
@@ -413,7 +419,7 @@ export default () => {
         />
       </div>
 
-      <Modal title={modalMode === 'edit' ? '编辑足迹' : '新增足迹'} open={isModelOpen} onCancel={closeModal} destroyOnClose footer={null}>
+      <Modal title={modalMode === 'edit' ? '编辑足迹' : '新增足迹'} open={isModelOpen} onCancel={closeModal} destroyOnHidden footer={null}>
         <Spin spinning={detailLoading || searchLoading}>
           <Form form={form} layout="vertical" size="large" preserve={false} className="mt-6">
             <Form.Item label="标题" name="title" rules={[{ required: true, message: '标题不能为空' }]}>
@@ -425,7 +431,10 @@ export default () => {
             </Form.Item>
 
             <Form.Item label="坐标纬度" name="position" rules={[{ required: true, message: '坐标纬度不能为空' }]}>
-              <Input placeholder="请输入坐标纬度" prefix={<GiPositionMarker />} addonAfter={<IoSearch onClick={getGeocode} className="cursor-pointer" />} />
+              <Space.Compact style={{ width: '100%' }}>
+                <Input placeholder="请输入坐标纬度" prefix={<GiPositionMarker />} />
+                <Button icon={<IoSearch />} onClick={getGeocode} />
+              </Space.Compact>
             </Form.Item>
 
             <div className="relative">

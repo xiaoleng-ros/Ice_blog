@@ -1,0 +1,305 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Article {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  description String?  @db.VarChar(200)
+  content     String   @db.Text
+  cover       String?  @db.VarChar(300)
+  view        Int      @default(0)
+  comment     Int      @default(0)
+  createTime  String   @map("create_time") @db.VarChar(255)
+
+  articleConfig ArticleConfig?
+  articleCates  ArticleCate[]
+  articleTags   ArticleTag[]
+
+  @@map("article")
+}
+
+model ArticleConfig {
+  id         Int      @id @default(autoincrement())
+  status     String   @default("default") @db.VarChar(20)
+  password   String?  @db.VarChar(100)
+  isEncrypt  Boolean  @default(false) @map("is_encrypt")
+  isDraft    Boolean  @default(false) @map("is_draft")
+  isDel      Boolean  @default(false) @map("is_del")
+  articleId  Int      @unique @map("article_id")
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("article_config")
+}
+
+model ArticleCate {
+  id        Int @id @default(autoincrement())
+  articleId Int @map("article_id")
+  cateId   Int @map("cate_id")
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  cate    Cate    @relation(fields: [cateId], references: [id], onDelete: Cascade)
+
+  @@unique([id])
+  @@map("article_cate")
+}
+
+model ArticleTag {
+  id        Int @id @default(autoincrement())
+  articleId Int @map("article_id")
+  tagId    Int @map("tag_id")
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([id])
+  @@map("article_tag")
+}
+
+model Assistant {
+  id        Int     @id @default(autoincrement())
+  name      String  @db.VarChar(255)
+  key       String  @db.VarChar(500)
+  url       String  @db.VarChar(500)
+  model     String  @db.VarChar(255)
+  isDefault Boolean @default(false) @map("is_default")
+
+  @@map("assistant")
+}
+
+model Cate {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique @db.VarChar(255)
+  icon  String? @db.VarChar(100)
+  url   String  @default("/") @db.VarChar(255)
+  mark  String  @unique @db.VarChar(100)
+  level Int?
+  order Int     @default(0)
+  type  String  @default("cate") @db.VarChar(10)
+
+  articleCates ArticleCate[]
+
+  @@map("cate")
+}
+
+model Comment {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(50)
+  avatar       String?  @db.VarChar(255)
+  content      String   @db.Text
+  email        String?  @db.VarChar(100)
+  url          String?  @db.VarChar(500)
+  articleId    Int      @map("article_id")
+  commentId    Int      @default(0) @map("comment_id")
+  auditStatus  Int      @default(0) @map("audit_status")
+  createTime   String   @map("create_time") @db.VarChar(255)
+
+  @@map("comment")
+}
+
+model EnvConfig {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique @db.VarChar(255)
+  value Json    @db.Json
+  notes String? @db.VarChar(255)
+
+  @@map("env_config")
+}
+
+model FileDetail {
+  id               String    @id @db.VarChar(32)
+  url              String    @db.VarChar(512)
+  size             BigInt?
+  filename         String?   @db.VarChar(256)
+  originalFilename String?   @map("original_filename") @db.VarChar(256)
+  basePath         String?   @map("base_path") @db.VarChar(256)
+  path             String?   @db.VarChar(256)
+  ext              String?   @db.VarChar(32)
+  contentType      String?   @map("content_type") @db.VarChar(128)
+  platform         String?   @db.VarChar(32)
+  thUrl            String?   @map("th_url") @db.VarChar(512)
+  thFilename       String?   @map("th_filename") @db.VarChar(256)
+  thSize           BigInt?   @map("th_size")
+  thContentType    String?   @map("th_content_type") @db.VarChar(128)
+  objectId         String?   @map("object_id") @db.VarChar(32)
+  objectType       String?   @map("object_type") @db.VarChar(32)
+  metadata         String?   @db.Text
+  userMetadata     String?   @map("user_metadata") @db.Text
+  thMetadata       String?   @map("th_metadata") @db.Text
+  thUserMetadata   String?   @map("th_user_metadata") @db.Text
+  attr             String?   @db.Text
+  fileAcl          String?   @map("file_acl") @db.VarChar(32)
+  thFileAcl        String?   @map("th_file_acl") @db.VarChar(32)
+  hashInfo         String?   @map("hash_info") @db.Text
+  uploadId         String?   @map("upload_id") @db.VarChar(128)
+  uploadStatus     Int?      @map("upload_status")
+  createTime       DateTime? @map("create_time") @db.Timestamp
+
+  @@map("file_detail")
+}
+
+model Footprint {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(255)
+  content   String?  @db.VarChar(1500)
+  address   String   @db.VarChar(255)
+  position  String   @db.VarChar(255)
+  images    Json?    @db.Json
+  createTime String  @map("create_time") @db.VarChar(255)
+
+  @@map("footprint")
+}
+
+model Link {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(255)
+  url         String  @db.VarChar(500)
+  logo        String? @db.VarChar(500)
+  description String? @db.VarChar(500)
+  status      Int     @default(1)
+  order       Int     @default(0)
+  typeId      Int?    @map("type_id")
+
+  linkType LinkType? @relation(fields: [typeId], references: [id])
+
+  @@map("link")
+}
+
+model LinkType {
+  id    Int    @id @default(autoincrement())
+  name  String @db.VarChar(255)
+  order Int    @default(0)
+
+  links Link[]
+
+  @@map("link_type")
+}
+
+model Oss {
+  id       Int     @id @default(autoincrement())
+  type     String  @db.VarChar(50)
+  accessKey String @map("access_key") @db.VarChar(255)
+  secretKey String @map("secret_key") @db.VarChar(255)
+  bucket   String  @db.VarChar(255)
+  endpoint String? @db.VarChar(255)
+  domain   String? @db.VarChar(255)
+  status   Int     @default(1)
+
+  @@map("oss")
+}
+
+model PageConfig {
+  id        Int    @id @default(autoincrement())
+  pageName  String @unique @map("page_name") @db.VarChar(100)
+  config    Json   @db.Json
+
+  @@map("page_config")
+}
+
+model Record {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(255)
+  content   String?  @db.Text
+  images    Json?    @db.Json
+  createdAt String   @map("created") @db.VarChar(255)
+
+  @@map("record")
+}
+
+model Rss {
+  id      Int      @id @default(autoincrement())
+  name    String   @db.VarChar(255)
+  url     String   @db.VarChar(500)
+  rule    Json?    @db.Json
+  created String   @map("created") @db.VarChar(255)
+
+  @@map("rss")
+}
+
+model Swiper {
+  id    Int     @id @default(autoincrement())
+  title String? @db.VarChar(255)
+  cover String  @db.VarChar(500)
+  url   String  @db.VarChar(500)
+  order Int     @default(0)
+  status Int    @default(1)
+
+  @@map("swiper")
+}
+
+model Tag {
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(255)
+  icon  String? @db.VarChar(100)
+  mark  String  @unique @db.VarChar(100)
+
+  articleTags ArticleTag[]
+
+  @@map("tag")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique @db.VarChar(100)
+  password   String   @db.VarChar(100)
+  nickname   String?  @db.VarChar(100)
+  avatar     String?  @db.VarChar(255)
+  email      String?  @db.VarChar(100)
+  role       String   @default("user") @db.VarChar(20)
+  status     Int      @default(1)
+  createTime String?  @map("create_time") @db.VarChar(255)
+
+  userTokens UserToken[]
+
+  @@map("user")
+}
+
+model UserToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  token     String    @db.Text
+  expireTime DateTime @map("expire_time")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_token")
+}
+
+model Wall {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  cateId       Int      @map("cate_id")
+  color        String?  @db.VarChar(50)
+  content      String   @db.Text
+  avatar       String?  @db.VarChar(255)
+  email        String?  @db.VarChar(100)
+  auditStatus  Int      @default(0) @map("audit_status")
+  isChoice     Int      @default(0) @map("is_choice")
+  ip           String?  @db.VarChar(50)
+  createdAt    String   @map("created") @db.VarChar(255)
+
+  @@map("wall")
+}
+
+model WallCate {
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(100)
+  icon  String? @db.VarChar(100)
+  order Int     @default(0)
+
+  @@map("wall_cate")
+}
+
+model WebConfig {
+  id    Int    @id @default(autoincrement())
+  name  String @unique @db.VarChar(100)
+  value Json   @db.Json
+
+  @@map("web_config")
+}

@@ -1,13 +1,16 @@
 import Request from '@/utils/request';
 
-type StatisType = 'overview' | 'new-visitor' | 'basic-overview';
+// 获取访客统计 (PV量、IP量、跳出率、平均访问时长)
+export const getVisitorStatisAPI = () => Request('GET', `/statis/visitor`)
 
-// overview(概览趋势), new-visitor(新访客趋势), basic-overview(基础概览趋势)
-// 获取 PV量、IP量、跳出率、平均访问时长
-export const getStatisAPI = (type: StatisType, startDate: string, endDate: string) => Request('GET', `/statis`, {
-  params: {
-    startDate,
-    endDate,
-    type
-  },
-})
+// 获取文章统计
+export const getArticleStatisAPI = () => Request('GET', `/statis/article`)
+
+// 获取分类统计
+export const getCateStatisAPI = () => Request('GET', `/statis/cate`)
+
+// 获取标签统计
+export const getTagStatisAPI = () => Request('GET', `/statis/tag`)
+
+// 获取评论统计
+export const getCommentStatisAPI = () => Request('GET', `/statis/comment`)

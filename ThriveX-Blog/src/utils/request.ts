@@ -5,11 +5,24 @@ const url = process.env.NEXT_PUBLIC_PROJECT_API
 // 配置页面缓存时间
 const cachingTime = +process.env.NEXT_PUBLIC_CACHING_TIME!
 
+if (!url) {
+    console.error('❌ 环境变量 NEXT_PUBLIC_PROJECT_API 未设置或为空');
+    console.error('当前 NEXT_PUBLIC_PROJECT_API 值:', url);
+    console.error('请检查 .env 或 .env.local 文件配置');
+}
+
 export const Request = async <T>(method: string, api: string, data?: any, caching = true) => {
+    if (!url) {
+        console.error('❌ 请求被阻止: NEXT_PUBLIC_PROJECT_API 未定义');
+        console.error('请求路径:', api);
+        return { code: 500, message: 'API URL not configured', data: {} as T };
+    }
+
     const query = params(data?.params ?? {});
-    
+
     try {
-        const res = await fetch(`${url}${api}${query}`, {
+        const fullUrl = `${url}${api}${query}`;
+        const res = await fetch(fullUrl, {
             method,
             headers: {
                 'Content-Type': 'application/json'
@@ -20,7 +33,8 @@ export const Request = async <T>(method: string, api: string, data?: any, cachin
 
         return res?.json() as Promise<ResponseData<T>>;
     } catch (error) {
-        console.log('捕获到异常：', error);
+        console.error('❌ 请求异常:', error);
+        console.error('请求路径:', api);
         return { code: 500, message: 'Request failed', data: {} as T };
     }
 }

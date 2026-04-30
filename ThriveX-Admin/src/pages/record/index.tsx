@@ -56,7 +56,7 @@ export default () => {
       setBtnLoading(id);
       await delRecordDataAPI(id);
       await fetchData(); // 重新获取数据
-      notification.success({ message: '删除成功' });
+      notification.success({ title: '删除成功' });
     } catch (error) {
       console.error(error);
     } finally {

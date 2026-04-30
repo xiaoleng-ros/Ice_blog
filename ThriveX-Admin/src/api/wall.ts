@@ -17,16 +17,13 @@ export const editWallDataAPI = (data: Wall) => Request('PATCH', '/wall', { data 
 export const getWallDataAPI = (id?: number) => Request<Paginate<Wall>>('GET', `/wall/${id}`)
 
 // 获取留言列表
-export const getWallListAPI = (data?: QueryData) => Request<Wall[]>('POST', `/wall/list`, {
-    data: { ...data?.query },
+export const getWallListAPI = (data?: QueryData) => Request<Wall[]>('GET', `/wall`, {
+    params: { ...data?.query },
 })
 
 // 分页获取留言列表
-export const getWallPagingAPI = (data?: QueryData) => Request<Paginate<Wall[]>>('POST', `/wall/paging`, {
-    data: { ...data?.query },
-    params: {
-        ...data?.pagination
-    }
+export const getWallPagingAPI = (data?: QueryData & { page?: number; size?: number }) => Request<Paginate<Wall[]>>('GET', `/wall`, {
+    params: { ...data?.query, page: data?.page, size: data?.size }
 })
 
 // 获取留言分类列表

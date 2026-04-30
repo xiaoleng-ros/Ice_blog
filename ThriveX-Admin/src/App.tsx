@@ -26,8 +26,14 @@ function App() {
   const setWeb = useWebStore((state) => state.setWeb);
   const getWebData = async () => {
     if (!token) return;
-    const { data } = await getWebConfigDataAPI<{ value: Web }>('web');
-    setWeb(data.value);
+    try {
+      const { data } = await getWebConfigDataAPI<{ value: Web }>('web');
+      if (data?.value) {
+        setWeb(data.value);
+      }
+    } catch (err) {
+      console.error('获取网站配置失败:', err);
+    }
   };
 
   useEffect(() => {

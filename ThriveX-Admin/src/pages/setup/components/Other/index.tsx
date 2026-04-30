@@ -12,8 +12,10 @@ export default () => {
   const getConfigData = async () => {
     try {
       setLoading(true);
-      const { data } = await getWebConfigDataAPI<{ value: Other }>('other');
-      form.setFieldsValue(data.value);
+      const res = await getWebConfigDataAPI<{ value: Other }>('other');
+      if (res?.data?.value) {
+        form.setFieldsValue(res.data.value);
+      }
       setLoading(false);
     } catch (error) {
       setLoading(false);

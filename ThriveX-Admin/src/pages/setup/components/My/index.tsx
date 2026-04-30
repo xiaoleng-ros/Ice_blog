@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
 
 import { useUserStore } from '@/stores';
@@ -17,14 +18,22 @@ export default () => {
 
   const [form] = Form.useForm<UserForm>();
   const store = useUserStore();
+  const navigate = useNavigate();
 
   const getUserData = async () => {
     try {
+      if (!store.user?.id) {
+        // 如果没有用户 ID，跳过数据预填，由 API 401 拦截器处理认证问题
+        return;
+      }
+
       setLoading(true);
 
-      const { data } = await getUserDataAPI(store.user?.id);
-      store.setUser(data);
-      form.setFieldsValue(data);
+      const res = await getUserDataAPI(store.user.id);
+      if (res?.data) {
+        store.setUser(res.data);
+        form.setFieldsValue(res.data);
+      }
 
       setLoading(false);
     } catch (error) {

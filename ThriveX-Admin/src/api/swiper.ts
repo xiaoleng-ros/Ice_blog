@@ -14,14 +14,11 @@ export const editSwiperDataAPI = (data: Swiper) => Request('PATCH', '/swiper', {
 export const getSwiperDataAPI = (id?: number) => Request<Swiper>('GET', `/swiper/${id}`)
 
 // 获取轮播图数据列表
-export const getSwiperListAPI = (data?: QueryData) => Request<Swiper[]>('POST', `/swiper/list`, {
-    data: { ...data?.query },
+export const getSwiperListAPI = (data?: QueryData) => Request<Swiper[]>('GET', `/swiper`, {
+    params: { ...data?.query },
 })
 
 // 分页获取轮播图列表
-export const getSwiperPagingAPI = (data?: QueryData) => Request<Paginate<Swiper[]>>('POST', `/swiper/paging`, {
-    data: { ...data?.query },
-    params: {
-        ...data?.pagination
-    }
+export const getSwiperPagingAPI = (data?: QueryData & { page?: number; size?: number }) => Request<Paginate<Swiper[]>>('GET', `/swiper`, {
+    params: { ...data?.query, page: data?.page, size: data?.size }
 })

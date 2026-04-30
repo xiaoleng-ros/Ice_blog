@@ -35,7 +35,7 @@ export default () => {
       }
 
       const { data } = await getWallListAPI();
-      setList(data);
+      setList(data || []);
       isFirstLoadRef.current = false;
     } catch (error) {
       console.error(error);
@@ -63,8 +63,12 @@ export default () => {
   // 获取留言的分类列表
   const [cateList, setCateList] = useState<Cate[]>([]);
   const getCateList = async () => {
-    const { data } = await getWallCateListAPI();
-    setCateList((data as Cate[]).filter((item) => item.id !== 1));
+    try {
+      const { data } = await getWallCateListAPI();
+      setCateList((data as Cate[])?.filter((item) => item.id !== 1) || []);
+    } catch (err) {
+      console.error('获取分类列表失败:', err);
+    }
   };
 
   useEffect(() => {

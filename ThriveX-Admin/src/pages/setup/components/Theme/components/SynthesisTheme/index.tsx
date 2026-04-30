@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Alert, Button, Checkbox, Divider, Form, Input, notification } from 'antd';
+import { Alert, App, Button, Checkbox, Divider, Form, Input, Space } from 'antd';
 import { CloudUploadOutlined, PictureOutlined } from '@ant-design/icons';
 
 import { Theme } from '@/types/app/config';
@@ -13,6 +13,7 @@ export default () => {
 
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>({} as Theme);
+  const { notification } = App.useApp();
 
   const [form] = Form.useForm();
 
@@ -22,18 +23,23 @@ export default () => {
     try {
       setLoading(true);
 
-      const { data } = await getWebConfigDataAPI<{ value: Theme }>('theme');
+      const res = await getWebConfigDataAPI<{ value: Theme }>('theme');
 
-      const theme = data.value;
+      if (!res?.data?.value) {
+        setLoading(false);
+        return;
+      }
+
+      const theme = res.data.value;
 
       setTheme(theme);
 
       form.setFieldsValue({
         ...theme,
-        social: theme.social.map((item) => JSON.stringify(item)).join('\n'),
-        swiper_text: theme.swiper_text.join('\n'),
-        covers: theme.covers.join('\n'),
-        reco_article: theme.reco_article.join('\n'),
+        social: theme.social?.map((item) => JSON.stringify(item)).join('\n') || '',
+        swiper_text: theme.swiper_text?.join('\n') || '',
+        covers: theme.covers?.join('\n') || '',
+        reco_article: theme.reco_article?.join('\n') || '',
       });
 
       setLoading(false);
@@ -63,7 +69,7 @@ export default () => {
       await editWebConfigDataAPI('theme', updatedLayout);
 
       notification.success({
-        message: '成功',
+        title: '成功',
         description: '🎉 修改主题成功',
       });
 
@@ -96,19 +102,28 @@ export default () => {
         <Form form={form} onFinish={editThemeData} layout="vertical">
           <Divider>亮色主题 Logo</Divider>
           <Form.Item name="light_logo" label="亮色主题 Logo">
-            <Input prefix={<PictureOutlined />} addonAfter={<UploadBtn type="light_logo" />} size="large" placeholder="请输入亮色Logo地址" />
+            <Space.Compact style={{ width: '100%' }}>
+              <Input prefix={<PictureOutlined />} size="large" placeholder="请输入亮色Logo地址" />
+              <UploadBtn type="light_logo" />
+            </Space.Compact>
           </Form.Item>
           <img src={form.getFieldValue('light_logo')} alt="" className="w-1/3 mt-4 rounded-sm" />
 
           <Divider>暗色主题 Logo</Divider>
           <Form.Item name="dark_logo" label="暗色主题 Logo">
-            <Input prefix={<PictureOutlined />} addonAfter={<UploadBtn type="dark_logo" />} size="large" placeholder="请输入暗色Logo地址" />
+            <Space.Compact style={{ width: '100%' }}>
+              <Input prefix={<PictureOutlined />} size="large" placeholder="请输入暗色Logo地址" />
+              <UploadBtn type="dark_logo" />
+            </Space.Compact>
           </Form.Item>
           <img src={form.getFieldValue('dark_logo')} alt="" className="w-1/3 mt-4 rounded-sm" />
 
           <Divider>首页背景图</Divider>
           <Form.Item name="swiper_image" label="首页背景图">
-            <Input prefix={<PictureOutlined />} addonAfter={<UploadBtn type="swiper_image" />} size="large" placeholder="请输入背景图地址" />
+            <Space.Compact style={{ width: '100%' }}>
+              <Input prefix={<PictureOutlined />} size="large" placeholder="请输入背景图地址" />
+              <UploadBtn type="swiper_image" />
+            </Space.Compact>
           </Form.Item>
           <img src={form.getFieldValue('swiper_image')} alt="" className="w-1/3 mt-4 rounded-sm" />
 
@@ -116,25 +131,25 @@ export default () => {
           <Form.Item name="swiper_text" label="打字机文本">
             <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} size="large" placeholder="请输入打字机文本" />
           </Form.Item>
-          <Alert message="以换行分隔，每行表示一段文本" type="info" className="mt-2" />
+          <Alert title="以换行分隔，每行表示一段文本" type="info" className="mt-2" />
 
           <Divider>社交网站</Divider>
           <Form.Item name="social" label="社交网站">
             <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} size="large" placeholder="请输入社交网站" />
           </Form.Item>
-          <Alert message="请务必确保每一项格式正确，否则会导致网站无法访问" type="info" className="mt-2" />
+          <Alert title="请务必确保每一项格式正确，否则会导致网站无法访问" type="info" className="mt-2" />
 
           <Divider>文章随机封面</Divider>
           <Form.Item name="covers" label="文章随机封面">
             <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} size="large" placeholder="请输入文章随机封面" />
           </Form.Item>
-          <Alert message="以换行分隔，每行表示一段文本" type="info" className="mt-2" />
+          <Alert title="以换行分隔，每行表示一段文本" type="info" className="mt-2" />
 
           <Divider>作者推荐文章</Divider>
           <Form.Item name="reco_article" label="作者推荐文章">
             <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} size="large" placeholder="请输入作者推荐文章ID" />
           </Form.Item>
-          <Alert message="以换行分隔，每行表示一段文本" type="info" className="mt-2" />
+          <Alert title="以换行分隔，每行表示一段文本" type="info" className="mt-2" />
 
           <Divider>侧边栏</Divider>
           <Checkbox.Group

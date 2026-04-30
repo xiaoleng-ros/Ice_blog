@@ -1,0 +1,44 @@
+import { Router } from 'express';
+import articleRoutes from './article.routes';
+import userRoutes from './user.routes';
+import cateRoutes from './cate.routes';
+import tagRoutes from './tag.routes';
+import commentRoutes from './comment.routes';
+import wallRoutes from './wall.routes';
+import recordRoutes from './record.routes';
+import swiperRoutes from './swiper.routes';
+import footprintRoutes from './footprint.routes';
+import linkRoutes from './link.routes';
+import fileRoutes from './file.routes';
+import ossRoutes from './oss.routes';
+import configRoutes from './config.routes';
+import assistantRoutes from './assistant.routes';
+import rssRoutes from './rss.routes';
+import statisRoutes from './statis.routes';
+import emailRoutes from './email.routes';
+import homeRoutes from './home.routes';
+import authRoutes from './auth.routes';
+
+const router = Router();
+
+router.use('/article', articleRoutes);
+router.use('/user', userRoutes);
+router.use('/cate', cateRoutes);
+router.use('/tag', tagRoutes);
+router.use('/comment', commentRoutes);
+router.use('/wall', wallRoutes);
+router.use('/record', recordRoutes);
+router.use('/swiper', swiperRoutes);
+router.use('/footprint', footprintRoutes);
+router.use('/link', linkRoutes);
+router.use('/file', fileRoutes);
+router.use('/oss', ossRoutes);
+router.use('/config', configRoutes);
+router.use('/assistant', assistantRoutes);
+router.use('/rss', rssRoutes);
+router.use('/statis', statisRoutes);
+router.use('/email', emailRoutes);
+router.use('/home', homeRoutes);
+router.use('/auth', authRoutes);
+
+export default router;

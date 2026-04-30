@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Form, notification, Input, Button } from 'antd';
+import { App, Form, Input, Button } from 'antd';
 
 import { Theme } from '@/types/app/config';
 import { editWebConfigDataAPI, getWebConfigDataAPI } from '@/api/config';
@@ -7,6 +7,7 @@ import { editWebConfigDataAPI, getWebConfigDataAPI } from '@/api/config';
 export default () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [theme, setTheme] = useState<Theme>({} as Theme);
+  const { notification } = App.useApp();
 
   const [form] = Form.useForm();
 
@@ -14,9 +15,14 @@ export default () => {
     try {
       setLoading(true);
 
-      const { data } = await getWebConfigDataAPI<{ value: Theme }>('theme');
+      const res = await getWebConfigDataAPI<{ value: Theme }>('theme');
 
-      const theme = data.value;
+      if (!res?.data?.value) {
+        setLoading(false);
+        return;
+      }
+
+      const theme = res.data.value;
 
       setTheme(theme);
 
@@ -47,7 +53,7 @@ export default () => {
       });
 
       notification.success({
-        message: '成功',
+        title: '成功',
         description: '🎉 修改主题成功',
       });
 

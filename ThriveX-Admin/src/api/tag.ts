@@ -22,9 +22,6 @@ export const getTagDataAPI = (id?: number) => Request<Tag>('GET', `/tag/${id}`)
 export const getTagListAPI = () => Request<Tag[]>('GET', '/tag/article/count')
 
 // 分页获取标签列表
-export const getTagPagingAPI = (data?: QueryData) => Request<Paginate<Tag[]>>('POST', `/tag/paging`, {
-    data: { ...data?.query },
-    params: {
-        ...data?.pagination
-    }
+export const getTagPagingAPI = (data?: QueryData & { page?: number; size?: number }) => Request<Paginate<Tag[]>>('GET', `/tag`, {
+    params: { ...data?.query, page: data?.page, size: data?.size }
 })

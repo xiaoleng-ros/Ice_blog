@@ -77,7 +77,7 @@ export default () => {
       setBtnLoading(id);
       await delArticleDataAPI(id, true);
       await getArticleList();
-      notification.success({ message: '删除成功' });
+      notification.success({ title: '删除成功' });
     } catch (error) {
       console.error(error);
     } finally {
@@ -378,7 +378,7 @@ export default () => {
 
   const getCateList = async () => {
     const { data } = await getCateListAPI();
-    setCateList(data.result.filter((item: ArticleCate) => item.type === 'cate'));
+    setCateList((data?.result || []).filter((item: ArticleCate) => item.type === 'cate'));
   };
 
   const getTagList = async () => {
@@ -402,7 +402,7 @@ export default () => {
     }
 
     if (articles.length === 0) {
-      notification.error({ message: '解析失败，未提取出有效文章数据' });
+      notification.error({ title: '解析失败，未提取出有效文章数据' });
       return;
     }
 
@@ -418,10 +418,10 @@ export default () => {
         }
       }
       await getArticleList();
-      notification.success({ message: `🎉 成功导入 ${articles.length} 篇文章` });
+      notification.success({ title: `🎉 成功导入 ${articles.length} 篇文章` });
     } catch (err) {
       console.error(err);
-      notification.error({ message: '导入失败，请检查文件格式或控制台报错' });
+      notification.error({ title: '导入失败，请检查文件格式或控制台报错' });
       throw err;
     } finally {
       setLoading(false);

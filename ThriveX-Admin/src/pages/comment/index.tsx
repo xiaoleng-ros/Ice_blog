@@ -35,7 +35,7 @@ export default () => {
       }
 
       const { data } = await getCommentListAPI();
-      setList(data);
+      setList(data || []);
       isFirstLoadRef.current = false;
     } catch (error) {
       console.error(error);
@@ -197,7 +197,7 @@ export default () => {
         endDate: values.createTime?.[1]?.valueOf()?.toString(),
       };
       const { data } = await getCommentListAPI({ query });
-      setList(data);
+      setList(data || []);
     } catch (error) {
       console.error(error);
     } finally {

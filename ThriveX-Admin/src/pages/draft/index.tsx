@@ -32,7 +32,7 @@ export default () => {
         setLoading(true);
       }
       const { data } = await getArticlePagingAPI({ isDraft: 1, page: 1, size: 8 });
-      setArticleList(data.result);
+      setArticleList((data as any)?.records || []);
       isFirstLoadRef.current = false;
     } catch (error) {
       console.error(error);
@@ -53,7 +53,7 @@ export default () => {
       await getArticlePagingAPI({ page: 1, size: 8 });
       form.resetFields();
       setCurrent(1);
-      notification.success({ message: '🎉 删除文章成功' });
+      notification.success({ title: '🎉 删除文章成功' });
     } catch (error) {
       console.error(error);
     } finally {

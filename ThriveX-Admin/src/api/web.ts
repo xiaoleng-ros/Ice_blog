@@ -14,16 +14,13 @@ export const editLinkDataAPI = (data: Web) => Request('PATCH', '/link', { data }
 export const getLinkDataAPI = (id?: number) => Request<Web>('GET', `/link/${id}`)
 
 // 获取网站列表
-export const getLinkListAPI = (data?: QueryData) => Request<Web[]>('POST', `/link/list`, {
-    data: { ...data?.query },
+export const getLinkListAPI = (data?: QueryData) => Request<Web[]>('GET', `/link`, {
+    params: { ...data?.query },
 })
 
-// 分页获取评论列表
-export const getLinkPagingAPI = (data?: QueryData) => Request<Paginate<Web[]>>('POST', `/link/paging`, {
-    data: { ...data?.query },
-    params: {
-        ...data?.pagination
-    }
+// 分页获取网站列表
+export const getLinkPagingAPI = (data?: QueryData & { page?: number; size?: number }) => Request<Paginate<Web[]>>('GET', `/link`, {
+    params: { ...data?.query, page: data?.page, size: data?.size }
 })
 
 // 获取网站类型列表

@@ -34,7 +34,7 @@ instance.interceptors.request.use(
     },
     (err: AxiosError) => {
         notification.error({
-            message: '请求异常',
+            title: '请求异常',
             description: err.message,
         })
 
@@ -50,7 +50,7 @@ instance.interceptors.response.use(
         // 只要code不等于200, 就相当于响应失败
         if (res.data?.code !== 200) {
             notification.error({
-                message: '响应异常',
+                title: '响应异常',
                 description: res.data?.message || '未知错误',
             })
 
@@ -84,7 +84,7 @@ instance.interceptors.response.use(
         }
 
         notification.error({
-            message: '程序异常',
+            title: '程序异常',
             description: err.message || '未知错误',
         })
 

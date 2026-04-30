@@ -18,8 +18,8 @@ interface CardProps {
 
 const Card = async ({ data }: CardProps) => {
   const themeResponse = await getWebConfigDataAPI<{ value: Theme }>('theme');
-  const theme = themeResponse?.data?.value as Theme;
-  const covers = theme.covers ?? [];
+  const theme = themeResponse?.data?.value as Theme | undefined;
+  const covers = theme?.covers ?? [];
 
   // 生成文章摘要，取前100个字
   const genArticleInfo = (data: Article) => {

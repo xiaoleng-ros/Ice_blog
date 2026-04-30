@@ -14,7 +14,7 @@ export const editOssDataAPI = (data: Oss) => Request('PATCH', '/oss', { data })
 export const getOssDataAPI = (id?: number) => Request<Oss>('GET', `/oss/${id}`)
 
 // 获取OSS列表
-export const getOssListAPI = () => Request<Oss[]>('POST', `/oss/list`)
+export const getOssListAPI = () => Request<Oss[]>('GET', `/oss`)
 
 // 获取启用的OSS列表
 export const getOssEnableListAPI = () => Request<Oss[]>('GET', `/oss/getEnableOss`)
@@ -26,4 +26,4 @@ export const enableOssDataAPI = (id: number) => Request('PATCH', `/oss/enable/${
 export const disableOssDataAPI = (id: number) => Request('PATCH', `/oss/disable/${id}`)
 
 // 获取支持的OSS平台列表
-export const getOssPlatformListAPI = () => Request<{ name: string, value: string }[]>('GET', `/oss/platform`)
+export const getOssPlatformListAPI = () => Request<{ name: string, value: string }[]>('GET', `/oss/platforms`)

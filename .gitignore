@@ -11,6 +11,11 @@ ThriveX-Admin/pnpm-lock.yaml
 ThriveX-Admin/package-lock.json
 ThriveX-Admin/.vite/
 
+ThriveX-Server-Node/node_modules/
+ThriveX-Server-Node/dist/
+ThriveX-Server-Node/pnpm-lock.yaml
+ThriveX-Server-Node/package-lock.json
+
 ThriveX-Server/target/
 ThriveX-Server/*.class
 ThriveX-Server/.mvn/wrapper/maven-wrapper.jar

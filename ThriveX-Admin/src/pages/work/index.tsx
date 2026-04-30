@@ -43,13 +43,13 @@ export default () => {
 
       if (type === 'comment') {
         const { data } = await getCommentListAPI({ query: { status: 0 }, pattern: 'list' });
-        setCommentList(data);
+        setCommentList(data || []);
       } else if (type === 'link') {
         const { data } = await getLinkListAPI({ query: { status: 0 } });
-        setLinkList(data);
+        setLinkList(data || []);
       } else if (type === 'wall') {
         const { data } = await getWallListAPI({ query: { status: 0 } });
-        setWallList(data);
+        setWallList(data || []);
       }
 
       isFirstLoadRef.current = false;
@@ -66,7 +66,7 @@ export default () => {
   }, [active]);
 
   const renderList = (list: CommentType[] | Web[] | Wall[], type: Menu) => {
-    if (list.length === 0) {
+    if (!Array.isArray(list) || list.length === 0) {
       return <Empty />;
     }
     return list.map((item) => <List key={item.id} item={item} type={type} fetchData={(type) => fetchData(type)} setLoading={setLoading} />);

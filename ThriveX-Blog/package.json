@@ -3,9 +3,9 @@
   "version": "3.0",
   "private": true,
   "scripts": {
-    "dev": "next lint && next dev --turbopack",
+    "dev": "next lint && next dev --turbopack -p 9000",
     "build": "next build",
-    "start": "next start -p 9001",
+    "start": "next start -p 9000",
     "lint": "next lint"
   },
   "author": {

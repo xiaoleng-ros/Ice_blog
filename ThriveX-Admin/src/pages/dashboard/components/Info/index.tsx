@@ -12,13 +12,17 @@ export default function InfoCard() {
   const [wallCount, setWallCount] = useState<number>(0);
 
   const getData = async () => {
-    const { data: commentList } = await getCommentListAPI({ query: { status: 0 }, pattern: 'list' });
-    const { data: linkList } = await getLinkListAPI({ query: { status: 0 } });
-    const { data: wallList } = await getWallListAPI({ query: { status: 0 } });
+    try {
+      const { data: commentList } = await getCommentListAPI({ query: { status: 0 }, pattern: 'list' });
+      const { data: linkList } = await getLinkListAPI({ query: { status: 0 } });
+      const { data: wallList } = await getWallListAPI({ query: { status: 0 } });
 
-    setCommentCount(commentList.length);
-    setLinkCount(linkList.length);
-    setWallCount(wallList.length);
+      setCommentCount(commentList?.length || 0);
+      setLinkCount(linkList?.length || 0);
+      setWallCount(wallList?.length || 0);
+    } catch (err) {
+      console.error('获取数据失败:', err);
+    }
   };
 
   useEffect(() => {

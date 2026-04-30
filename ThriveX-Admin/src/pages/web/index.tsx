@@ -242,7 +242,7 @@ export default () => {
                   <span className="text-base font-semibold text-gray-800 dark:text-gray-200">{key}</span>
                 </div>
 
-                {Object.values(list[key]).length ? (
+                {list[key] && Object.values(list[key]).length ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
                     {Object.values(list[key]).map((item, index2) => (
                       <div

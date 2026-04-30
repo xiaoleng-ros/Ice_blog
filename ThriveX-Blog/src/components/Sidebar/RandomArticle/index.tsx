@@ -19,7 +19,7 @@ const RANKING_COLORS = [
 
 const HotArticle = () => {
   const { theme } = useConfigStore();
-  const covers = theme.covers ?? [];
+  const covers = theme?.covers ?? [];
 
   const [list, setList] = useState<Article[]>([]);
 
