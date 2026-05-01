@@ -30,11 +30,11 @@ export default () => {
 
       // 将用户信息和token保存起来
       store.setToken(data.token);
-      if (data.user) {
-        store.setUser(data.user);
+      if (data.userInfo) {
+        store.setUser(data.userInfo);
       }
-      if (data.role) {
-        store.setRole(data.role);
+      if (data.userInfo?.role) {
+        store.setRole(data.userInfo.role);
       }
 
       // 设置显示登录通知的标记
@@ -42,7 +42,7 @@ export default () => {
 
       notification.success({
         title: '🎉 登录成功',
-        description: `Hello ${data.user?.name || '用户'} 欢迎回来`,
+        description: `Hello ${data.userInfo?.nickname || '用户'} 欢迎回来`,
       });
 
       setLoading(false);

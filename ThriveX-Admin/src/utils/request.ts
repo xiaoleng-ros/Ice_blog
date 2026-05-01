@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { Modal, notification } from 'antd';
+import { Modal } from 'antd';
 import { useUserStore } from '@/stores';
+import { getNotification } from '@/utils/notification';
 
 // 配置项目API域名
 // 最新调整：在本地 .env 文件配置你的后端API地址
@@ -33,7 +34,7 @@ instance.interceptors.request.use(
         return config;
     },
     (err: AxiosError) => {
-        notification.error({
+        getNotification().error({
             title: '请求异常',
             description: err.message,
         })
@@ -49,7 +50,7 @@ instance.interceptors.response.use(
 
         // 只要code不等于200, 就相当于响应失败
         if (res.data?.code !== 200) {
-            notification.error({
+            getNotification().error({
                 title: '响应异常',
                 description: res.data?.message || '未知错误',
             })
@@ -83,7 +84,7 @@ instance.interceptors.response.use(
             return Promise.reject(err.response?.data);
         }
 
-        notification.error({
+        getNotification().error({
             title: '程序异常',
             description: err.message || '未知错误',
         })

@@ -1,5 +1,5 @@
 import Request from '@/utils/request'
-import { LoginReturn, EditUser, Login, User, UserInfo } from '@/types/app/user'
+import { LoginReturn, EditUser, Login, User, EditUserInfo } from '@/types/app/user'
 
 // 新增用户
 export const addUserDataAPI = (data: User) => Request('POST', '/user', { data });
@@ -8,10 +8,13 @@ export const addUserDataAPI = (data: User) => Request('POST', '/user', { data })
 export const delUserDataAPI = (id: number) => Request('DELETE', `/user/${id}`);
 
 // 编辑用户
-export const editUserDataAPI = (data: UserInfo) => Request('PATCH', '/user', { data })
+export const editUserDataAPI = (data: EditUserInfo) => Request('PATCH', '/user', { data })
 
 // 获取用户
 export const getUserDataAPI = (id?: number) => Request<User>('GET', `/user/${id}`)
+
+// 获取当前登录用户信息（基于 token）
+export const getUserInfoAPI = () => Request<User>('GET', `/user/info`)
 
 // 获取用户列表
 export const getUserListAPI = (data?: QueryData) => Request<User[]>('GET', `/user`, {

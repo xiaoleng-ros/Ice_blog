@@ -68,7 +68,7 @@ class UserController {
       const { id, nickname, avatar, email, role, status } = req.body;
 
       await prisma.user.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: {
           nickname,
           avatar,

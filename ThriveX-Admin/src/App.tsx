@@ -1,13 +1,15 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import useAuthRedirect from '@/hooks/useAuthRedirect';
-import { App as AntdApp, ConfigProvider, theme } from 'antd';
+import { App as AntdApp, ConfigProvider, theme, notification } from 'antd';
 import RouteList from './components/RouteList';
 import '@/styles/antd.scss';
 
 import { getWebConfigDataAPI } from '@/api/config';
 import { useWebStore, useUserStore, useConfigStore } from './stores';
 import { Web } from './types/app/config';
+
+import { setNotificationInstance } from '@/utils/notification';
 
 import zhCN from 'antd/locale/zh_CN';
 import 'dayjs/locale/zh-cn';
@@ -18,6 +20,12 @@ function App() {
   const token = useUserStore((state) => state.token);
   const colorMode = useConfigStore((state) => state.colorMode);
   const { pathname } = useLocation();
+
+  const [notificationApi, notificationContextHolder] = notification.useNotification();
+
+  useEffect(() => {
+    setNotificationInstance(notificationApi);
+  }, [notificationApi]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -60,6 +68,7 @@ function App() {
       locale={zhCN}
     >
       <AntdApp>
+        {notificationContextHolder}
         <RouteList />
       </AntdApp>
     </ConfigProvider>

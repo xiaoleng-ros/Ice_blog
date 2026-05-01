@@ -3,9 +3,19 @@ export interface Login {
   password: string;
 }
 
+export interface EditUserInfo {
+  id?: number;
+  nickname?: string;
+  email?: string;
+  avatar?: string;
+  role?: string;
+  status?: number;
+}
+
 export interface UserInfo {
   id?: number;
   name: string;
+  nickname?: string;
   email: string;
   avatar: string;
   info: string;
@@ -17,7 +27,7 @@ export type User = Login & UserInfo & { createTime?: string };
 
 export interface LoginReturn {
   token: string;
-  user: User;
+  userInfo: User;
   role: Role;
 }
 

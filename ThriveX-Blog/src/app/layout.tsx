@@ -1,6 +1,8 @@
 import localFont from 'next/font/local';
 import { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 import HeroUIProvider from '@/components/HeroUIProvider';
 import NProgress from '@/components/NProgress';
 import Header from '@/components/Header';

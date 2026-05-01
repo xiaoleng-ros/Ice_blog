@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, message } from 'antd';
+import { App, Form, Input, Button } from 'antd';
 
 import { useUserStore } from '@/stores';
-import { editUserDataAPI, getUserDataAPI } from '@/api/user';
+import { editUserDataAPI } from '@/api/user';
 import { User } from '@/types/app/user';
 
 interface UserForm {
   name: string;
   email: string;
   avatar: string;
-  info: string;
 }
 
 export default () => {
@@ -18,47 +16,47 @@ export default () => {
 
   const [form] = Form.useForm<UserForm>();
   const store = useUserStore();
-  const navigate = useNavigate();
+  const { message } = App.useApp();
 
-  const getUserData = async () => {
+  // 从 store 中预填表单数据（登录时已存入）
+  useEffect(() => {
+    if (store.user?.id) {
+      form.setFieldsValue({
+        name: store.user.nickname || store.user.name,
+        email: store.user.email,
+        avatar: store.user.avatar,
+      });
+    }
+  }, [store.user]);
+
+  const onSubmit = async (values: UserForm) => {
     try {
-      if (!store.user?.id) {
-        // 如果没有用户 ID，跳过数据预填，由 API 401 拦截器处理认证问题
+      const userId = store.user?.id;
+      if (!userId) {
+        message.error('用户信息尚未加载，请刷新页面后重试');
         return;
       }
 
       setLoading(true);
 
-      const res = await getUserDataAPI(store.user.id);
-      if (res?.data) {
-        store.setUser(res.data);
-        form.setFieldsValue(res.data);
-      }
-
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getUserData();
-  }, []);
-
-  const onSubmit = async (values: UserForm) => {
-    try {
-      setLoading(true);
-
       await editUserDataAPI({
-        id: store.user.id,
-        ...values,
-        role: undefined,
+        id: userId,
+        nickname: values.name,
+        email: values.email,
+        avatar: values.avatar,
       });
 
-      getUserData();
+      // 直接更新 store，右上角立即响应
+      store.setUser({
+        ...store.user,
+        name: values.name,
+        nickname: values.name,
+        email: values.email,
+        avatar: values.avatar,
+      } as User);
+
+      setLoading(false);
       message.success('🎉 修改用户信息成功');
-      store.setUser(values as User);
     } catch (error) {
       console.error(error);
       setLoading(false);
@@ -71,19 +69,15 @@ export default () => {
 
       <Form form={form} size="large" layout="vertical" onFinish={onSubmit} className="w-full lg:w-[500px] md:ml-10">
         <Form.Item label="名称" name="name" rules={[{ required: true, message: '名称不能为空' }]}>
-          <Input placeholder="宇阳" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="邮箱" name="email" rules={[{ required: true, message: '邮箱不能为空' }]}>
-          <Input placeholder="liuyuyang1024@yeah.net" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="头像" name="avatar" rules={[{ required: true, message: '头像不能为空' }]}>
-          <Input placeholder="https://liuyuyang.net/logo.png" />
-        </Form.Item>
-
-        <Form.Item label="介绍" name="info" rules={[{ required: true, message: '介绍不能为空' }]}>
-          <Input placeholder="互联网从不缺乏天才, 而努力才是最终的入场劵" />
+          <Input />
         </Form.Item>
 
         <Form.Item>

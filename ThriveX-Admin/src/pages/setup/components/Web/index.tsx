@@ -53,35 +53,35 @@ export default () => {
 
       <Form form={form} size="large" layout="vertical" onFinish={onSubmit} initialValues={initialValues} className="w-full lg:w-[500px] md:ml-10">
         <Form.Item label="网站名称" name="title" rules={[{ required: true, message: '网站名称不能为空' }]}>
-          <Input placeholder="ThriveX" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="网站副标题" name="subhead" rules={[{ required: true, message: '网站副标题不能为空' }]}>
-          <Input placeholder="花有重开日, 人无再少年" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="网站链接" name="url" rules={[{ required: true, message: '网站链接不能为空' }]}>
-          <Input placeholder="https://liuyuyang.net/" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="网站图标" name="favicon">
-          <Input placeholder="https://liuyuyang.net/favicon.ico" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="网站描述" name="description" rules={[{ required: true, message: '网站描述不能为空' }]}>
-          <Input placeholder="记录前端、Python、Java点点滴滴" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="网站关键词" name="keyword" rules={[{ required: true, message: '网站关键词不能为空' }]}>
-          <Input placeholder="Java,前端,Python" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="底部信息" name="footer" rules={[{ required: true, message: '网站底部信息不能为空' }]}>
-          <Input placeholder="记录前端、Python、Java点点滴滴" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="ICP 备案号" name="icp">
-          <Input placeholder="豫ICP备2020031040号-1" />
+          <Input />
         </Form.Item>
 
         <Form.Item label="网站创建时间" name="create_time">

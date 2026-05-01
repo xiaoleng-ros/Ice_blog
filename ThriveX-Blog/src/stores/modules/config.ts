@@ -20,8 +20,8 @@ interface ConfigState {
   setOther: (data: Other) => void;
 }
 
-export default create(
-  persist<ConfigState>(
+export default create<ConfigState>()(
+  persist(
     (set) => ({
       isDark: false,
       setIsDark: (status: boolean) => set(() => ({ isDark: status })),
@@ -37,7 +37,16 @@ export default create(
     }),
     {
       name: 'config_storage',
-      storage: createJSONStorage(() => localStorage)
+      storage: createJSONStorage(() => localStorage),
+      version: 2,
+      migrate: (persistedState: unknown, version: number) => {
+        // 旧版本包含 web/theme/other 缓存，需要清除
+        if (version < 2) {
+          return { isDark: false };
+        }
+        return persistedState as ConfigState;
+      },
+      partialize: (state) => ({ isDark: state.isDark }),
     }
   )
 )
