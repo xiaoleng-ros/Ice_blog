@@ -36,7 +36,7 @@ export default () => {
       }
 
       const { data } = await getCommentListAPI();
-      setList(data || []);
+      setList(data?.result || []);
       isFirstLoadRef.current = false;
     } catch (error) {
       console.error(error);
@@ -198,7 +198,7 @@ export default () => {
         endDate: values.createTime?.[1]?.valueOf()?.toString(),
       };
       const { data } = await getCommentListAPI({ query });
-      setList(data || []);
+      setList(data?.result || []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -315,7 +315,7 @@ export default () => {
 
         <Table
           rowKey="id"
-          dataSource={list}
+          dataSource={Array.isArray(list) ? list : []}
           columns={columns}
           loading={loading}
           scroll={{ x: 1300 }}

@@ -77,11 +77,9 @@ export default () => {
 
   // 监听 list 变化，设置初始加载状态
   useEffect(() => {
-    if (list.length > 0 || isFirstLoadRef.current) {
-      if (isFirstLoadRef.current && list.length > 0) {
-        setInitialLoading(false);
-        isFirstLoadRef.current = false;
-      }
+    if (isFirstLoadRef.current) {
+      setInitialLoading(false);
+      isFirstLoadRef.current = false;
     }
   }, [list]);
 

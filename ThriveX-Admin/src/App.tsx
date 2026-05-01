@@ -36,8 +36,11 @@ function App() {
     if (!token) return;
     try {
       const { data } = await getWebConfigDataAPI<{ value: Web }>('web');
+      // 如果配置存在且有效，则设置到 store 中
       if (data?.value) {
         setWeb(data.value);
+      } else {
+        console.warn('网站配置不存在或为空，使用默认配置');
       }
     } catch (err) {
       console.error('获取网站配置失败:', err);

@@ -168,7 +168,10 @@ export default () => {
 
   const handleTabChange = (key: string) => {
     setTab(key);
-    form.resetFields();
+    // 延迟重置表单，等待 Form 组件渲染完成
+    setTimeout(() => {
+      form.resetFields();
+    }, 0);
     setSwiper({} as Swiper);
   };
 
@@ -205,34 +208,38 @@ export default () => {
       key: 'operate',
       children: (
         <Spin spinning={editLoading}>
-          <h2 className="text-xl pb-4 pt-8 text-center text-gray-800 dark:text-gray-100">{swiper.id ? '编辑轮播图' : '新增轮播图'}</h2>
+          <div className="flex justify-center px-6 pb-6">
+            <div className="w-full max-w-xl">
+              <h2 className="text-xl pb-4 pt-8 text-center text-gray-800 dark:text-gray-100">{swiper.id ? '编辑轮播图' : '新增轮播图'}</h2>
 
-          <Form form={form} layout="vertical" initialValues={swiper} onFinish={onSubmit} size="large" className="max-w-md mx-auto px-6 pb-6">
-            <Form.Item label="标题" name="title" rules={[{ required: true, message: '轮播图标题不能为空' }]}>
-              <Input placeholder="要么沉沦 要么巅峰!" />
-            </Form.Item>
+              <Form form={form} layout="vertical" initialValues={swiper} onFinish={onSubmit} size="large">
+                <Form.Item label="标题" name="title" rules={[{ required: true, message: '轮播图标题不能为空' }]}>
+                  <Input placeholder="要么沉沦 要么巅峰!" />
+                </Form.Item>
 
-            <Form.Item label="描述" name="description">
-              <Input placeholder="Either sink or peak!" />
-            </Form.Item>
+                <Form.Item label="描述" name="description">
+                  <Input placeholder="Either sink or peak!" />
+                </Form.Item>
 
-            <Form.Item label="链接" name="url">
-              <Input placeholder="https://liuyuyang.net/" />
-            </Form.Item>
+                <Form.Item label="链接" name="url">
+                  <Input placeholder="https://liuyuyang.net/" />
+                </Form.Item>
 
-            <Form.Item label="图片" name="image" rules={[{ required: true, message: '轮播图地址不能为空' }]}>
-              <Space.Compact style={{ width: '100%' }}>
-                <Input placeholder="https://liuyuyang.net/swiper.jpg" prefix={<PictureOutlined />} />
-                <UploadBtn />
-              </Space.Compact>
-            </Form.Item>
+                <Form.Item label="图片" name="image" rules={[{ required: true, message: '轮播图地址不能为空' }]}>
+                  <Space.Compact style={{ width: '100%' }}>
+                    <Input placeholder="https://liuyuyang.net/swiper.jpg" prefix={<PictureOutlined />} />
+                    <UploadBtn />
+                  </Space.Compact>
+                </Form.Item>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={btnLoading} className="w-full">
-                确定
-              </Button>
-            </Form.Item>
-          </Form>
+                <Form.Item>
+                  <Button type="primary" htmlType="submit" loading={btnLoading} className="w-full">
+                    确定
+                  </Button>
+                </Form.Item>
+              </Form>
+            </div>
+          </div>
         </Spin>
       ),
     },

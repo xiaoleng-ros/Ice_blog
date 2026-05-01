@@ -83,7 +83,10 @@ export default () => {
     setModalMode('create');
     setEditingId(null);
     setDetailLoading(false);
-    form.resetFields();
+    // 延迟重置表单，等待 Modal 关闭动画完成
+    setTimeout(() => {
+      form.resetFields();
+    }, 0);
   }, [form]);
 
   const openCreate = useCallback(() => {
@@ -92,7 +95,10 @@ export default () => {
     setEditingId(null);
     setIsModelOpen(true);
     setDetailLoading(false);
-    form.resetFields();
+    // 延迟重置表单，等待 Modal 渲染完成
+    setTimeout(() => {
+      form.resetFields();
+    }, 0);
   }, [form]);
 
   const openEdit = useCallback(
@@ -101,7 +107,10 @@ export default () => {
       setEditingId(id);
       setIsModelOpen(true);
       setDetailLoading(true);
-      form.resetFields(); // 先清空，避免看到旧值闪一下
+      // 延迟清空表单，等待 Modal 渲染完成
+      setTimeout(() => {
+        form.resetFields();
+      }, 0);
     },
     [form],
   );

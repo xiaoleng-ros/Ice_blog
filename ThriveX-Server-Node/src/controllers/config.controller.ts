@@ -26,6 +26,13 @@ class ConfigController {
       const config = await prisma.webConfig.findUnique({
         where: { name },
       });
+      
+      // 如果配置不存在，返回空数据而不是报错
+      if (!config) {
+        res.json(success({ name, value: null }));
+        return;
+      }
+      
       res.json(success(config));
     } catch (err) {
       console.error('getWebConfigByName error:', err);
@@ -55,8 +62,11 @@ class ConfigController {
   async getPageConfig(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { pageName } = req.query;
+      
+      // 如果没有提供 pageName，返回所有页面配置列表
       if (!pageName) {
-        res.json(error('请提供页面名称'));
+        const configs = await prisma.pageConfig.findMany();
+        res.json(success(configs));
         return;
       }
 
@@ -104,7 +114,7 @@ class ConfigController {
         where: { name },
       });
       if (!config) {
-        res.json(error('获取环境配置失败'));
+        res.json(success(null));
         return;
       }
       res.json(success(config));
