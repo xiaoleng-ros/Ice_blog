@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Form, Input, Button, message, DatePicker } from 'antd';
+import { App, Form, Input, Button, DatePicker } from 'antd';
 import { editWebConfigDataAPI } from '@/api/config';
 import { Web } from '@/types/app/config';
 import { useWebStore } from '@/stores';
@@ -9,6 +9,7 @@ export default () => {
   const [loading, setLoading] = useState(false);
 
   const [form] = Form.useForm();
+  const { message } = App.useApp();
 
   const web = useWebStore((state) => state.web);
   const setWeb = useWebStore((state) => state.setWeb);

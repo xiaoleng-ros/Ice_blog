@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, Card, Dropdown, MenuProps, message, Spin, Space } from 'antd';
+import { App, Button, Card, Dropdown, MenuProps, Spin, Space, Modal } from 'antd';
 import { BiSave } from 'react-icons/bi';
 import { AiOutlineEdit, AiOutlineSend } from 'react-icons/ai';
 
 import Title from '@/components/Title';
-import Drawer from '@/components/Drawer';
 import useAssistant from '@/hooks/useAssistant';
 import { Article } from '@/types/app/article';
 import { getArticleDataAPI } from '@/api/article';
@@ -16,6 +15,7 @@ import PublishForm from './components/PublishForm';
 
 export default () => {
   const [loading, setLoading] = useState(false);
+  const { message } = App.useApp();
 
   const [params] = useSearchParams();
   const id = +params.get('id')!;
@@ -248,11 +248,9 @@ export default () => {
         <Card className={`${titleSty} overflow-hidden rounded-2xl! min-h-[calc(100vh-160px)]`}>
           <Editor value={content} onChange={(value) => setContent(value)} />
 
-          <Drawer title={id && !isDraftParams ? '编辑文章' : '发布文章'} open={publishOpen} onClose={() => setPublishOpen(false)}>
-            <div className="max-w-5xl mx-auto">
-              <PublishForm data={data} closeModel={() => setPublishOpen(false)} />
-            </div>
-          </Drawer>
+          <Modal title={id && !isDraftParams ? '编辑文章' : '发布文章'} open={publishOpen} onCancel={() => setPublishOpen(false)} footer={null} width={600} styles={{ body: { padding: '12px 20px', maxHeight: '70vh', overflowY: 'auto' } }}>
+            <PublishForm data={data} closeModel={() => setPublishOpen(false)} />
+          </Modal>
         </Card>
       </Spin>
     </div>

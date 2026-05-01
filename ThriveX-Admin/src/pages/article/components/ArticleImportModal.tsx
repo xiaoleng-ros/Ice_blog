@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, ChangeEvent, DragEvent } from 'react';
-import { Modal, Button, message } from 'antd';
+import { App, Modal, Button } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import type { RcFile } from 'antd/es/upload/interface';
 import type { UploadFileStatus } from 'antd/es/upload/interface';
@@ -33,6 +33,7 @@ const ArticleImportModal: React.FC<ArticleImportModalProps> = ({
   onClose,
   onImport,
 }) => {
+  const { message } = App.useApp();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [importLoading, setImportLoading] = useState(false);

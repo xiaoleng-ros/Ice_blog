@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Alert, App, Button, Checkbox, Divider, Form, Input, Space } from 'antd';
+import { Alert, App, Button, Checkbox, Divider, Form, Input, Modal, Space } from 'antd';
 import { CloudUploadOutlined, PictureOutlined } from '@ant-design/icons';
 
 import { Theme } from '@/types/app/config';
@@ -12,6 +12,9 @@ export default () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string>('');
+  const [previewTitle, setPreviewTitle] = useState<string>('');
   const [theme, setTheme] = useState<Theme>({} as Theme);
   const { notification } = App.useApp();
 
@@ -100,6 +103,12 @@ export default () => {
     return new URL(`../../image/${name}.png`, import.meta.url).href;
   };
 
+  const handlePreviewLayout = (item: string) => {
+    setPreviewImage(getFile(item));
+    setPreviewTitle(item === 'classics' ? '经典布局' : item === 'card' ? '卡片布局' : '瀑布流布局');
+    setIsPreviewModalOpen(true);
+  };
+
   const UploadBtn = ({ type }: { type: string }) => (
     <CloudUploadOutlined
       className="text-xl cursor-pointer"
@@ -185,13 +194,26 @@ export default () => {
           </Checkbox.Group>
 
           <Divider>文章布局</Divider>
-          <div className="overflow-auto w-full">
-            <div className="article flex w-[650px]">
+          <div className="overflow-x-auto w-full pb-2">
+            <div className="article flex min-w-fit gap-6 justify-center">
               {['classics', 'card', 'waterfall'].map((item) => (
-                <div key={item} onClick={() => setTheme({ ...theme, is_article_layout: item })} className={`item flex flex-col items-center p-4 m-4 border-2 rounded-sm cursor-pointer ${theme.is_article_layout === item ? 'border-primary' : 'border-stroke'}`}>
-                  <p className={`text-center ${theme.is_article_layout === item ? 'text-primary' : ''}`}>{item === 'classics' ? '经典布局' : item === 'card' ? '卡片布局' : '瀑布流布局'}</p>
+                <div key={item} className="flex flex-col items-center">
+                  <div
+                    onClick={() => setTheme({ ...theme, is_article_layout: item })}
+                    className={`item flex flex-col items-center p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-lg ${theme.is_article_layout === item ? 'border-primary shadow-md' : 'border-stroke'}`}
+                  >
+                    <p className={`text-base mb-3 ${theme.is_article_layout === item ? 'text-primary' : 'text-gray-500'}`}>{item === 'classics' ? '经典布局' : item === 'card' ? '卡片布局' : '瀑布流布局'}</p>
 
-                  <img src={`${getFile(item)}`} alt="" className="w-[200px] mt-4 rounded-sm" />
+                    <img
+                      src={`${getFile(item)}`}
+                      alt=""
+                      className="w-[320px] rounded-md cursor-zoom-in"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePreviewLayout(item);
+                      }}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -202,6 +224,16 @@ export default () => {
           </Button>
         </Form>
       </div>
+
+      <Modal
+        open={isPreviewModalOpen}
+        title={previewTitle}
+        footer={null}
+        onCancel={() => setIsPreviewModalOpen(false)}
+        width={800}
+      >
+        <img src={previewImage} alt={previewTitle} className="w-full rounded-lg" />
+      </Modal>
 
       <Material
         open={isMaterialModalOpen}

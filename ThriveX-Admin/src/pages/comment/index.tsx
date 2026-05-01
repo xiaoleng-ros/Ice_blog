@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
 
-import { message, Table, Popconfirm, Button, Modal, Form, Input, DatePicker, Tooltip } from 'antd';
+import { App, Table, Popconfirm, Button, Modal, Form, Input, DatePicker, Tooltip } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, SendOutlined, SearchOutlined, ClearOutlined } from '@ant-design/icons';
@@ -15,6 +15,7 @@ export default () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const isFirstLoadRef = useRef<boolean>(true);
+  const { message } = App.useApp();
 
   const web = useWebStore((state) => state.web);
   const user = useUserStore((state) => state.user);

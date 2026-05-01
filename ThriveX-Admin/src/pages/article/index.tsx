@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Table, Button, Tag, notification, Popconfirm, Form, Input, Select, DatePicker, message, Tooltip, Space, Divider, Popover } from 'antd';
+import { App, Table, Button, Tag, notification, Popconfirm, Form, Input, Select, DatePicker, Tooltip, Space, Divider, Popover } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { TableRowSelection } from 'antd/es/table/interface';
 import { DeleteOutlined, FormOutlined, InboxOutlined, SearchOutlined, ClearOutlined, EyeOutlined, CommentOutlined } from '@ant-design/icons';
@@ -31,6 +31,7 @@ export default () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const isFirstLoadRef = useRef<boolean>(true);
   const filterDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { message } = App.useApp();
 
   const [form] = Form.useForm();
   const web = useWebStore((state) => state.web);

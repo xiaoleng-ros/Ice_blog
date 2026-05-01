@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Button, Dropdown, Popconfirm, Space, Tooltip, message } from 'antd';
+import { App, Button, Dropdown, Popconfirm, Space, Tooltip } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -92,6 +92,8 @@ export const ArticleExportDropdown = ({
   onLoadAll,
   setLoading,
 }: ArticleExportDropdownProps) => {
+  const { message } = App.useApp();
+
   const handleExportSelected = useCallback(() => {
     if (!selectedArticles.length) {
       message.warning('请选择要导出的文章');

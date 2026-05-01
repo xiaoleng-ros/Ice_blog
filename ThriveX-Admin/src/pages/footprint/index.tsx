@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, DatePicker, Divider, Form, Input, message, Modal, notification, Popconfirm, Space, Spin, Table, Tag, Tooltip } from 'antd';
+import { App, Button, DatePicker, Divider, Form, Input, Modal, notification, Popconfirm, Space, Spin, Table, Tag, Tooltip } from 'antd';
 import type { ColumnType } from 'antd/es/table';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -24,6 +24,7 @@ export default () => {
   const [detailLoading, setDetailLoading] = useState(false);
   const isFirstLoadRef = useRef(true);
   const detailRequestSeqRef = useRef(0);
+  const { message } = App.useApp();
 
   const [gaodeApKey, setGaodeApKey] = useState('');
   const [footprintList, setFootprintList] = useState<Footprint[]>([]);

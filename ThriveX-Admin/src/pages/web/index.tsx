@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 
-import { Button, Card, Empty, Form, Input, Popconfirm, Select, Spin, Modal, message, Skeleton } from 'antd';
+import { App, Button, Card, Empty, Form, Input, Popconfirm, Select, Spin, Modal, Skeleton } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 import { getLinkListAPI, addLinkDataAPI, editLinkDataAPI, delLinkDataAPI, getWebTypeListAPI } from '@/api/web';
@@ -16,6 +16,7 @@ export default () => {
   const [btnLoading, setBtnLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const isFirstLoadRef = useRef<boolean>(true);
+  const { message } = App.useApp();
 
   const [form] = Form.useForm();
 

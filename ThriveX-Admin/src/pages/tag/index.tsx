@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Table, Button, Form, Input, Popconfirm, message, Card, Spin, Skeleton, Tooltip } from 'antd';
+import { App, Table, Button, Form, Input, Popconfirm, Card, Spin, Skeleton, Tooltip } from 'antd';
 import { getTagListAPI, addTagDataAPI, editTagDataAPI, delTagDataAPI, getTagDataAPI } from '@/api/tag';
 import { Tag } from '@/types/app/tag';
 import Title from '@/components/Title';
@@ -12,6 +12,7 @@ export default () => {
   const [btnLoading, setBtnLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const isFirstLoadRef = useRef<boolean>(true);
+  const { message } = App.useApp();
 
   const [form] = Form.useForm();
 

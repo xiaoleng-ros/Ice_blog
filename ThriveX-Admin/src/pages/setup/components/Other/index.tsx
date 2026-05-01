@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Form, Input, Button, message } from 'antd';
+import { App, Form, Input, Button } from 'antd';
 import { editWebConfigDataAPI, getWebConfigDataAPI } from '@/api/config';
 import { Other, Web } from '@/types/app/config';
 import dayjs from 'dayjs';
@@ -8,6 +8,7 @@ export default () => {
   const [loading, setLoading] = useState(false);
 
   const [form] = Form.useForm();
+  const { message } = App.useApp();
 
   const getConfigData = async () => {
     try {

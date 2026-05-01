@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Form, Input, Button, Tree, Modal, Spin, Dropdown, Card, MenuProps, Popconfirm, message, Radio, Select, Skeleton } from 'antd';
+import { App, Form, Input, Button, Tree, Modal, Spin, Dropdown, Card, MenuProps, Popconfirm, Radio, Select, Skeleton } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 
 import { Cate } from '@/types/app/cate';
@@ -16,6 +16,7 @@ export default () => {
   const [btnLoading, setBtnLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const isFirstLoadRef = useRef<boolean>(true);
+  const { message } = App.useApp();
 
   const [isModelOpen, setIsModelOpen] = useState(false);
   const [cate, setCate] = useState<Cate>({} as Cate);

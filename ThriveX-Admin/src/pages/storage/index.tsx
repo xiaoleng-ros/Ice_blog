@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Button, Form, Input, Popconfirm, message, Card, Modal, Select, Skeleton, Switch, Tooltip } from 'antd';
+import { App, Button, Form, Input, Popconfirm, Card, Modal, Select, Skeleton, Switch, Tooltip } from 'antd';
 import {
   DeleteOutlined,
   EditOutlined,
@@ -23,6 +23,7 @@ export default () => {
   const [editLoading, setEditLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isFirstLoadRef = useRef<boolean>(true);
+  const { message } = App.useApp();
 
   const [oss, setOss] = useState<Oss>({} as Oss);
   const [ossList, setOssList] = useState<Oss[]>([]);

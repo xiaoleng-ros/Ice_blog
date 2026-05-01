@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Image, Spin, message, Button } from 'antd';
+import { App, Image, Spin, Button } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import Masonry from 'react-masonry-css';
@@ -28,6 +28,7 @@ const breakpointColumnsObj = {
 };
 
 export default ({ multiple, open, onClose, onSelect, maxCount }: Props) => {
+  const { message } = App.useApp();
   // 加载状态
   const [loading, setLoading] = useState(false);
   // 当前页码

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { Form, Input, Button, Select, DatePicker, Cascader, message, Switch, Radio, Space } from 'antd';
+import { App, Form, Input, Button, Select, DatePicker, Cascader, Switch, Radio, Space } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { RuleObject } from 'antd/es/form';
 import dayjs from 'dayjs';
@@ -57,6 +57,7 @@ const PublishForm = ({ data, closeModel }: Props) => {
 
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { message } = App.useApp();
 
   const [cateList, setCateList] = useState<Cate[]>([]);
   const [tagList, setTagList] = useState<Tag[]>([]);

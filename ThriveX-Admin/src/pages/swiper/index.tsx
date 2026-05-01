@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Table, Button, Image, Form, Input, Tabs, Popconfirm, message, Spin, Tooltip, Divider, Space } from 'antd';
+import { App, Table, Button, Image, Form, Input, Tabs, Popconfirm, Spin, Tooltip, Divider, Space } from 'antd';
 import { getSwiperListAPI, addSwiperDataAPI, editSwiperDataAPI, delSwiperDataAPI, getSwiperDataAPI } from '@/api/swiper';
 import { Swiper } from '@/types/app/swiper';
 import Title from '@/components/Title';
@@ -13,6 +13,7 @@ export default () => {
   const [btnLoading, setBtnLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const isFirstLoadRef = useRef<boolean>(true);
+  const { message } = App.useApp();
 
   const [form] = Form.useForm();
 

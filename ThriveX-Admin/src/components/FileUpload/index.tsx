@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
-import { message, Modal, Radio, Select, Spin } from 'antd';
+import { App, Modal, Radio, Select, Spin } from 'antd';
 import { useUserStore } from '@/stores';
 import { DirList } from '@/types/app/file';
 import { baseURL } from '@/utils/request';
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export default ({ multiple, dir, open, onCancel, onSuccess }: Props) => {
+  const { message } = App.useApp();
   const store = useUserStore();
   const dragCounterRef = useRef(0);
 

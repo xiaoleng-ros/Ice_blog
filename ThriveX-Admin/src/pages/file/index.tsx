@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Image, Card, Space, Spin, message, Popconfirm, Button, Drawer, Divider, Skeleton } from 'antd';
+import { App, Image, Card, Space, Spin, Popconfirm, Button, Drawer, Divider, Skeleton } from 'antd';
 import { PiKeyReturnFill } from 'react-icons/pi';
 import { DeleteOutlined, DownloadOutlined, RotateLeftOutlined, RotateRightOutlined, SwapOutlined, UndoOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import Masonry from 'react-masonry-css';
@@ -21,6 +21,7 @@ const breakpointColumnsObj = {
 };
 
 export default () => {
+  const { message } = App.useApp();
   // 加载状态
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);

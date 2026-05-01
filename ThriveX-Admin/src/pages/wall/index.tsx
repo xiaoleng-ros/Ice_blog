@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 
-import { Button, DatePicker, Form, Input, Modal, Popconfirm, Select, Table, Tag, message, Tooltip } from 'antd';
+import { App, Button, DatePicker, Form, Input, Modal, Popconfirm, Select, Table, Tag, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import TextArea from 'antd/es/input/TextArea';
 import { DeleteOutlined, SendOutlined, StarFilled, StarOutlined, SearchOutlined, ClearOutlined } from '@ant-design/icons';
@@ -18,6 +18,7 @@ export default () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const isFirstLoadRef = useRef<boolean>(true);
+  const { message } = App.useApp();
 
   const [wall, setWall] = useState<Wall>({} as Wall);
   const [list, setList] = useState<Wall[]>([]);

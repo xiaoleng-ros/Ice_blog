@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Table, Button, Modal, Form, message, Card, Tabs, Skeleton } from 'antd';
+import { App, Table, Button, Modal, Form, Card, Tabs, Skeleton } from 'antd';
 import { FormOutlined } from '@ant-design/icons';
 import type { FormInstance } from 'antd/es/form';
 
@@ -54,12 +54,13 @@ const tabConfig = {
   page: {
     label: '页面配置',
     getList: getPageConfigListAPI,
-    update: async (item: Config, value: object) => updatePageConfigDataAPI(Number(item.id), value),
+    update: async (item: Config, value: object) => updatePageConfigDataAPI(item.id, value),
     modalTitle: '编辑页面配置',
   },
 };
 
 export default () => {
+  const { message } = App.useApp();
   // 合并状态
   const [activeTab, setActiveTab] = useState<'env' | 'page'>('env');
   const [data, setData] = useState<{ [key: string]: Config[] }>({ env: [], page: [] });

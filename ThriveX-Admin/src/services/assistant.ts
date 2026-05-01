@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import { Assistant } from '@/types/app/assistant';
 
 /**
@@ -124,12 +123,11 @@ export const testAssistantConnection = async (assistant: Assistant): Promise<boo
     });
 
     if (response.ok) {
-      message.success('测试连接成功');
       return true;
     } else {
       const json = await response.json().catch(() => null);
       const errMsg = json?.error?.message || response.statusText;
-      message.error(`测试连接失败：${errMsg}`);
+      console.error(`测试连接失败：${errMsg}`);
       return false;
     }
   } catch (error) {

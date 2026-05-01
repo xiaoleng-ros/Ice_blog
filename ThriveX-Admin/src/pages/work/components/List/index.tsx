@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Button, Dropdown, message, Modal } from 'antd';
+import { App, Button, Dropdown, Modal } from 'antd';
 import dayjs from 'dayjs';
 
 import { auditCommentDataAPI, delCommentDataAPI, addCommentDataAPI } from '@/api/comment';
@@ -24,6 +24,7 @@ interface ListItemProps {
 
 export default ({ item, type, fetchData, setLoading }: ListItemProps) => {
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
+  const { message } = App.useApp();
 
   const web = useWebStore((state) => state.web);
   const user = useUserStore((state) => state.user);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Dropdown, Image, Input, message, Modal, Spin, Tooltip } from 'antd';
+import { App, Button, Dropdown, Image, Input, Modal, Spin, Tooltip } from 'antd';
 import type { MenuProps } from 'antd';
 import { BiLogoTelegram, BiLink } from 'react-icons/bi';
 import { LuImagePlus } from 'react-icons/lu';
@@ -12,6 +12,7 @@ import './index.scss';
 export default () => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState('');
+  const { message } = App.useApp();
 
   const [params] = useSearchParams();
   const id = +params.get('id')!;
@@ -143,7 +144,7 @@ export default () => {
                   // 微信朋友圈风格的三图布局：左大右小双排
                   <div className="grid grid-cols-3 gap-2">
                     <div key={0} className="group relative aspect-auto col-span-2 row-span-1 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 flex items-center justify-center image-container">
-                      <Image src={imageList[0]} className="object-cover w-full h-full min-w-full min-h-full transition-transform duration-500 group-hover:scale-110" wrapperClassName="w-full h-full" preview={true} />
+                      <Image src={imageList[0]} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" preview={true} />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
                         <Tooltip title="移除图片">
                           <button
@@ -160,7 +161,7 @@ export default () => {
                     </div>
                     <div className="space-y-4">
                       <div key={1} className="group relative aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 flex items-center justify-center image-container">
-                        <Image src={imageList[1]} className="object-cover w-full h-full min-w-full min-h-full transition-transform duration-500 group-hover:scale-110" wrapperClassName="w-full h-full" preview={true} />
+                        <Image src={imageList[1]} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" preview={true} />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
                           <Tooltip title="移除图片">
                             <button
@@ -176,7 +177,7 @@ export default () => {
                         </div>
                       </div>
                       <div key={2} className="group relative aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 flex items-center justify-center image-container">
-                        <Image src={imageList[2]} className="object-cover w-full h-full min-w-full min-h-full transition-transform duration-500 group-hover:scale-110" wrapperClassName="w-full h-full" preview={true} />
+                        <Image src={imageList[2]} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" preview={true} />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
                           <Tooltip title="移除图片">
                             <button
@@ -198,7 +199,7 @@ export default () => {
                     {imageList.map((item, index) => (
                       <div key={index} className="group relative aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 flex items-center justify-center image-container">
                         {/* 图片主体 */}
-                        <Image src={item} className="object-cover w-full h-full min-w-full min-h-full transition-transform duration-500 group-hover:scale-110" wrapperClassName="w-full h-full" preview={true} />
+                        <Image src={item} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" preview={true} />
 
                         {/* 删除遮罩层 */}
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
