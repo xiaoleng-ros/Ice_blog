@@ -60,10 +60,26 @@ export default () => {
       const updatedLayout = {
         ...theme,
         ...values,
-        social: values.social ? values.social.split('\n').map((item: string) => JSON.parse(item)) : [],
-        swiper_text: values.swiper_text ? values.swiper_text.split('\n') : [],
-        covers: values.covers ? values.covers.split('\n') : [],
-        reco_article: values.reco_article ? values.reco_article.split('\n').map((item: string) => Number(item)) : [],
+        social: values.social
+          ? values.social
+              .split('\n')
+              .filter((item: string) => item.trim())
+              .map((item: string) => {
+                try {
+                  return JSON.parse(item);
+                } catch {
+                  return { name: item.trim(), url: item.trim() };
+                }
+              })
+          : [],
+        swiper_text: values.swiper_text ? values.swiper_text.split('\n').filter((item: string) => item.trim()) : [],
+        covers: values.covers ? values.covers.split('\n').filter((item: string) => item.trim()) : [],
+        reco_article: values.reco_article
+          ? values.reco_article
+              .split('\n')
+              .filter((item: string) => item.trim())
+              .map((item: string) => Number(item))
+          : [],
       };
 
       await editWebConfigDataAPI('theme', updatedLayout);
