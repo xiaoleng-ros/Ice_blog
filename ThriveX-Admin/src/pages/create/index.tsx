@@ -116,6 +116,7 @@ export default () => {
           tagIds: data.tagIds || [],
           config: {
             ...data.config,
+            status: 'default',
             password: '',
             isEncrypt: 0,
             isDraft: 1,

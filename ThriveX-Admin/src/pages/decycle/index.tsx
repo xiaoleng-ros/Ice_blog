@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Table, Button, Tag, notification, Popconfirm, Form, Tooltip, Popover, Space, Divider } from 'antd';
 import { DeleteOutlined, UndoOutlined, EyeOutlined, CommentOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -17,7 +16,6 @@ export default () => {
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const isFirstLoadRef = useRef<boolean>(true);
 
-  const navigate = useNavigate();
   const web = useWebStore((state) => state.web);
 
   const [current, setCurrent] = useState<number>(1);
@@ -50,8 +48,8 @@ export default () => {
   const delArticleData = async (id: number) => {
     try {
       setLoading(true);
-      await delArticleDataAPI(id);
-      await getArticlePagingAPI({ page: 1, size: 8 });
+      await delArticleDataAPI(id, true);
+      await getArticleList();
       form.resetFields();
       setCurrent(1);
       notification.success({ title: '🎉 彻底删除文章成功' });
@@ -66,8 +64,10 @@ export default () => {
     try {
       setLoading(true);
       await reductionArticleDataAPI(id);
+      await getArticleList();
+      form.resetFields();
+      setCurrent(1);
       notification.success({ title: '🎉 恢复文章成功' });
-      navigate('/article');
     } catch (error) {
       console.error(error);
     } finally {

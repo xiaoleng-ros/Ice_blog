@@ -118,10 +118,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ArticleConfig config = article.getConfig();
         ArticleConfig articleConfig = new ArticleConfig();
         articleConfig.setArticleId(article.getId());
-        articleConfig.setStatus(config.getStatus());
-        articleConfig.setPassword(config.getPassword());
-        articleConfig.setIsDraft(article.getConfig().getIsDraft());
-        articleConfig.setIsEncrypt(article.getConfig().getIsEncrypt());
+        articleConfig.setStatus(config.getStatus() != null ? config.getStatus() : "default");
+        articleConfig.setPassword(config.getPassword() != null ? config.getPassword() : "");
+        articleConfig.setIsDraft(config.getIsDraft() != null ? config.getIsDraft() : 0);
+        articleConfig.setIsEncrypt(config.getIsEncrypt() != null ? config.getIsEncrypt() : 0);
         articleConfig.setIsDel(0);
 
         articleConfigMapper.insert(articleConfig);
@@ -208,10 +208,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ArticleConfig config = articleFormDTO.getConfig();
         ArticleConfig articleConfig = new ArticleConfig();
         articleConfig.setArticleId(articleFormDTO.getId());
-        articleConfig.setStatus(config.getStatus());
-        articleConfig.setPassword(config.getPassword());
-        articleConfig.setIsDraft(config.getIsDraft());
-        articleConfig.setIsEncrypt(config.getIsEncrypt());
+        articleConfig.setStatus(config.getStatus() != null ? config.getStatus() : "default");
+        articleConfig.setPassword(config.getPassword() != null ? config.getPassword() : "");
+        articleConfig.setIsDraft(config.getIsDraft() != null ? config.getIsDraft() : 0);
+        articleConfig.setIsEncrypt(config.getIsEncrypt() != null ? config.getIsEncrypt() : 0);
         articleConfig.setIsDel(0);
         articleConfigMapper.insert(articleConfig);
 

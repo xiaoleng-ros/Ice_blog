@@ -311,7 +311,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       <div className="flex justify-center items-center gap-2 px-6 py-5 pb-0 lg:pt-6">
         <NavLink to="/" className={`flex items-center ${isSideBarTheme === 'dark' ? 'font-bold text-white' : 'font-medium text-[#555]! dark:text-white!'}`}>
           <img src={logo} alt="logo" className="w-8 mr-2.5" />
-          <div>Thrive X</div>
+          <div className="text-lg font-bold">云岫小筑</div>
         </NavLink>
 
         {/* 移动端侧边栏触发器按钮 */}

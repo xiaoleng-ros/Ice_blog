@@ -253,6 +253,8 @@ export default () => {
       width: 130,
       align: 'center',
       render: (config: Config) => {
+        if (!config) return <Tag color="default" className="m-0! border-0!">未知</Tag>;
+        
         const statusMap: Record<string, string> = {
           default: '正常',
           no_home: '不在首页显示',

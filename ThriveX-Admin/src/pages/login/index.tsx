@@ -6,7 +6,6 @@ import { UserOutlined, LockOutlined, EyeOutlined, EyeInvisibleOutlined } from '@
 
 import { loginDataAPI } from '@/api/user';
 import { useUserStore } from '@/stores';
-import { setShowLoginNotification } from '@/components/SystemNotification';
 
 export default () => {
   const navigate = useNavigate();
@@ -36,9 +35,6 @@ export default () => {
       if (data.userInfo?.role) {
         store.setRole(data.userInfo.role);
       }
-
-      // 设置显示登录通知的标记
-      setShowLoginNotification();
 
       notification.success({
         title: '🎉 登录成功',
@@ -70,8 +66,8 @@ export default () => {
           <div className="flex justify-center space-x-4 mb-8">
             <img src="/logo.png" alt="" className="w-12 h-12" />
             <div className="flex flex-col">
-              <h1 className="font-bold text-lg text-slate-700">ThriveX</h1>
-              <p className="text-slate-400 text-sm">现代化博客管理系统</p>
+              <h1 className="font-bold text-lg text-slate-700">云岫小筑</h1>
+              <p className="text-slate-400 text-sm">云端栖息之所</p>
             </div>
           </div>
 
@@ -92,9 +88,6 @@ export default () => {
           </Form>
         </div>
 
-        <div className="text-center mt-4">
-          <p className="text-gray-500 text-sm">再小的个体，也有自己的品牌</p>
-        </div>
       </div>
     </div>
   );

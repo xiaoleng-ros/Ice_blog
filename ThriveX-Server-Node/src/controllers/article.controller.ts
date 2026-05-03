@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
 class ArticleController {
   async addArticle(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { title, description, content, cover, cateIds, tagIds } = req.body;
+      const { title, description, content, cover, cateIds, tagIds, config, createTime } = req.body;
 
       const article = await prisma.article.create({
         data: {
@@ -21,7 +21,7 @@ class ArticleController {
           description,
           content,
           cover,
-          createTime: Date.now().toString(),
+          createTime: createTime || Date.now().toString(),
         },
       });
 
@@ -46,10 +46,11 @@ class ArticleController {
       await prisma.articleConfig.create({
         data: {
           articleId: article.id,
-          status: 'default',
-          isEncrypt: false,
-          isDraft: false,
-          isDel: false,
+          status: config?.status || 'default',
+          password: config?.password || '',
+          isEncrypt: config?.isEncrypt === 1 || config?.isEncrypt === true,
+          isDraft: config?.isDraft === 1 || config?.isDraft === true,
+          isDel: config?.isDel === 1 || config?.isDel === true,
         },
       });
 
@@ -116,7 +117,7 @@ class ArticleController {
 
   async editArticle(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { id, title, description, content, cover, cateIds, tagIds } = req.body;
+      const { id, title, description, content, cover, cateIds, tagIds, config, createTime } = req.body;
 
       await prisma.article.update({
         where: { id },
@@ -125,6 +126,7 @@ class ArticleController {
           description,
           content,
           cover,
+          createTime: createTime || undefined,
         },
       });
 
@@ -154,6 +156,19 @@ class ArticleController {
             })),
           });
         }
+      }
+
+      if (config) {
+        await prisma.articleConfig.update({
+          where: { articleId: id },
+          data: {
+            status: config.status || 'default',
+            password: config.password || '',
+            isEncrypt: config.isEncrypt === 1 || config.isEncrypt === true,
+            isDraft: config.isDraft === 1 || config.isDraft === true,
+            isDel: config.isDel === 1 || config.isDel === true,
+          },
+        });
       }
 
       res.json(success());
@@ -250,6 +265,24 @@ class ArticleController {
         ];
       }
 
+      const articleConfigWhere: any = {};
+      
+      if (isDraft !== undefined) {
+        articleConfigWhere.isDraft = isDraft === '1' || isDraft === 'true';
+      }
+      
+      if (isDel !== undefined) {
+        articleConfigWhere.isDel = isDel === '1' || isDel === 'true';
+      }
+      
+      if (status) {
+        articleConfigWhere.status = status as string;
+      }
+      
+      if (Object.keys(articleConfigWhere).length > 0) {
+        where.articleConfig = articleConfigWhere;
+      }
+
       const pageNum = parseInt(page as string) || 1;
       const sizeNum = parseInt(size as string) || 10;
       const skip = (pageNum - 1) * sizeNum;
@@ -270,11 +303,11 @@ class ArticleController {
       ]);
 
       res.json(success({
-        records: articles,
+        result: articles,
         total,
         page: pageNum,
         size: sizeNum,
-        totalPages: Math.ceil(total / sizeNum),
+        pages: Math.ceil(total / sizeNum),
       }));
     } catch (err) {
       console.error('getArticleList error:', err);

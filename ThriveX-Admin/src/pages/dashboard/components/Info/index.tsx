@@ -13,13 +13,13 @@ export default function InfoCard() {
 
   const getData = async () => {
     try {
-      const { data: commentList } = await getCommentListAPI({ query: { status: 0 }, pattern: 'list' });
-      const { data: linkList } = await getLinkListAPI({ query: { status: 0 } });
-      const { data: wallList } = await getWallListAPI({ query: { status: 0 } });
+      const { data: commentData } = await getCommentListAPI({ query: { status: 0 }, pattern: 'list' });
+      const { data: linkData } = await getLinkListAPI({ query: { status: 0 } });
+      const { data: wallData } = await getWallListAPI({ query: { status: 0 } });
 
-      setCommentCount(commentList?.length || 0);
-      setLinkCount(linkList?.length || 0);
-      setWallCount(wallList?.length || 0);
+      setCommentCount(commentData?.result?.length || 0);
+      setLinkCount(linkData?.length || 0);
+      setWallCount(wallData?.length || 0);
     } catch (err) {
       console.error('获取数据失败:', err);
     }
@@ -41,7 +41,7 @@ export default function InfoCard() {
 
       <div className="relative z-10">
         <h1 className="text-white text-xl font-bold sm:text-2xl">
-          欢迎使用 ThriveX 现代化博客管理系统
+          欢迎回到云岫小筑
         </h1>
 
         <p className="text-white text-sm mt-2 mb-3">

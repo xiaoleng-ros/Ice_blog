@@ -31,7 +31,7 @@ export default () => {
       } else {
         setLoading(true);
       }
-      const { data } = await getArticlePagingAPI({ isDraft: 1, page: 1, size: 8 });
+      const { data } = await getArticlePagingAPI({ isDraft: 1, isDel: 0, page: 1, size: 8 });
       setArticleList(data?.result || []);
       isFirstLoadRef.current = false;
     } catch (error) {
@@ -50,7 +50,7 @@ export default () => {
     try {
       setLoading(true);
       await delArticleDataAPI(id);
-      await getArticlePagingAPI({ page: 1, size: 8 });
+      await getArticleList();
       form.resetFields();
       setCurrent(1);
       notification.success({ title: '🎉 删除文章成功' });
