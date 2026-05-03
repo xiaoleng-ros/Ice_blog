@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { App, Button, Card, Dropdown, MenuProps, Spin, Space, Modal } from 'antd';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useSearchParams, useLocation } from 'react-router-dom';
+import { App, Button, Card, Dropdown, MenuProps, Spin, Space, Modal, Tag } from 'antd';
 import { BiSave } from 'react-icons/bi';
 import { AiOutlineEdit, AiOutlineSend } from 'react-icons/ai';
+import { CheckCircleOutlined, SyncOutlined } from '@ant-design/icons';
 
 import Title from '@/components/Title';
 import useAssistant from '@/hooks/useAssistant';
@@ -16,6 +17,7 @@ import PublishForm from './components/PublishForm';
 export default () => {
   const [loading, setLoading] = useState(false);
   const { message } = App.useApp();
+  const location = useLocation();
 
   const [params] = useSearchParams();
   const id = +params.get('id')!;
@@ -24,6 +26,12 @@ export default () => {
   const [data, setData] = useState<Article>({} as Article);
   const [content, setContent] = useState('');
   const [publishOpen, setPublishOpen] = useState(false);
+
+  // 自动保存相关状态
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasUnsavedChanges = useRef(false);
+  const initialContentRef = useRef('');
 
   // 下一步
   const nextBtn = () => {
@@ -42,6 +50,7 @@ export default () => {
       const { data } = await getArticleDataAPI(id);
       setData(data);
       setContent(data.content);
+      initialContentRef.current = data.content;
 
       setLoading(false);
     } catch (error) {
@@ -61,24 +70,101 @@ export default () => {
     }
 
     // 没有就回显本地保存的数据
-    const content = localStorage.getItem('article_content');
+    const savedContent = localStorage.getItem('article_content');
 
-    if (content) {
-      setData({ ...data, content });
-      setContent(content);
+    if (savedContent) {
+      setData({ ...data, content: savedContent });
+      setContent(savedContent);
+      initialContentRef.current = savedContent;
     }
   }, [id]);
 
   // 保存文章
-  const saveBtn = () => {
+  const saveBtn = useCallback(() => {
     if (content.trim().length >= 1) {
       // 将文章内容持久化存储到本地
       localStorage.setItem('article_content', content);
+      hasUnsavedChanges.current = false;
+      setAutoSaveStatus('saved');
       message.success('内容已保存');
+
+      // 2秒后恢复空闲状态
+      setTimeout(() => {
+        setAutoSaveStatus('idle');
+      }, 2000);
     } else {
       message.error('请输入文章内容');
     }
-  };
+  }, [content, message]);
+
+  // 自动保存到 localStorage（防抖，1秒延迟）
+  useEffect(() => {
+    // 如果内容和初始内容一致，不触发自动保存
+    if (content === initialContentRef.current) return;
+
+    hasUnsavedChanges.current = true;
+
+    // 清除之前的定时器
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+
+    // 设置新的定时器，1秒后自动保存
+    saveTimerRef.current = setTimeout(() => {
+      if (content.trim().length >= 1) {
+        localStorage.setItem('article_content', content);
+        hasUnsavedChanges.current = false;
+        setAutoSaveStatus('saved');
+
+        // 2秒后恢复空闲状态
+        setTimeout(() => {
+          setAutoSaveStatus('idle');
+        }, 2000);
+      }
+    }, 1000);
+
+    // 清理函数
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, [content]);
+
+  // 离开页面时提示未保存的内容
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges.current) {
+        e.preventDefault();
+        e.returnValue = '您有未保存的内容，确定要离开吗？';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  // 路由切换时的拦截提示
+  useEffect(() => {
+    const handleRouteChange = () => {
+      if (hasUnsavedChanges.current) {
+        const confirmed = window.confirm('您有未保存的内容，确定要离开吗？');
+        if (!confirmed) {
+          // 阻止路由切换
+          window.history.pushState(null, '', location.pathname);
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handleRouteChange);
+
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     setData({ ...data, content });
@@ -217,7 +303,7 @@ export default () => {
   return (
     <div>
       <Title value="创作">
-        <div className="flex items-center space-x-4 w-[365px]">
+        <div className="flex items-center space-x-4 w-[450px]">
           <Space.Compact>
             <Dropdown
               menu={{ items }}
@@ -241,6 +327,20 @@ export default () => {
           <Button size="large" type="primary" className="w-full flex justify-between" onClick={nextBtn}>
             <AiOutlineSend className="text-2xl" /> 发布
           </Button>
+
+          {/* 自动保存状态指示器 */}
+          <div className="flex items-center ml-2">
+            {autoSaveStatus === 'saving' && (
+              <Tag color="processing" icon={<SyncOutlined spin />}>
+                自动保存中...
+              </Tag>
+            )}
+            {autoSaveStatus === 'saved' && (
+              <Tag color="success" icon={<CheckCircleOutlined />}>
+                已自动保存
+              </Tag>
+            )}
+          </div>
         </div>
       </Title>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Button, Card, Form, Input, Modal, Select, Tooltip, Space, Skeleton, Avatar, Tag, Dropdown, MenuProps } from 'antd';
+import { App, Button, Card, Form, Input, Modal, Select, Tooltip, Space, Skeleton, Avatar, Tag, Dropdown, MenuProps } from 'antd';
 import { DeleteOutlined, FormOutlined, PlusOutlined, InfoCircleOutlined, MoreOutlined, ApiOutlined, ThunderboltFilled } from '@ant-design/icons';
 import { ImSwitch } from 'react-icons/im';
 
@@ -72,6 +72,7 @@ export default () => {
   const [inputModelValue, setInputModelValue] = useState('');
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const isFirstLoadRef = useRef<boolean>(true);
+  const { message } = App.useApp();
 
   const { list, testingMap, saveAssistant, delAssistantData, setDefaultAssistant, testConnection } = useAssistant();
 
@@ -85,9 +86,6 @@ export default () => {
 
   const handleSubmit = () => {
     form.validateFields().then((values) => {
-      console.log(values);
-
-      // 如果输入的模型不在列表，则直接用输入的文本
       const model = values.model;
       saveAssistant({ ...assistant, ...values, model }).then((success) => {
         if (success) {
@@ -233,7 +231,7 @@ export default () => {
                     </div>
 
                     <Space size={4}>
-                      <Tag bordered={false} className="text-xs bg-gray-100 text-gray-500 dark:bg-boxdark-2 dark:text-gray-300 mr-0">
+                      <Tag variant="filled" className="text-xs bg-gray-100 text-gray-500 dark:bg-boxdark-2 dark:text-gray-300 mr-0">
                         {info ? info.label : item.model}
                       </Tag>
 
@@ -271,7 +269,14 @@ export default () => {
                   className={`${isTesting ? '' : 'text-primary border-primary bg-blue-50/50 dark:bg-blue-900/20 dark:border-primary dark:text-primary'} w-full`}
                   icon={isTesting ? <ThunderboltFilled spin /> : <ThunderboltFilled />}
                   loading={isTesting}
-                  onClick={() => testConnection(item)}
+                  onClick={async () => {
+                    const result = await testConnection(item);
+                    if (result) {
+                      message.success('连接测试成功');
+                    } else {
+                      message.error('连接测试失败，请检查配置');
+                    }
+                  }}
                 >
                   {isTesting ? '连接测试中...' : '测试连接'}
                 </Button>

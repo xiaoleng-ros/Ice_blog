@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { message } from 'antd';
+import { App } from 'antd';
 import { testAssistantConnection, callAssistantAPI } from '@/services/assistant';
 import { Assistant } from '@/types/app/assistant';
 import { delAssistantDataAPI, getAssistantListAPI, addAssistantDataAPI, editAssistantDataAPI, setDefaultAssistantAPI } from '@/api/assistant';
 
 export default function useAssistant() {
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const [testingMap, setTestingMap] = useState<Record<string, boolean>>({});
 

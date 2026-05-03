@@ -96,12 +96,12 @@ const PublishForm = ({ data, closeModel }: Props) => {
 
   const getCateList = async () => {
     const { data } = await getCateListAPI();
-    setCateList(data.result.filter((item: Cate) => item.type === 'cate'));
+    setCateList((data?.result ?? []).filter((item: Cate) => item.type === 'cate'));
   };
 
   const getTagList = async () => {
     const { data } = await getTagListAPI();
-    setTagList(data as Tag[]);
+    setTagList((data as Tag[]) ?? []);
   };
 
   useEffect(() => {
@@ -232,7 +232,10 @@ const PublishForm = ({ data, closeModel }: Props) => {
   const [generating, setGenerating] = useState(false);
 
   // 调用助手API生成标题和简介
-  const generateTitleAndDescription = async () => {
+  const generateTitleAndDescription = async (retryCount = 0) => {
+    const MAX_RETRIES = 2;
+    const RETRY_DELAY = 3000; // 3秒后重试
+
     try {
       setGenerating(true);
 
@@ -290,7 +293,23 @@ ${content}
       }
     } catch (error) {
       console.error(error);
-      message.error('调用助手失败');
+
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      // 如果是 429 频率限制错误，尝试重试
+      if (errorMessage.includes('429') || errorMessage.includes('访问量过大')) {
+        if (retryCount < MAX_RETRIES) {
+          message.warning(`AI 服务繁忙，${RETRY_DELAY / 1000}秒后自动重试（${retryCount + 1}/${MAX_RETRIES}）...`);
+          setTimeout(() => {
+            generateTitleAndDescription(retryCount + 1);
+          }, RETRY_DELAY);
+          return;
+        } else {
+          message.error('AI 服务当前访问量过大，请稍后再试或手动填写标题和简介');
+        }
+      } else {
+        message.error('调用助手失败');
+      }
     } finally {
       setGenerating(false);
     }
@@ -311,7 +330,7 @@ ${content}
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" onClick={generateTitleAndDescription} loading={generating}>
+          <Button type="primary" onClick={() => generateTitleAndDescription()} loading={generating}>
             一键生成标题和简介
           </Button>
         </Form.Item>

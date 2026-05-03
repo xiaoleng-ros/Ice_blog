@@ -93,12 +93,32 @@ export const getModelName = (rawModel: string): string => {
 
 /**
  * 测试助手连接是否正常
+ * 优先使用 models 接口验证（不消耗对话配额），失败后降级为轻量对话测试
  */
 export const testAssistantConnection = async (assistant: Assistant): Promise<boolean> => {
   try {
     const baseUrl = assistant.url || 'https://api.deepseek.com/v1';
     const apiKey = assistant.key.trim();
 
+    // 策略 1：先尝试调用 models 接口验证 API Key（不消耗对话配额）
+    try {
+      const modelsResponse = await fetch(`${baseUrl}/models`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Accept: 'application/json',
+        },
+      });
+
+      if (modelsResponse.ok) {
+        console.log('API Key 验证成功');
+        return true;
+      }
+    } catch {
+      // models 接口不可用，降级到策略 2
+    }
+
+    // 策略 2：使用极简对话测试（max_tokens=1 减少消耗）
     const response = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -110,15 +130,12 @@ export const testAssistantConnection = async (assistant: Assistant): Promise<boo
         model: getModelName(assistant.model),
         messages: [
           {
-            role: 'system',
-            content: '你是一个 AI 助手，致力于为用户提供安全、准确、有帮助的中文和英文服务。',
-          },
-          {
             role: 'user',
-            content: '测试连接',
+            content: 'hi',
           },
         ],
-        temperature: 0.3,
+        max_tokens: 1,
+        temperature: 0.1,
       }),
     });
 
@@ -127,7 +144,13 @@ export const testAssistantConnection = async (assistant: Assistant): Promise<boo
     } else {
       const json = await response.json().catch(() => null);
       const errMsg = json?.error?.message || response.statusText;
-      console.error(`测试连接失败：${errMsg}`);
+
+      // 针对 429 频率限制给出友好提示
+      if (response.status === 429) {
+        console.error('测试连接失败：该模型当前访问量过大，请您稍后再试');
+      } else {
+        console.error(`测试连接失败：${errMsg}`);
+      }
       return false;
     }
   } catch (error) {
