@@ -320,7 +320,7 @@ export default () => {
         align: 'center',
         width: 130,
         render: (_: string, record: Footprint) => (
-          <Space split={<Divider type="vertical" />}>
+          <Space separator={<Divider orientation="vertical" />}>
             <Tooltip title="编辑">
               <Button type="text" onClick={() => openEdit(record.id!)} icon={<FormOutlined className="text-primary" />} />
             </Tooltip>
@@ -416,7 +416,6 @@ export default () => {
           loading={loading}
           scroll={{ x: 1200 }}
           pagination={{
-            position: ['bottomRight'],
             pageSize: 8,
             showTotal: (totalCount) => (
               <div className="mt-[9px] text-xs text-gray-500 dark:text-gray-400">

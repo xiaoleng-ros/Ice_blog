@@ -32,7 +32,7 @@ export default () => {
         setLoading(true);
       }
       const { data } = await getArticlePagingAPI({ isDraft: 1, page: 1, size: 8 });
-      setArticleList((data as any)?.records || []);
+      setArticleList(data?.result || []);
       isFirstLoadRef.current = false;
     } catch (error) {
       console.error(error);
@@ -210,7 +210,7 @@ export default () => {
       align: 'center',
       width: 130,
       render: (_: string, record: Article) => (
-        <Space split={<Divider type="vertical" />}>
+        <Space separator={<Divider orientation="vertical" />}>
           <Tooltip title="编辑">
             <Link to={`/create?id=${record.id}&draft=true`}>
               <Button type="text" icon={<FormOutlined className="text-primary" />} />
@@ -259,7 +259,6 @@ export default () => {
           loading={loading}
           scroll={{ x: 1400 }}
           pagination={{
-            position: ['bottomRight'],
             current,
             pageSize: 8,
             total: articleList.length,

@@ -219,7 +219,6 @@ export default () => {
             columns={columns}
             scroll={{ x: 'max-content' }}
             pagination={{
-              position: ['bottomCenter'],
               pageSize: 8,
             }}
             loading={loading}

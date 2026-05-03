@@ -53,30 +53,6 @@ export const getModelName = (rawModel: string): string => {
     chatglm3: 'glm-3-turbo',
     chatglm4: 'glm-4',
 
-    // === 百川 Baichuan ===
-    baichuan: 'baichuan2-53b',
-    baichuan2: 'baichuan2-53b',
-    'baichuan-13b': 'baichuan2-13b-chat',
-    'baichuan-53b': 'baichuan2-53b',
-
-    // === 01.AI（Yi）===
-    yi: 'yi-34b-chat',
-    'yi-6b': 'yi-6b-chat',
-    'yi-34b': 'yi-34b-chat',
-
-    // === 上海 AI 实验室 InternLM ===
-    internlm: 'internlm2-chat-20b',
-    internlm2: 'internlm2-chat-20b',
-
-    // === Mistral / Mixtral ===
-    mistral: 'mistral-7b-instruct',
-    mixtral: 'mixtral-8x7b-instruct',
-
-    // === Command R (by Cohere) ===
-    'command-r': 'command-r',
-    'command-r+': 'command-r-plus',
-    'command-r-plus': 'command-r-plus',
-
     // === Google Gemini（如通过 proxy 接 OpenAI 格式）===
     gemini: 'gemini-pro',
     'gemini-pro': 'gemini-pro',

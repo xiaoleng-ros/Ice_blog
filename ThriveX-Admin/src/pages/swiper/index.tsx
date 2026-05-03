@@ -74,7 +74,7 @@ export default () => {
       fixed: 'right',
       width: 130,
       render: (_: string, record: Swiper) => (
-        <Space split={<Divider type="vertical" />}>
+        <Space separator={<Divider orientation="vertical" />}>
           <Tooltip title="编辑">
             <Button type="text" onClick={() => editSwiperData(record)} icon={<FormOutlined className="text-blue-500" />} />
           </Tooltip>
@@ -190,7 +190,6 @@ export default () => {
           loading={loading}
           scroll={{ x: 900 }}
           pagination={{
-            position: ['bottomRight'],
             pageSize: 8,
             showTotal: (totalCount) => (
               <div className="mt-[9px] text-xs text-gray-500 dark:text-gray-400">

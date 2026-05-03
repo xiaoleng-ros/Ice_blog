@@ -693,7 +693,6 @@ export default () => {
           columns={columns}
           loading={loading}
           pagination={{
-            position: ['bottomRight'],
             current: filter.page,
             pageSize: filter.size,
             total,
