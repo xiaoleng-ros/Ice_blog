@@ -126,15 +126,18 @@ const IterativePage = () => {
   const [adminData, setAdminData] = useState<TimelineItem[]>([]);
   const [serverData, setServerData] = useState<TimelineItem[]>([]);
 
-  const getCommitData = async (project: string) => {
+  const getCommitData = async (project: string, path?: string) => {
     try {
       if (isFirstLoadRef.current) setInitialLoading(true);
       else setLoading(true);
 
-      const res = await fetch(`https://api.github.com/repos/LiuYuYang01/${project}/commits?per_page=10`);
+      const url = path 
+        ? `https://api.github.com/repos/xiaoleng-ros/Ice_blog/commits?per_page=10&path=${path}`
+        : `https://api.github.com/repos/xiaoleng-ros/Ice_blog/commits?per_page=10`;
+      const res = await fetch(url);
       const data = await res.json();
       const result = data?.map((item: Commit) => ({
-        label: dayjs(item.commit.author.date).format('YYYY-MM-DD HH:mm'), // 优化了日期格式
+        label: dayjs(item.commit.author.date).format('YYYY-MM-DD HH:mm'),
         children: item.commit.message,
       }));
 
@@ -147,7 +150,7 @@ const IterativePage = () => {
           sessionStorage.setItem('admin_project_iterative', JSON.stringify(result));
           setAdminData(result);
           break;
-        case 'ThriveX-Server':
+        case 'ThriveX-Server-Node':
           sessionStorage.setItem('server_project_iterative', JSON.stringify(result));
           setServerData(result);
           break;
@@ -163,12 +166,12 @@ const IterativePage = () => {
 
   type SetTimelineData = React.Dispatch<React.SetStateAction<TimelineItem[]>>;
 
-  const loadData = (key: string, setter: SetTimelineData, project: string) => {
+  const loadData = (key: string, setter: SetTimelineData, project: string, path?: string) => {
     const cached: TimelineItem[] = JSON.parse(sessionStorage.getItem(key) ?? '[]');
     if (cached.length > 0) {
       setter(cached);
     } else {
-      getCommitData(project);
+      getCommitData(project, path);
     }
   };
 
@@ -177,9 +180,13 @@ const IterativePage = () => {
     const list = Array.from({ length: 5 }, (_, i) => currentYear - i);
     setYearList(list.map((value) => ({ value, label: String(value) })));
 
-    loadData('blog_project_iterative', setBlogData, 'ThriveX-Blog');
-    loadData('admin_project_iterative', setAdminData, 'ThriveX-Admin');
-    loadData('server_project_iterative', setServerData, 'ThriveX-Server');
+    sessionStorage.removeItem('blog_project_iterative');
+    sessionStorage.removeItem('admin_project_iterative');
+    sessionStorage.removeItem('server_project_iterative');
+
+    loadData('blog_project_iterative', setBlogData, 'ThriveX-Blog', 'ThriveX-Blog');
+    loadData('admin_project_iterative', setAdminData, 'ThriveX-Admin', 'ThriveX-Admin');
+    loadData('server_project_iterative', setServerData, 'ThriveX-Server-Node', 'ThriveX-Server-Node');
 
     const timer = setTimeout(() => setInitialLoading(false), 500);
     return () => clearTimeout(timer);
@@ -266,7 +273,7 @@ const IterativePage = () => {
             />
 
             <ProjectTimelineCard
-              title="ThriveX Server"
+              title="ThriveX Server-Node"
               icon={FiServer}
               colorIndex={2}
               data={serverData}
