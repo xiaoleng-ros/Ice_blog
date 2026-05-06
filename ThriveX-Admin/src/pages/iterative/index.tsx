@@ -134,9 +134,40 @@ const IterativePage = () => {
       const url = path 
         ? `https://api.github.com/repos/xiaoleng-ros/Ice_blog/commits?per_page=10&path=${path}`
         : `https://api.github.com/repos/xiaoleng-ros/Ice_blog/commits?per_page=10`;
-      const res = await fetch(url);
+      
+      const headers: HeadersInit = {
+        'Accept': 'application/vnd.github.v3+json',
+      };
+      
+      const token = import.meta.env.VITE_GITHUB_TOKEN;
+      if (token) {
+        headers['Authorization'] = `token ${token}`;
+      }
+      
+      const res = await fetch(url, { headers });
+      
+      // 处理速率限制
+      if (res.status === 403) {
+        const errorData = await res.json();
+        if (errorData.message?.includes('rate limit')) {
+          console.warn(`GitHub API 速率限制已超出，使用缓存数据: ${project}`);
+          return;
+        }
+      }
+      
+      if (!res.ok) {
+        console.error(`API Error for ${project}:`, await res.text());
+        return;
+      }
+      
       const data = await res.json();
-      const result = data?.map((item: Commit) => ({
+      
+      if (!Array.isArray(data)) {
+        console.error(`Invalid response for ${project}:`, data);
+        return;
+      }
+      
+      const result = data.map((item: Commit) => ({
         label: dayjs(item.commit.author.date).format('YYYY-MM-DD HH:mm'),
         children: item.commit.message,
       }));
@@ -157,7 +188,7 @@ const IterativePage = () => {
       }
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      console.error(`Error fetching commits for ${project}:`, error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -179,10 +210,6 @@ const IterativePage = () => {
     const currentYear = dayjs().year();
     const list = Array.from({ length: 5 }, (_, i) => currentYear - i);
     setYearList(list.map((value) => ({ value, label: String(value) })));
-
-    sessionStorage.removeItem('blog_project_iterative');
-    sessionStorage.removeItem('admin_project_iterative');
-    sessionStorage.removeItem('server_project_iterative');
 
     loadData('blog_project_iterative', setBlogData, 'ThriveX-Blog', 'ThriveX-Blog');
     loadData('admin_project_iterative', setAdminData, 'ThriveX-Admin', 'ThriveX-Admin');
@@ -226,7 +253,7 @@ const IterativePage = () => {
 
           <div className="relative z-10 w-full overflow-x-auto pb-2 flex justify-center">
             <GitHubCalendar
-              username="liuyuyang01"
+              username="xiaoleng-ros"
               year={year}
               fontSize={12}
               blockSize={13}

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Spin } from 'antd';
 import CardDataStats from '@/components/CardDataStats';
 
-import { AiOutlineEye, AiOutlineMeh, AiOutlineStock, AiOutlineFieldTime, AiOutlineFileText, AiOutlineMessage, AiOutlineTags, AiOutlineAppstore } from 'react-icons/ai';
+import { AiOutlineEye, AiOutlineFileText, AiOutlineMessage, AiOutlineTags, AiOutlineAppstore } from 'react-icons/ai';
 import { getVisitorStatisAPI, getArticleStatisAPI, getCommentStatisAPI, getCateStatisAPI, getTagStatisAPI } from '@/api/statis';
 
 export default () => {
@@ -30,11 +30,11 @@ export default () => {
       ]);
 
       setStats({
-        pv: (visitorRes.data as any)?.totalViews || 0,
-        articleCount: (articleRes.data as any)?.total || 0,
-        commentCount: (commentRes.data as any)?.total || 0,
-        cateCount: (cateRes.data as any)?.length || 0,
-        tagCount: (tagRes.data as any)?.length || 0,
+        pv: visitorRes.data?.totalViews ?? 0,
+        articleCount: articleRes.data?.total ?? 0,
+        commentCount: commentRes.data?.total ?? 0,
+        cateCount: cateRes.data?.length ?? 0,
+        tagCount: tagRes.data?.length ?? 0,
       });
 
       setLoading(false);
