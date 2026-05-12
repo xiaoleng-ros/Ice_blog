@@ -13,33 +13,39 @@ const prisma = new PrismaClient();
 class FileController {
   async uploadFile(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const file = req.file;
-      if (!file) {
+      const files = req.files;
+      if (!files || files.length === 0) {
         res.json(error('请选择文件'));
         return;
       }
 
-      const fileId = uuidv4();
-      const ext = path.extname(file.originalname);
-      const filename = `${fileId}${ext}`;
+      const uploadResults = [];
 
-      const uploadResult = await ossUploadFile(file.buffer, filename, file.mimetype);
+      for (const file of files as Express.Multer.File[]) {
+        const fileId = uuidv4();
+        const ext = path.extname(file.originalname);
+        const filename = `${fileId}${ext}`;
 
-      const fileDetail = await prisma.fileDetail.create({
-        data: {
-          id: fileId,
-          url: uploadResult.url,
-          size: uploadResult.size,
-          filename,
-          originalFilename: file.originalname,
-          ext,
-          contentType: file.mimetype,
-          platform: uploadResult.platform,
-          createTime: new Date(),
-        },
-      });
+        const uploadResult = await ossUploadFile(file.buffer, filename, file.mimetype);
 
-      res.json(success(fileDetail));
+        const fileDetail = await prisma.fileDetail.create({
+          data: {
+            id: fileId,
+            url: uploadResult.url,
+            size: uploadResult.size,
+            filename,
+            originalFilename: file.originalname,
+            ext,
+            contentType: file.mimetype,
+            platform: uploadResult.platform,
+            createTime: new Date(),
+          },
+        });
+
+        uploadResults.push(fileDetail);
+      }
+
+      res.json(success(uploadResults));
     } catch (err) {
       console.error('uploadFile error:', err);
       res.json(error('上传文件失败'));

@@ -57,7 +57,7 @@ export default ({ multiple, dir, open, onCancel, onSuccess }: Props) => {
       }
 
       // 发起网络请求
-      const res = await fetch(`${baseURL}/file`, {
+      const res = await fetch(`${baseURL}/file/upload`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -70,17 +70,20 @@ export default ({ multiple, dir, open, onCancel, onSuccess }: Props) => {
 
       try {
         // 把数据写入到剪贴板
-        await navigator.clipboard.writeText(data.join('\n'));
+        const urls = data.map((item: any) => item.url || item);
+        await navigator.clipboard.writeText(urls.join('\n'));
       } catch (error) {
         console.error(error);
         message.error('复制到剪贴板失败，请手动复制');
-        onSuccess(data);
+        const urls = data.map((item: any) => item.url || item);
+        onSuccess(urls);
         setIsLoading(false);
         return;
       }
 
       message.success(`🎉 文件上传成功，URL链接已复制到剪贴板`);
-      onSuccess(data);
+      const urls = data.map((item: any) => item.url || item);
+      onSuccess(urls);
       onCloseModel();
     } catch (error) {
       message.error('文件上传失败：' + (error as Error).message);

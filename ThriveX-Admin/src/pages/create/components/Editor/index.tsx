@@ -48,7 +48,7 @@ const EditorMD = ({ value, onChange }: Props) => {
 
       const {
         data: { data },
-      } = await axios.post(`${baseURL}/file`, formData, {
+      } = await axios.post(`${baseURL}/file/upload`, formData, {
         headers: {
           Authorization: `Bearer ${store.token}`,
           'Content-Type': 'multipart/form-data',
@@ -58,10 +58,11 @@ const EditorMD = ({ value, onChange }: Props) => {
       setLoading(false);
 
       // 返回图片信息数组
-      return data.map((url: string) => ({ url }));
+      return (data || []).map((item: any) => ({ url: item.url || item }));
     } catch (error) {
       console.error(error);
       setLoading(false);
+      return [];
     }
   };
 
