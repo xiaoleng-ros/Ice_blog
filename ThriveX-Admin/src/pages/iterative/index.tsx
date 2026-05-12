@@ -198,12 +198,13 @@ const IterativePage = () => {
   type SetTimelineData = React.Dispatch<React.SetStateAction<TimelineItem[]>>;
 
   const loadData = (key: string, setter: SetTimelineData, project: string, path?: string) => {
+    // 先显示缓存数据（如果有），然后请求最新数据
     const cached: TimelineItem[] = JSON.parse(sessionStorage.getItem(key) ?? '[]');
     if (cached.length > 0) {
       setter(cached);
-    } else {
-      getCommitData(project, path);
     }
+    // 每次都请求最新数据
+    getCommitData(project, path);
   };
 
   useEffect(() => {
