@@ -64,7 +64,7 @@ app.get('/', (req, res) => {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>云岫小筑</title>
-      <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;600&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
       <style>
         :root {
           --accent: #818cf8;
@@ -98,7 +98,7 @@ app.get('/', (req, res) => {
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-          font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
           background: var(--bg-base);
           min-height: 100vh;
           display: flex;
@@ -109,6 +109,7 @@ app.get('/', (req, res) => {
           position: relative;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
+          text-rendering: optimizeLegibility;
         }
 
         /* 深邃渐变背景 */
@@ -306,18 +307,32 @@ app.get('/', (req, res) => {
 
         /* 标题 */
         h1 {
-          font-family: 'Noto Serif SC', serif;
-          font-size: 3.8rem;
-          font-weight: 700;
-          letter-spacing: 0.2em;
+          font-family: 'Ma Shan Zheng', 'Noto Serif SC', serif;
+          font-size: 4.2rem;
+          font-weight: 400;
+          letter-spacing: 0.25em;
           margin-bottom: 14px;
-          background: linear-gradient(135deg, #ffffff 0%, var(--accent-light) 25%, var(--cyan) 50%, var(--accent) 75%, #ffffff 100%);
+          background: linear-gradient(135deg, #ffffff 0%, var(--accent-light) 20%, var(--cyan) 40%, var(--accent) 60%, var(--purple) 80%, #ffffff 100%);
           background-size: 400% 400%;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
-          animation: titleShimmer 8s ease-in-out infinite;
-          filter: drop-shadow(0 0 25px var(--accent-glow));
+          animation: titleShimmer 10s ease-in-out infinite;
+          filter: drop-shadow(0 0 30px var(--accent-glow)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+          text-shadow: none;
+          position: relative;
+        }
+
+        h1::after {
+          content: '';
+          position: absolute;
+          bottom: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 80%;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, var(--accent-glow), var(--cyan-glow), var(--accent-glow), transparent);
+          filter: blur(0.5px);
         }
 
         @keyframes titleShimmer {
@@ -327,12 +342,14 @@ app.get('/', (req, res) => {
         }
 
         .subtitle {
-          font-size: 0.9rem;
+          font-family: 'Noto Sans SC', sans-serif;
+          font-size: 0.85rem;
           color: var(--text-muted);
-          letter-spacing: 0.4em;
+          letter-spacing: 0.5em;
           margin-bottom: 55px;
           font-weight: 300;
           text-transform: uppercase;
+          text-shadow: 0 0 15px rgba(129, 140, 248, 0.15);
         }
 
         /* 链接网格 */
@@ -354,9 +371,10 @@ app.get('/', (req, res) => {
           border-radius: 12px;
           color: var(--text);
           text-decoration: none;
-          font-size: 0.9rem;
-          font-weight: 400;
-          letter-spacing: 0.08em;
+          font-family: 'Noto Sans SC', sans-serif;
+          font-size: 0.92rem;
+          font-weight: 500;
+          letter-spacing: 0.12em;
           transition: all 0.5s var(--ease-out-expo);
           position: relative;
           overflow: hidden;
@@ -391,6 +409,8 @@ app.get('/', (req, res) => {
           transform: translateY(-3px);
           box-shadow: var(--shadow-card-hover);
           background: var(--bg-card-hover);
+          color: var(--accent-light);
+          text-shadow: 0 0 12px var(--accent-glow);
         }
 
         .link:hover::before { opacity: 1; }
@@ -433,9 +453,10 @@ app.get('/', (req, res) => {
           background: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: 10px;
+          font-family: 'Noto Sans SC', monospace;
           font-size: 0.82rem;
           color: var(--text-muted);
-          letter-spacing: 0.06em;
+          letter-spacing: 0.08em;
           transition: all 0.5s var(--ease-out-expo);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
@@ -470,10 +491,13 @@ app.get('/', (req, res) => {
         /* 底部装饰 */
         .footer {
           margin-top: 55px;
+          font-family: 'Noto Sans SC', sans-serif;
           font-size: 0.65rem;
+          font-weight: 300;
           color: var(--text-dim);
-          letter-spacing: 0.3em;
+          letter-spacing: 0.35em;
           text-transform: uppercase;
+          text-shadow: 0 0 10px rgba(129, 140, 248, 0.08);
         }
 
         /* 响应式 */
