@@ -67,7 +67,9 @@ export default () => {
   }, [store, isLoginRoute]);
 
   useEffect(() => {
-    if (store.token) checkTokenAPI(store.token);
+    if (store.token) {
+      checkTokenAPI(store.token).catch(() => {});
+    }
   }, [store, pathname]);
 
   if (isLoginRoute) {

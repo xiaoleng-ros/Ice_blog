@@ -48,6 +48,27 @@ instance.interceptors.response.use(
     (res: AxiosResponse) => {
         if (res.data?.code === 600) return res.data
 
+        // 检测 Token 过期（服务器返回 code 400 + Token 过期消息）
+        if (res.data?.code === 400 && res.data?.message?.includes('Token')) {
+            if (isHandling401Error) return Promise.reject(res.data);
+
+            isHandling401Error = true;
+
+            Modal.error({
+                title: '登录已过期',
+                content: '🔒 登录状态已失效，请重新登录',
+                okText: '去登录',
+                onOk: () => {
+                    const store = useUserStore.getState()
+                    store.quitLogin()
+                    isHandling401Error = false;
+                }
+            });
+
+            source.cancel('Token 已过期，取消所有请求');
+            return Promise.reject(res.data);
+        }
+
         // 只要code不等于200, 就相当于响应失败
         if (res.data?.code !== 200) {
             getNotification().error({
