@@ -70,19 +70,19 @@ export default ({ multiple, dir, open, onCancel, onSuccess }: Props) => {
 
       try {
         // 把数据写入到剪贴板
-        const urls = data.map((item: any) => item.url || item);
+        const urls = data || [];
         await navigator.clipboard.writeText(urls.join('\n'));
       } catch (error) {
         console.error(error);
         message.error('复制到剪贴板失败，请手动复制');
-        const urls = data.map((item: any) => item.url || item);
+        const urls = data || [];
         onSuccess(urls);
         setIsLoading(false);
         return;
       }
 
       message.success(`🎉 文件上传成功，URL链接已复制到剪贴板`);
-      const urls = data.map((item: any) => item.url || item);
+      const urls = data || [];
       onSuccess(urls);
       onCloseModel();
     } catch (error) {

@@ -45,7 +45,9 @@ class FileController {
         uploadResults.push(fileDetail);
       }
 
-      res.json(success(uploadResults));
+      // 返回 URL 字符串数组（前端编辑器需要的格式）
+      const urls = uploadResults.map((item: { url: string }) => item.url);
+      res.json(success(urls));
     } catch (err) {
       console.error('uploadFile error:', err);
       res.json(error('上传文件失败'));

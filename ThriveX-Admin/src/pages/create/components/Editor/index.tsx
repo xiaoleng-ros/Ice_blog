@@ -46,9 +46,7 @@ const EditorMD = ({ value, onChange }: Props) => {
       formData.append('dir', 'article');
       for (let i = 0; i < files.length; i++) formData.append('files', files[i]);
 
-      const {
-        data: { data },
-      } = await axios.post(`${baseURL}/file/upload`, formData, {
+      const response = await axios.post(`${baseURL}/file/upload`, formData, {
         headers: {
           Authorization: `Bearer ${store.token}`,
           'Content-Type': 'multipart/form-data',
@@ -57,8 +55,15 @@ const EditorMD = ({ value, onChange }: Props) => {
 
       setLoading(false);
 
-      // 返回图片信息数组
-      return (data || []).map((item: any) => ({ url: item.url || item }));
+      // axios 直接请求返回的数据结构是 { code, message, data }
+      const result = response.data;
+      if (result.code !== 200 || !result.data) {
+        console.error('上传失败:', result.message);
+        return [];
+      }
+
+      // 返回图片 URL 字符串数组（bytemd 要求的格式）
+      return result.data || [];
     } catch (error) {
       console.error(error);
       setLoading(false);
