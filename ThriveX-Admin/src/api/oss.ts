@@ -27,3 +27,6 @@ export const disableOssDataAPI = (id: number) => Request('PATCH', `/oss/disable/
 
 // 获取支持的OSS平台列表
 export const getOssPlatformListAPI = () => Request<{ name: string, value: string }[]>('GET', `/oss/platforms`)
+
+// 测试OSS连接
+export const testOssConnectionAPI = (id: number) => Request<{ connected: boolean; message: string }>('POST', `/oss/test/${id}`)

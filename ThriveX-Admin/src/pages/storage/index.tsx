@@ -14,7 +14,7 @@ import { BsDatabase } from 'react-icons/bs';
 
 import Title from '@/components/Title';
 import type { Oss } from '@/types/app/oss';
-import { addOssDataAPI, delOssDataAPI, editOssDataAPI, getOssListAPI, enableOssDataAPI, disableOssDataAPI, getOssDataAPI, getOssPlatformListAPI } from '@/api/oss';
+import { addOssDataAPI, delOssDataAPI, editOssDataAPI, getOssListAPI, enableOssDataAPI, disableOssDataAPI, getOssDataAPI, getOssPlatformListAPI, testOssConnectionAPI } from '@/api/oss';
 import StatusTag from '@/components/StatusTag';
 
 export default () => {
@@ -56,12 +56,15 @@ export default () => {
   const testConnection = async (record: Oss) => {
     setTestingMap((prev) => ({ ...prev, [record.id!]: true }));
     try {
-      // TODO: 实现测试连接的 API 调用
-      // 这里暂时模拟测试
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      message.success('测试连接成功');
-    } catch {
-      message.error('测试连接失败');
+      const { data } = await testOssConnectionAPI(record.id!);
+      if (data.connected) {
+        message.success(`✅ ${data.message || '连接测试成功！配置正确'}`);
+      } else {
+        message.error(` ${data.message || '连接测试失败，请检查配置信息是否正确'}`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      message.error(`❌ 连接测试失败: ${errorMessage}`);
     } finally {
       setTestingMap((prev) => ({ ...prev, [record.id!]: false }));
     }
@@ -265,12 +268,16 @@ export default () => {
                     <div className="font-semibold text-lg dark:text-white">
                       {record.platform === 'local'
                         ? '本地存储'
+                        : record.platform === 'qiniu'
+                        ? '七牛云'
                         : (record.platformName || record.platform)}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {record.platform === 'local'
                         ? '本地存储'
-                        : (record.platform === 'webdav' ? 'WebDAV' : record.platformName || '云存储')}
+                        : record.platform === 'qiniu'
+                        ? '七牛云对象存储'
+                        : (record.platformName || '云存储')}
                     </div>
                   </div>
                 </div>
@@ -389,7 +396,17 @@ export default () => {
                   </Form.Item>
 
                   <Form.Item label="地域" name="endPoint" rules={[{ required: true, message: '地域不能为空' }]}>
-                    <Input placeholder="请输入地域" />
+                    {platform === 'qiniu' ? (
+                      <Select placeholder="请选择地域" options={[
+                        { label: '华东', value: 'z0' },
+                        { label: '华北', value: 'z1' },
+                        { label: '华南', value: 'z2' },
+                        { label: '北美', value: 'na0' },
+                        { label: '东南亚', value: 'as0' },
+                      ]} />
+                    ) : (
+                      <Input placeholder="请输入地域" />
+                    )}
                   </Form.Item>
 
                   <Form.Item label="存储桶" name="bucketName" rules={[{ required: true, message: '存储桶不能为空' }]}>
@@ -407,15 +424,15 @@ export default () => {
           <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.platform !== currentValues.platform || oss.platform !== currentValues.platform}>
             {({ getFieldValue }) => {
               const platform = getFieldValue('platform') || oss.platform;
-              return (
+              return platform === 'local' ? (
                 <Form.Item
-                  label={platform === 'local' ? '存储路径' : '文件目录'}
+                  label="存储路径"
                   name="basePath"
-                  rules={[{ required: true, message: platform === 'local' ? '存储路径不能为空' : '文件目录不能为空' }]}
+                  rules={[{ required: true, message: '存储路径不能为空' }]}
                 >
-                  <Input placeholder={platform === 'local' ? '请输入存储路径，如：/uploads' : '请输入文件目录'} />
+                  <Input placeholder="请输入存储路径，如：/uploads" />
                 </Form.Item>
-              );
+              ) : null;
             }}
           </Form.Item>
 
