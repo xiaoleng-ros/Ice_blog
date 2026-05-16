@@ -55,11 +55,16 @@ abstract class StorageAdapter {
 class LocalStorageAdapter extends StorageAdapter {
   private basePath: string;
   private domain: string;
+  private urlPrefix: string;
 
   constructor(config: StorageConfig) {
     super(config);
     this.basePath = config.basePath || './uploads';
+    if (!this.basePath.startsWith('./') && !this.basePath.includes(':')) {
+      this.basePath = './' + this.basePath;
+    }
     this.domain = config.domain || 'http://localhost:9002';
+    this.urlPrefix = '/uploads';
   }
 
   async upload(file: Buffer, filename: string, mimetype: string): Promise<UploadResult> {
@@ -71,7 +76,7 @@ class LocalStorageAdapter extends StorageAdapter {
     fs.writeFileSync(filePath, file);
 
     return {
-      url: `${this.domain}${this.config.basePath || ''}/${filename}`,
+      url: `${this.domain}${this.urlPrefix}/${filename}`,
       filename,
       originalFilename: filename,
       size: file.length,
@@ -92,7 +97,7 @@ class LocalStorageAdapter extends StorageAdapter {
   }
 
   getFileUrl(filename: string): string {
-    return `${this.domain}${this.config.basePath || ''}/${filename}`;
+    return `${this.domain}${this.urlPrefix}/${filename}`;
   }
 }
 
@@ -187,7 +192,7 @@ let currentAdapter: StorageAdapter | null = null;
 let currentPlatform: string = 'local';
 let defaultConfig: StorageConfig = {
   platform: 'local',
-  basePath: '/uploads',
+  basePath: './uploads',
   domain: 'http://localhost:9002',
 };
 

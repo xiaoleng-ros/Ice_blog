@@ -55,14 +55,30 @@ const EditorMD = ({ value, onChange }: Props) => {
 
       setLoading(false);
 
-      // axios 直接请求返回的数据结构是 { code, message, data }
+      // 调试：打印完整的响应数据结构
+      console.log('上传响应:', response);
+      console.log('response.data:', response.data);
+      console.log('response.data 类型:', typeof response.data);
+
+      // axios 直接请求返回的数据结构
+      // 注意：这里用的是 axios 直接请求，没有经过 request 拦截器处理
+      // 所以 response.data 是后端返回的完整对象 { code, message, data }
       const result = response.data;
+      
+      // 如果 result 是数组，说明直接返回了 URL 数组
+      if (Array.isArray(result)) {
+        console.log('返回数组:', result);
+        return result;
+      }
+      
+      // 否则按标准响应格式 { code, message, data } 处理
       if (result.code !== 200 || !result.data) {
         console.error('上传失败:', result.message);
         return [];
       }
 
       // 返回图片 URL 字符串数组（bytemd 要求的格式）
+      console.log('返回 data:', result.data);
       return result.data || [];
     } catch (error) {
       console.error(error);

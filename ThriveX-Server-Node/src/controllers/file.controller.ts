@@ -22,7 +22,7 @@ class FileController {
       const uploadResults = [];
 
       for (const file of files as Express.Multer.File[]) {
-        const fileId = uuidv4();
+        const fileId = uuidv4().replace(/-/g, '');
         const ext = path.extname(file.originalname);
         const filename = `${fileId}${ext}`;
 
@@ -48,9 +48,10 @@ class FileController {
       // 返回 URL 字符串数组（前端编辑器需要的格式）
       const urls = uploadResults.map((item: { url: string }) => item.url);
       res.json(success(urls));
-    } catch (err) {
+    } catch (err: any) {
       console.error('uploadFile error:', err);
-      res.json(error('上传文件失败'));
+      const errorMessage = err?.message || '未知错误';
+      res.json(error(`上传文件失败: ${errorMessage}`));
     }
   }
 

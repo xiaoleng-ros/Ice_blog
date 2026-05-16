@@ -4,6 +4,7 @@ import compression from 'compression';
 import multer from 'multer';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import path from 'path';
 import config from './config';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
@@ -48,6 +49,8 @@ const upload = multer({
   },
 });
 app.use(upload.any());
+
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
 app.use((req, res, next) => {
   logRequest(req);
