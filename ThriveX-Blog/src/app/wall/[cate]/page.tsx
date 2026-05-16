@@ -8,6 +8,7 @@ import WallMasonry from '../components/WallMasonry';
 import Loading from '@/components/Loading';
 import { getCateListAPI, getCateWallListAPI } from '@/api/wall';
 import { Cate, Wall } from '@/types/app/wall';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const params = useParams();
@@ -54,7 +55,7 @@ export default () => {
           setHasMore(false);
         }
       } catch (error) {
-        console.error('获取留言列表失败:', error);
+        logger.error('获取留言列表失败:', error);
         setHasMore(false);
       } finally {
         setLoading(false);

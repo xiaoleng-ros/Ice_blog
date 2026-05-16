@@ -51,7 +51,7 @@ export default () => {
 
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };

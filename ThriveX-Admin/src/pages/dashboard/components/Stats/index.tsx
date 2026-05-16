@@ -4,6 +4,7 @@ import CardDataStats from '@/components/CardDataStats';
 
 import { AiOutlineEye, AiOutlineFileText, AiOutlineMessage, AiOutlineTags, AiOutlineAppstore } from 'react-icons/ai';
 import { getVisitorStatisAPI, getArticleStatisAPI, getCommentStatisAPI, getCateStatisAPI, getTagStatisAPI } from '@/api/statis';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const [loading, setLoading] = useState(false);
@@ -39,7 +40,7 @@ export default () => {
 
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };

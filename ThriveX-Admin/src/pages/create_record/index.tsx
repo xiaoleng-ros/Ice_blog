@@ -7,6 +7,7 @@ import { LuImagePlus } from 'react-icons/lu';
 import { RiDeleteBinLine, RiLoader4Line } from 'react-icons/ri';
 import Material from '@/components/Material';
 import { addRecordDataAPI, editRecordDataAPI, getRecordDataAPI } from '@/api/record';
+import { logger } from '@/utils/logger';
 import './index.scss';
 
 export default () => {
@@ -51,7 +52,7 @@ export default () => {
       setLoading(false);
       navigate('/record');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -64,7 +65,7 @@ export default () => {
       setImageList(JSON.parse(data.images as string));
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };

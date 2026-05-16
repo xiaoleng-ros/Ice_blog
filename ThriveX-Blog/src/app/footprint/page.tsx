@@ -9,6 +9,7 @@ import 'react-photo-view/dist/react-photo-view.css';
 import dayjs from 'dayjs';
 import Masonry from 'react-masonry-css';
 import { getGaodeMapConfigDataAPI } from '@/api/config';
+import { logger } from '@/utils/logger';
 import './page.scss';
 
 const breakpointColumnsObj = {
@@ -171,7 +172,7 @@ export default function MapContainer() {
           });
         })
         .catch((e) => {
-          console.log('加载地图失败：', e);
+          logger.error('加载地图失败：', e);
         });
 
       return () => {

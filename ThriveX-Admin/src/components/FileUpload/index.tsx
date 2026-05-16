@@ -4,6 +4,7 @@ import { App, Modal, Radio, Select, Spin } from 'antd';
 import { useUserStore } from '@/stores';
 import { DirList } from '@/types/app/file';
 import { baseURL } from '@/utils/request';
+import { logger } from '@/utils/logger';
 import Compressor from 'compressorjs';
 
 interface Props {
@@ -73,7 +74,7 @@ export default ({ multiple, dir, open, onCancel, onSuccess }: Props) => {
         const urls = data || [];
         await navigator.clipboard.writeText(urls.join('\n'));
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         message.error('复制到剪贴板失败，请手动复制');
         const urls = data || [];
         onSuccess(urls);

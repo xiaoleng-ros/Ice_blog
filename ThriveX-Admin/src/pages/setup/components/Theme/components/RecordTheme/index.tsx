@@ -3,6 +3,7 @@ import { App, Form, Input, Button } from 'antd';
 
 import { Theme } from '@/types/app/config';
 import { editWebConfigDataAPI, getWebConfigDataAPI } from '@/api/config';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -33,7 +34,7 @@ export default () => {
 
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -59,7 +60,7 @@ export default () => {
 
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };

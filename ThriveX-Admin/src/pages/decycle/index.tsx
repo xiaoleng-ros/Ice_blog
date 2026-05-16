@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import Title from '@/components/Title';
 import { delArticleDataAPI, getArticlePagingAPI, reductionArticleDataAPI } from '@/api/article';
 import { useWebStore } from '@/stores';
+import { logger } from '@/utils/logger';
 import type { Tag as ArticleTag } from '@/types/app/tag';
 import type { Cate } from '@/types/app/cate';
 import type { Article } from '@/types/app/article';
@@ -34,7 +35,7 @@ export default () => {
       setArticleList(data?.result || []);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -54,7 +55,7 @@ export default () => {
       setCurrent(1);
       notification.success({ title: '🎉 彻底删除文章成功' });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setLoading(false);
     }
@@ -69,7 +70,7 @@ export default () => {
       setCurrent(1);
       notification.success({ title: '🎉 恢复文章成功' });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setLoading(false);
     }

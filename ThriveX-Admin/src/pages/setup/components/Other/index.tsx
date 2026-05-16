@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { App, Form, Input, Button } from 'antd';
 import { editWebConfigDataAPI, getWebConfigDataAPI } from '@/api/config';
 import { Other, Web } from '@/types/app/config';
+import { logger } from '@/utils/logger';
 import dayjs from 'dayjs';
 
 export default () => {
@@ -20,7 +21,7 @@ export default () => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.error(error);
+      logger.error(error);
     }
   };
 
@@ -48,7 +49,7 @@ export default () => {
       };
       form.setFieldsValue(newInitialValues);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
 

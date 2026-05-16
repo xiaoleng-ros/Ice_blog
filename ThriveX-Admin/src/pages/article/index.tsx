@@ -21,6 +21,7 @@ import type { Cate as ArticleCate } from '@/types/app/cate';
 import type { Article, Config, ArticleFilterQueryParams, ArticleFilterDataForm } from '@/types/app/article';
 
 import { useWebStore } from '@/stores';
+import { logger } from '@/utils/logger';
 
 const { RangePicker } = DatePicker;
 
@@ -66,7 +67,7 @@ export default () => {
       setArticleList(data.result);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -80,7 +81,7 @@ export default () => {
       await getArticleList();
       notification.success({ title: '删除成功' });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setBtnLoading(null);
     }
@@ -416,14 +417,14 @@ export default () => {
           const { code } = await addArticleDataAPI(article);
           if (code === 200) message.success(`${article.title}--导入成功~`);
         } catch (error) {
-          console.error(error);
+          logger.error(error);
           message.error(`${article.title}--导入失败~`);
         }
       }
       await getArticleList();
       notification.success({ title: `🎉 成功导入 ${articles.length} 篇文章` });
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       notification.error({ title: '导入失败，请检查文件格式或控制台报错' });
       throw err;
     } finally {
@@ -536,7 +537,7 @@ export default () => {
         message.error('删除失败');
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setLoading(false);
     }

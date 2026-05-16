@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { Spin } from 'antd';
 import { getStatisAPI } from '@/api/statis';
 import { StatisResponse } from '../VisitorsStatisChat/type';
+import { logger } from '@/utils/logger';
 
 interface ChartThreeState {
   series: number[];
@@ -76,7 +77,7 @@ export default () => {
       setState({ series: [newVisitors, oldVisitors] });
       setResult({ newVisitors, oldVisitors });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
 

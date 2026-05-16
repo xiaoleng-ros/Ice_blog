@@ -16,6 +16,7 @@ import Title from '@/components/Title';
 import { delRecordDataAPI, getRecordListAPI } from '@/api/record';
 import type { Record } from '@/types/app/record';
 import { FilterForm } from '@/types/app/comment';
+import { logger } from '@/utils/logger';
 
 const { RangePicker } = DatePicker;
 
@@ -39,7 +40,7 @@ export default () => {
       setRecordList(data as Record[]);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -58,7 +59,7 @@ export default () => {
       await fetchData(); // 重新获取数据
       notification.success({ title: '删除成功' });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setBtnLoading(null);
     }

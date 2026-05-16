@@ -7,6 +7,7 @@ import { FiChevronRight } from 'react-icons/fi';
 import { getRecordPagingAPI } from '@/api/record';
 import { Record } from '@/types/app/record';
 import { extractText } from '@/utils';
+import { logger } from '@/utils/logger';
 
 export default function Dynamic({ className = '' }: { className?: string }) {
   const [list, setList] = useState<Record[]>([]);
@@ -23,7 +24,7 @@ export default function Dynamic({ className = '' }: { className?: string }) {
       const { data } = await getRecordPagingAPI({ pagination: { page: 1, size: 8 } });
       setList(data?.result ?? []);
     } catch (error) {
-      console.error('Failed to fetch records:', error);
+      logger.error('Failed to fetch records:', error);
     } finally {
       setIsLoading(false);
     }

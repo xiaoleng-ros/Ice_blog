@@ -6,6 +6,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 import { getGaodeMapConfigDataAPI } from '@/api/config';
+import { logger } from '@/utils/logger';
 
 export default function MapContainer({ position }: { position: number[] }) {
   let map: any;
@@ -40,7 +41,7 @@ export default function MapContainer({ position }: { position: number[] }) {
           });
         })
         .catch((e) => {
-          console.log('加载地图失败：', e);
+          logger.error('加载地图失败：', e);
         });
 
       return () => map?.destroy();

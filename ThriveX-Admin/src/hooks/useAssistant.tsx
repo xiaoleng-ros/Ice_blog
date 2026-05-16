@@ -3,6 +3,7 @@ import { App } from 'antd';
 import { testAssistantConnection, callAssistantAPI } from '@/services/assistant';
 import { Assistant } from '@/types/app/assistant';
 import { delAssistantDataAPI, getAssistantListAPI, addAssistantDataAPI, editAssistantDataAPI, setDefaultAssistantAPI } from '@/api/assistant';
+import { logger } from '@/utils/logger';
 
 export default function useAssistant() {
   const { message } = App.useApp();
@@ -45,7 +46,7 @@ export default function useAssistant() {
       message.success(assistant.id ? '助手已更新' : '助手已添加');
       return true;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return false;
     } finally {
       setLoading(false);

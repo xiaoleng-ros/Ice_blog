@@ -5,6 +5,7 @@ import { Card, Spin, Skeleton } from 'antd';
 import { getCommentListAPI } from '@/api/comment';
 import { getLinkListAPI } from '@/api/web';
 import { getWallListAPI } from '@/api/wall';
+import { logger } from '@/utils/logger';
 
 import { Wall } from '@/types/app/wall';
 import { Web } from '@/types/app/web';
@@ -54,7 +55,7 @@ export default () => {
 
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);

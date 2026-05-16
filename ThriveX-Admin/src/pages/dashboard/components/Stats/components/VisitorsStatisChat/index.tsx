@@ -122,7 +122,7 @@ export default () => {
         setResult(result);
         setLoading(false);
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         setLoading(false);
       }
     };

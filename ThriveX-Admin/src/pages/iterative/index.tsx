@@ -10,6 +10,7 @@ import {
   FiLoader,
 } from 'react-icons/fi';
 import { useConfigStore } from '@/stores';
+import { logger } from '@/utils/logger';
 
 interface Commit {
   commit: {
@@ -150,20 +151,20 @@ const IterativePage = () => {
       if (res.status === 403) {
         const errorData = await res.json();
         if (errorData.message?.includes('rate limit')) {
-          console.warn(`GitHub API 速率限制已超出，使用缓存数据: ${project}`);
+          logger.warn(`GitHub API 速率限制已超出，使用缓存数据: ${project}`);
           return;
         }
       }
       
       if (!res.ok) {
-        console.error(`API Error for ${project}:`, await res.text());
+        logger.error(`API Error for ${project}:`, await res.text());
         return;
       }
       
       const data = await res.json();
       
       if (!Array.isArray(data)) {
-        console.error(`Invalid response for ${project}:`, data);
+        logger.error(`Invalid response for ${project}:`, data);
         return;
       }
       
@@ -188,7 +189,7 @@ const IterativePage = () => {
       }
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(`Error fetching commits for ${project}:`, error);
+      logger.error(`Error fetching commits for ${project}:`, error);
     } finally {
       setInitialLoading(false);
       setLoading(false);

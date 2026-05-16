@@ -5,6 +5,7 @@ import { Modal } from 'antd';
 import Masonry from 'react-masonry-css';
 import { getFileListAPI, getDirListAPI } from '@/api/file';
 import { File, FileDir } from '@/types/app/file';
+import { logger } from '@/utils/logger';
 import errorImg from '@/pages/file/image/error.png';
 import fileSvg from '@/pages/file/image/file.svg';
 import { PiKeyReturnFill } from 'react-icons/pi';
@@ -66,7 +67,7 @@ export default ({ multiple, open, onClose, onSelect, maxCount }: Props) => {
 
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -101,7 +102,7 @@ export default ({ multiple, open, onClose, onSelect, maxCount }: Props) => {
       setLoading(false);
       loadingRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
       loadingRef.current = false;
     }

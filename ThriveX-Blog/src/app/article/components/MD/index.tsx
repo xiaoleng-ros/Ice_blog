@@ -18,6 +18,7 @@ import rehypeCallouts from 'rehype-callouts';
 import 'rehype-callouts/theme/obsidian';
 import Skeleton from '@/components/Skeleton';
 import { BiCopy } from 'react-icons/bi';
+import { logger } from '@/utils/logger';
 
 import './index.scss';
 
@@ -92,7 +93,7 @@ const ContentMD = ({ data }: Props) => {
           return hljs.highlight(value, { language }).value.split('\n');
         }
       } catch (error) {
-        console.error(error);
+        logger.error(error);
       }
 
       return hljs.highlightAuto(value).value.split('\n');

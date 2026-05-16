@@ -4,6 +4,7 @@ import { App, Form, Input, Button } from 'antd';
 import { useUserStore } from '@/stores';
 import { editUserDataAPI } from '@/api/user';
 import { User } from '@/types/app/user';
+import { logger } from '@/utils/logger';
 
 interface UserForm {
   name: string;
@@ -58,7 +59,7 @@ export default () => {
       setLoading(false);
       message.success('🎉 修改用户信息成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };

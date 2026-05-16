@@ -10,6 +10,7 @@ import { addCommentDataAPI, getCommentListAPI, delCommentDataAPI } from '@/api/c
 import Title from '@/components/Title';
 import { Comment, FilterForm } from '@/types/app/comment';
 import { useWebStore, useUserStore } from '@/stores';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const [loading, setLoading] = useState(false);
@@ -39,7 +40,7 @@ export default () => {
       setList(data?.result || []);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -183,7 +184,7 @@ export default () => {
       await getCommentList();
       message.success('🎉 删除评论成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -200,7 +201,7 @@ export default () => {
       const { data } = await getCommentListAPI({ query });
       setList(data?.result || []);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setLoading(false);
     }
@@ -230,7 +231,7 @@ export default () => {
       setIsReplyModalOpen(false);
       setReplyInfo('');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setBtnLoading(false);
     }

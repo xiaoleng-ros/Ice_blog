@@ -5,6 +5,7 @@ import { CloudUploadOutlined, PictureOutlined } from '@ant-design/icons';
 
 import { Theme } from '@/types/app/config';
 import { editWebConfigDataAPI, getWebConfigDataAPI } from '@/api/config';
+import { logger } from '@/utils/logger';
 import Material from '@/components/Material';
 import { ThemeFormValues } from './type';
 
@@ -47,7 +48,7 @@ export default () => {
 
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -94,7 +95,7 @@ export default () => {
 
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };

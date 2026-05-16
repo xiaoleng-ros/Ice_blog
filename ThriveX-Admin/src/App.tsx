@@ -10,6 +10,7 @@ import { useWebStore, useUserStore, useConfigStore } from './stores';
 import { Web } from './types/app/config';
 
 import { setNotificationInstance } from '@/utils/notification';
+import { logger } from '@/utils/logger';
 
 import zhCN from 'antd/locale/zh_CN';
 import 'dayjs/locale/zh-cn';
@@ -40,10 +41,10 @@ function App() {
       if (data?.value) {
         setWeb(data.value);
       } else {
-        console.warn('网站配置不存在或为空，使用默认配置');
+        logger.warn('网站配置不存在或为空，使用默认配置');
       }
     } catch (err) {
-      console.error('获取网站配置失败:', err);
+      logger.error('获取网站配置失败:', err);
     }
   };
 

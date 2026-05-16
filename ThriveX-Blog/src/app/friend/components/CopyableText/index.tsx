@@ -1,6 +1,7 @@
 'use client';
 
 import { toast } from 'react-toastify';
+import { logger } from '@/utils/logger';
 
 interface CopyableTextProps {
   text: string;
@@ -38,7 +39,7 @@ export default function CopyableText({ text, children, className = '' }: Copyabl
         draggable: true,
       });
 
-      console.error(error);
+      logger.error(error);
     }
   };
 

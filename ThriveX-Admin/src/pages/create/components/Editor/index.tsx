@@ -10,6 +10,7 @@ import zh from 'bytemd/lib/locales/zh_Hans.json';
 
 import { baseURL } from '@/utils/request';
 import { useUserStore } from '@/stores';
+import { logger } from '@/utils/logger';
 import Material from '@/components/Material';
 
 import './index.scss';
@@ -56,9 +57,9 @@ const EditorMD = ({ value, onChange }: Props) => {
       setLoading(false);
 
       // 调试：打印完整的响应数据结构
-      console.log('上传响应:', response);
-      console.log('response.data:', response.data);
-      console.log('response.data 类型:', typeof response.data);
+      logger.log('上传响应:', response);
+      logger.log('response.data:', response.data);
+      logger.log('response.data 类型:', typeof response.data);
 
       // axios 直接请求返回的数据结构
       // 注意：这里用的是 axios 直接请求，没有经过 request 拦截器处理
@@ -67,21 +68,24 @@ const EditorMD = ({ value, onChange }: Props) => {
       
       // 如果 result 是数组，说明直接返回了 URL 数组
       if (Array.isArray(result)) {
-        console.log('返回数组:', result);
-        return result;
+        logger.log('返回数组:', result);
+        // bytemd 期望返回包含 url 属性的对象数组
+        return result.map(url => ({ url }));
       }
       
       // 否则按标准响应格式 { code, message, data } 处理
       if (result.code !== 200 || !result.data) {
-        console.error('上传失败:', result.message);
+        logger.error('上传失败:', result.message);
         return [];
       }
 
-      // 返回图片 URL 字符串数组（bytemd 要求的格式）
-      console.log('返回 data:', result.data);
-      return result.data || [];
+      // 返回图片 URL 对象数组（bytemd 要求的格式）
+      logger.log('返回 data:', result.data);
+      const urls = result.data || [];
+      // bytemd 期望返回包含 url 属性的对象数组
+      return Array.isArray(urls) ? urls.map(url => ({ url })) : [];
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
       return [];
     }

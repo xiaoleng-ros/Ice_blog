@@ -11,6 +11,7 @@ import type { Tag as ArticleTag } from '@/types/app/tag';
 import type { Cate } from '@/types/app/cate';
 import type { Article } from '@/types/app/article';
 import { ColumnsType } from 'antd/es/table';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,7 +36,7 @@ export default () => {
       setArticleList(data?.result || []);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -55,7 +56,7 @@ export default () => {
       setCurrent(1);
       notification.success({ title: '🎉 删除文章成功' });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setLoading(false);
     }

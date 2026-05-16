@@ -10,6 +10,7 @@ import useAssistant from '@/hooks/useAssistant';
 import { Article } from '@/types/app/article';
 import { getArticleDataAPI, addArticleDataAPI, editArticleDataAPI } from '@/api/article';
 import { titleSty } from '@/styles/sty';
+import { logger } from '@/utils/logger';
 
 import Editor from './components/Editor';
 import PublishForm from './components/PublishForm';
@@ -56,7 +57,7 @@ export default () => {
 
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -135,7 +136,7 @@ export default () => {
       // 跳转到草稿箱
       navigate('/draft');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       message.error('保存失败');
     } finally {
       setLoading(false);
@@ -290,7 +291,7 @@ export default () => {
             setContent(content + fullResponse);
           });
         } catch (error) {
-          console.error(error);
+          logger.error(error);
           message.error('调用助手失败');
         } finally {
           setLoading(false);
@@ -325,7 +326,7 @@ export default () => {
             setContent(fullResponse);
           });
         } catch (error) {
-          console.error(error);
+          logger.error(error);
           message.error('调用助手失败');
         } finally {
           setLoading(false);

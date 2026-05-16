@@ -5,6 +5,7 @@ import { Tag } from '@/types/app/tag';
 import Title from '@/components/Title';
 import { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, FormOutlined } from '@ant-design/icons';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -81,7 +82,7 @@ export default () => {
       setList(data as Tag[]);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -102,7 +103,7 @@ export default () => {
 
       setEditLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setEditLoading(false);
     }
   };
@@ -115,7 +116,7 @@ export default () => {
       getTagList();
       message.success('🎉 删除标签成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -144,7 +145,7 @@ export default () => {
       setLoading(false);
       setBtnLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
       setBtnLoading(false);
     }

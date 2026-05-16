@@ -4,6 +4,7 @@ import { App, Button, Card, Empty, Form, Input, Popconfirm, Select, Spin, Modal,
 import { SearchOutlined } from '@ant-design/icons';
 
 import { getLinkListAPI, addLinkDataAPI, editLinkDataAPI, delLinkDataAPI, getWebTypeListAPI } from '@/api/web';
+import { logger } from '@/utils/logger';
 import Title from '@/components/Title';
 import { WebType, Web } from '@/types/app/web';
 import { RuleObject } from 'antd/es/form';
@@ -60,7 +61,7 @@ export default () => {
       setListTemp(data);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -106,7 +107,7 @@ export default () => {
       getLinkList();
       message.success('🎉 删除网站成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -120,7 +121,7 @@ export default () => {
       setModalVisible(true);
       setEditLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setEditLoading(false);
     }
   };
@@ -164,7 +165,7 @@ export default () => {
 
       setBtnLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setBtnLoading(false);
     }
   };

@@ -10,6 +10,7 @@ import parse from 'html-react-parser';
 import { HTMLParser } from '@/utils/htmlParser';
 import Masonry from 'react-masonry-css';
 import { dayFormat } from '@/utils';
+import { logger } from '@/utils/logger';
 
 // 引入图标
 import { HiOutlineClock, HiOutlineHashtag } from 'react-icons/hi2';
@@ -37,7 +38,7 @@ export default function FishpondPage() {
         setRssData(response.data);
       }
     } catch (error) {
-      console.error('获取RSS数据失败:', error);
+      logger.error('获取RSS数据失败:', error);
     } finally {
       setLoading(false);
     }

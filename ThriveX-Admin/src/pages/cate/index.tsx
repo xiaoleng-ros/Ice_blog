@@ -6,6 +6,7 @@ import type { DataNode } from 'antd/es/tree';
 
 import { Cate } from '@/types/app/cate';
 import { addCateDataAPI, delCateDataAPI, editCateDataAPI, getCateDataAPI, getCateListAPI } from '@/api/cate';
+import { logger } from '@/utils/logger';
 import Title from '@/components/Title';
 
 import './index.scss';
@@ -40,7 +41,7 @@ export default () => {
       }
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -74,7 +75,7 @@ export default () => {
 
       setEditLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setEditLoading(false);
     }
   };
@@ -87,7 +88,7 @@ export default () => {
       await getCateList();
       message.success('🎉 删除分类成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -118,7 +119,7 @@ export default () => {
 
       setBtnLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setBtnLoading(false);
     }
   };

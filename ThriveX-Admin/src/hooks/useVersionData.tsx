@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { logger } from '@/utils/logger';
 
 interface Version {
   name: string;
@@ -32,7 +33,7 @@ const useVersionData = () => {
         // 将新数据存储到 sessionStorage
         sessionStorage.setItem('project_version', JSON.stringify(data));
       } catch (error) {
-        console.error('获取版本信息失败:', error);
+        logger.error('获取版本信息失败:', error);
       }
     };
 

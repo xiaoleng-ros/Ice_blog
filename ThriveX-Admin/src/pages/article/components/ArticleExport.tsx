@@ -5,6 +5,7 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
 import type { Article } from '@/types/app/article';
+import { logger } from '@/utils/logger';
 
 // 文章 → Markdown
 function articleToMarkdown(article: Article): string {
@@ -108,7 +109,7 @@ export const ArticleExportDropdown = ({
       const all = await onLoadAll();
       await downloadArticlesZip(all);
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       message.error('导出全部失败');
     } finally {
       setLoading?.(false);

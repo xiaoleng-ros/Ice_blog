@@ -6,6 +6,7 @@ import Title from '@/components/Title';
 import { ColumnsType } from 'antd/es/table';
 import { CloudUploadOutlined, DeleteOutlined, FormOutlined, PictureOutlined } from '@ant-design/icons';
 import Material from '@/components/Material';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -102,7 +103,7 @@ export default () => {
       setList(data as Swiper[]);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -124,7 +125,7 @@ export default () => {
 
       setEditLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setEditLoading(false);
     }
   };
@@ -136,7 +137,7 @@ export default () => {
       getSwiperList();
       message.success('🎉 删除轮播图成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setBtnLoading(false);
     }
@@ -160,7 +161,7 @@ export default () => {
         setSwiper({} as Swiper);
       });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setBtnLoading(false);
     }

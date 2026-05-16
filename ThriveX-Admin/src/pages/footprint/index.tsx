@@ -10,6 +10,7 @@ import { IoSearch } from 'react-icons/io5';
 
 import { addFootprintDataAPI, delFootprintDataAPI, editFootprintDataAPI, getFootprintDataAPI, getFootprintListAPI } from '@/api/footprint';
 import { getEnvConfigDataAPI } from '@/api/config';
+import { logger } from '@/utils/logger';
 import Material from '@/components/Material';
 import Title from '@/components/Title';
 import type { FilterForm, Footprint } from '@/types/app/footprint';
@@ -48,7 +49,7 @@ export default () => {
         setGaodeApKey((data.value as { key: string }).key);
       }
     } catch (err) {
-      console.error('获取高德配置失败:', err);
+      logger.error('获取高德配置失败:', err);
     }
   }, []);
 
@@ -63,7 +64,7 @@ export default () => {
         setFootprintList(data as Footprint[]);
         isFirstLoadRef.current = false;
       } catch (error) {
-        console.error(error);
+        logger.error(error);
       } finally {
         setInitialLoading(false);
         setLoading(false);
@@ -132,7 +133,7 @@ export default () => {
 
         form.setFieldsValue(normalized);
       } catch (error) {
-        console.error(error);
+        logger.error(error);
       } finally {
         if (reqSeq === detailRequestSeqRef.current) setDetailLoading(false);
       }
@@ -168,7 +169,7 @@ export default () => {
         notification.success({ title: '🎉 删除足迹成功' });
         await getFootprintList();
       } catch (error) {
-        console.error(error);
+        logger.error(error);
       } finally {
         setLoading(false);
       }
@@ -199,7 +200,7 @@ export default () => {
       await getFootprintList();
       closeModal();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setBtnLoading(false);
     }
@@ -235,7 +236,7 @@ export default () => {
 
       message.warning('未找到该地址的经纬度');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setSearchLoading(false);
     }

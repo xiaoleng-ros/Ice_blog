@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger';
 import { Assistant } from '@/types/app/assistant';
 
 /**
@@ -87,7 +88,7 @@ export const testAssistantConnection = async (assistant: Assistant): Promise<boo
       });
 
       if (modelsResponse.ok) {
-        console.log('API Key 验证成功');
+        logger.log('API Key 验证成功');
         return true;
       }
     } catch {
@@ -123,14 +124,14 @@ export const testAssistantConnection = async (assistant: Assistant): Promise<boo
 
       // 针对 429 频率限制给出友好提示
       if (response.status === 429) {
-        console.error('测试连接失败：该模型当前访问量过大，请您稍后再试');
+        logger.error('测试连接失败：该模型当前访问量过大，请您稍后再试');
       } else {
-        console.error(`测试连接失败：${errMsg}`);
+        logger.error(`测试连接失败：${errMsg}`);
       }
       return false;
     }
   } catch (error) {
-    console.error(`测试连接异常：${error}`);
+    logger.error(`测试连接异常：${error}`);
     return false;
   }
 };
@@ -179,7 +180,7 @@ export const callAssistantAPI = async (
 
     return await response.json();
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     throw error;
   }
 };

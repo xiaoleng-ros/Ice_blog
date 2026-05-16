@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { logger } from '@/utils/logger';
 
 type SetValue<T> = T | ((val: T) => T);
 
@@ -13,7 +14,7 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (value: SetValue<
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // 如果出错也返回initialValue
-      console.log(error);
+      logger.error(error);
       return initialValue;
     }
   });
@@ -27,7 +28,7 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (value: SetValue<
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
       // 更高级的实现会处理错误情况
-      console.log(error);
+      logger.error(error);
     }
   }, [key, storedValue]);
 

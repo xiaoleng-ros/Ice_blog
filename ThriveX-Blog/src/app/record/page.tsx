@@ -11,6 +11,7 @@ import Show from '@/components/Show';
 import Loading from '@/components/Loading';
 import { getWebConfigDataAPI } from '@/api/config';
 import { Theme } from '@/types/app/config';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const [records, setRecords] = useState<Record[]>([]);
@@ -41,7 +42,7 @@ export default () => {
         setHasMore(false);
       }
     } catch (error) {
-      console.error('获取记录列表失败:', error);
+      logger.error('获取记录列表失败:', error);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -70,7 +71,7 @@ export default () => {
         currentPageRef.current = 1;
         await fetchRecordList(1, false);
       } catch (error) {
-        console.error('获取初始数据失败:', error);
+        logger.error('获取初始数据失败:', error);
         setInitialLoading(false);
       }
     };

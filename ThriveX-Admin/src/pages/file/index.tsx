@@ -8,6 +8,7 @@ import Title from '@/components/Title';
 import FileUpload from '@/components/FileUpload';
 import { delFileDataAPI, getDirListAPI, getFileListAPI } from '@/api/file';
 import { File, FileDir } from '@/types/app/file';
+import { logger } from '@/utils/logger';
 import fileSvg from './image/file.svg';
 import errorImg from './image/error.png';
 import './index.scss';
@@ -74,7 +75,7 @@ export default () => {
       setDirList(data);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -109,7 +110,7 @@ export default () => {
       setLoading(false);
       loadingRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
       loadingRef.current = false;
     }
@@ -130,7 +131,7 @@ export default () => {
       setOpenFilePreviewDrawer(false);
       setBtnLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setBtnLoading(false);
     }
   };
@@ -156,7 +157,7 @@ export default () => {
         });
       setDownloadLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setDownloadLoading(false);
     }
   };

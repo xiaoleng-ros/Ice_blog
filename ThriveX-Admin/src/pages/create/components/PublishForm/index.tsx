@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { CloudUploadOutlined, PictureOutlined } from '@ant-design/icons';
 
 import { addArticleDataAPI, editArticleDataAPI } from '@/api/article';
+import { logger } from '@/utils/logger';
 import { getCateListAPI } from '@/api/cate';
 import useAssistant from '@/hooks/useAssistant';
 import { addTagDataAPI, getTagListAPI } from '@/api/tag';
@@ -75,7 +76,7 @@ const PublishForm = ({ data, closeModel }: Props) => {
       }
     });
 
-    console.log(data,data.tagList);
+    logger.log(data,data.tagList);
     
     const tagIds = data?.tagList!.map((item: Tag) => item.id);
 
@@ -210,7 +211,7 @@ const PublishForm = ({ data, closeModel }: Props) => {
       // 初始化表单
       form.resetFields();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setBtnLoading(false);
     }
 
@@ -284,7 +285,7 @@ ${content}
             });
             message.success('标题和简介生成成功');
           } catch (e) {
-            console.error('Failed to parse response:', e);
+            logger.error('Failed to parse response:', e);
             message.error('解析生成结果失败，请检查助手返回格式');
           }
         } else {
@@ -292,7 +293,7 @@ ${content}
         }
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
 
       const errorMessage = error instanceof Error ? error.message : String(error);
 

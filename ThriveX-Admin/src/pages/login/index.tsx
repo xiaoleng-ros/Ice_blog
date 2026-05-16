@@ -6,6 +6,7 @@ import { UserOutlined, LockOutlined, EyeOutlined, EyeInvisibleOutlined } from '@
 
 import { loginDataAPI } from '@/api/user';
 import { useUserStore } from '@/stores';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ export default () => {
       setLoading(false);
       navigate(returnUrl);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };

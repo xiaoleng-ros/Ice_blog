@@ -3,6 +3,7 @@ import { App, Form, Input, Button, DatePicker } from 'antd';
 import { editWebConfigDataAPI } from '@/api/config';
 import { Web } from '@/types/app/config';
 import { useWebStore } from '@/stores';
+import { logger } from '@/utils/logger';
 import dayjs from 'dayjs';
 
 export default () => {
@@ -41,7 +42,7 @@ export default () => {
       };
       form.setFieldsValue(newInitialValues);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
 

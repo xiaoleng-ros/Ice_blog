@@ -16,6 +16,7 @@ import Title from '@/components/Title';
 import type { Oss } from '@/types/app/oss';
 import { addOssDataAPI, delOssDataAPI, editOssDataAPI, getOssListAPI, enableOssDataAPI, disableOssDataAPI, getOssDataAPI, getOssPlatformListAPI, testOssConnectionAPI } from '@/api/oss';
 import StatusTag from '@/components/StatusTag';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
@@ -103,7 +104,7 @@ export default () => {
       setOssList(data);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
     }
@@ -125,7 +126,7 @@ export default () => {
       await getOssList();
       message.success('启用成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       message.error('启用失败');
     } finally {
       setSwitchLoadingMap((prev) => ({ ...prev, [id]: false }));
@@ -140,7 +141,7 @@ export default () => {
       await getOssList();
       message.success('禁用成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       message.error('禁用失败');
     } finally {
       setSwitchLoadingMap((prev) => ({ ...prev, [id]: false }));
@@ -159,7 +160,7 @@ export default () => {
 
       setEditLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setEditLoading(false);
     }
   };
@@ -171,7 +172,7 @@ export default () => {
       await getOssPlatformList();
       message.success('🎉 删除成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   };
 
@@ -209,7 +210,7 @@ export default () => {
 
       setBtnLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setBtnLoading(false);
     }
   };

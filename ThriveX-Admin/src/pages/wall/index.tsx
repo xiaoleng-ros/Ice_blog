@@ -11,6 +11,7 @@ import Title from '@/components/Title';
 import { useWebStore } from '@/stores';
 import type { Cate, Wall, FilterForm, FilterWall } from '@/types/app/wall';
 import { ColumnsType } from 'antd/es/table';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const web = useWebStore((state) => state.web);
@@ -39,7 +40,7 @@ export default () => {
       setList(data || []);
       isFirstLoadRef.current = false;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setInitialLoading(false);
       setLoading(false);
@@ -54,7 +55,7 @@ export default () => {
       getWallList();
       message.success('🎉 删除留言成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
 
@@ -68,7 +69,7 @@ export default () => {
       const { data } = await getWallCateListAPI();
       setCateList((data as Cate[])?.filter((item) => item.id !== 1) || []);
     } catch (err) {
-      console.error('获取分类列表失败:', err);
+      logger.error('获取分类列表失败:', err);
     }
   };
 
@@ -169,7 +170,7 @@ export default () => {
                   message.success('🎉 操作成功');
                   getWallList();
                 } catch (error) {
-                  console.error(error);
+                  logger.error(error);
                 } finally {
                   setLoading(false);
                 }
@@ -215,7 +216,7 @@ export default () => {
       const { data } = await getWallListAPI({ query });
       setList(data);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     } finally {
       setLoading(false);
     }
@@ -242,7 +243,7 @@ export default () => {
 
       setLoading(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };

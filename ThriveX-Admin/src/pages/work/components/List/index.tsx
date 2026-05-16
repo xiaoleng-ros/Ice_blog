@@ -7,6 +7,7 @@ import { auditCommentDataAPI, delCommentDataAPI, addCommentDataAPI } from '@/api
 import { auditWallDataAPI, delWallDataAPI } from '@/api/wall';
 import { delLinkDataAPI, auditWebDataAPI } from '@/api/web';
 import { sendDismissEmailAPI, sendReplyWallEmailAPI } from '@/api/email';
+import { logger } from '@/utils/logger';
 
 import RandomAvatar from '@/components/RandomAvatar';
 import { useUserStore, useWebStore } from '@/stores';
@@ -47,7 +48,7 @@ export default ({ item, type, fetchData, setLoading }: ListItemProps) => {
       await fetchData(type);
       if (btnType !== 'reply') message.success('🎉 审核成功');
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setLoading(false);
     }
   };
@@ -94,7 +95,7 @@ export default ({ item, type, fetchData, setLoading }: ListItemProps) => {
       setBtnType('');
       setIsModalOpen(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setBtnLoading(false);
     }
 
@@ -124,7 +125,7 @@ export default ({ item, type, fetchData, setLoading }: ListItemProps) => {
       setBtnType('');
       setIsModalOpen(false);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setBtnLoading(false);
     }
 

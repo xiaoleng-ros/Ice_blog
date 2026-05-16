@@ -26,4 +26,14 @@ export default defineConfig({
   server: {
     port: 9001,
   },
+  // 构建配置：生产环境自动移除 console.log/info/debug，保留 warn/error
+  build: {
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: false, // 不全部移除，手动控制
+        pure_funcs: ['console.log', 'console.info', 'console.debug'], // 仅移除这些
+      },
+    },
+  },
 })

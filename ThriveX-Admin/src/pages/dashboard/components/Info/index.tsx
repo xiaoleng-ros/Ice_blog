@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCommentListAPI } from '@/api/comment';
 import { getWallListAPI } from '@/api/wall';
 import { getLinkListAPI } from '@/api/web';
+import { logger } from '@/utils/logger';
 
 export default function InfoCard() {
   const navigate = useNavigate()
@@ -21,7 +22,7 @@ export default function InfoCard() {
       setLinkCount(linkData?.length || 0);
       setWallCount(wallData?.length || 0);
     } catch (err) {
-      console.error('获取数据失败:', err);
+      logger.error('获取数据失败:', err);
     }
   };
 

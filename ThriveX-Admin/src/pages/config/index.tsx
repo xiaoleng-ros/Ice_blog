@@ -9,6 +9,7 @@ import { json } from '@codemirror/lang-json';
 import Title from '@/components/Title';
 import { getEnvConfigListAPI, updateEnvConfigDataAPI, getPageConfigListAPI, updatePageConfigDataAPI } from '@/api/config';
 import { Config } from '@/types/app/config';
+import { logger } from '@/utils/logger';
 import { titleSty } from '@/styles/sty';
 import { ColumnsType } from 'antd/es/table';
 
@@ -88,7 +89,7 @@ export default () => {
       setData((d) => ({ ...d, [type]: list }));
       isFirstLoadRef.current = false;
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
       setInitialLoading(false);
       setLoading((l) => ({ ...l, [type]: false }));
@@ -118,7 +119,7 @@ export default () => {
       try {
         parsed = JSON.parse(values.value);
       } catch (e) {
-        console.error(e);
+        logger.error(e);
         message.error('请输入合法的JSON格式');
         setBtnLoading(false);
         return;
@@ -130,7 +131,7 @@ export default () => {
       setEditItem(null);
       setBtnLoading(false);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
       setBtnLoading(false);
     }
   };
@@ -142,7 +143,7 @@ export default () => {
     try {
       JSON.parse(value);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   };
 
@@ -154,7 +155,7 @@ export default () => {
       formRef.current[activeTab][0].setFieldsValue({ value: formatted });
       setJsonError(null);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   };
 
