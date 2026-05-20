@@ -8,14 +8,6 @@ import 'katex/dist/katex.css';
 import rehypeCallouts from 'rehype-callouts';
 import 'rehype-callouts/theme/obsidian';
 import { remarkMark } from 'remark-mark-highlight';
-import type { Plugin } from 'unified';
-import { visit } from 'unist-util-visit';
-import type { Element, Root } from 'hast';
-import { Modal, Input, message } from 'antd';
-import hljs from 'highlight.js/lib/core';
-import dos from 'highlight.js/lib/languages/dos';
-
-import videoSvg from './icon/video.svg?raw';
 import markerSvg from './icon/marker.svg?raw';
 import calloutSvg from './icon/callout.svg?raw';
 import noteSvg from './icon/note.svg?raw';
@@ -25,94 +17,9 @@ import checkSvg from './icon/check.svg?raw';
 import dangerSvg from './icon/danger.svg?raw';
 import imageSvg from './icon/image.svg?raw';
 
-// 注册 batch 语言支持
-hljs.registerLanguage('batch', dos);
-hljs.registerLanguage('bat', dos);
-hljs.registerLanguage('cmd', dos);
-
-const rehypeDouyinVideo: Plugin<[], Root> = () => {
-  return (tree) => {
-    visit(tree, 'element', (node: Element) => {
-      if (node.tagName === 'p') {
-        const link = node.children[0];
-        if (
-          link.type === 'element' &&
-          link.tagName === 'a' &&
-          link.properties?.href &&
-          typeof link.properties.href === 'string'
-        ) {
-          const match = /(?:ixigua\.com|douyin\.com)\/(\d+)/.exec(link.properties.href);
-          if (match) {
-            const videoId = match[1];
-            const wrapperDiv = {
-              type: 'element',
-              tagName: 'div',
-              properties: {
-                className: 'flex justify-center'
-              },
-              children: [{
-                type: 'element',
-                tagName: 'iframe',
-                properties: {
-                  src: `https://open.douyin.com/player/video?vid=${videoId}&autoplay=0`,
-                  referrerPolicy: 'unsafe-url',
-                  allowFullScreen: true,
-                  className: 'douyin'
-                },
-                children: []
-              }]
-            };
-            
-            Object.assign(node, wrapperDiv);
-          }
-        }
-      }
-    });
-  };
-};
-
-const videos = (): BytemdPlugin => {
-  return {
-    rehype: (processor) => processor.use(rehypeDouyinVideo),
-    actions: [
-      {
-        title: '视频',
-        icon: videoSvg,
-        handler: {
-          type: 'action',
-          click: (ctx) => {
-            let videoId = '';
-
-            Modal.info({
-              title: '插入抖音视频',
-              content: (
-                <div>
-                  <div className="mb-2 text-xs">目前仅支持插入抖音视频</div>
-                  <Input placeholder="请输入抖音视频ID" onChange={(e) => videoId = e.target.value.trim()} />
-                </div>
-              ),
-              cancelText: '取消',
-              okText: '确认',
-              onOk: () => {
-                if (!videoId) {
-                  message.error('请输入抖音视频ID');
-                  return Promise.reject();
-                }
-
-                ctx.appendBlock(`[douyin-video](${videoId})`);
-              },
-              maskClosable: true,
-              keyboard: true
-            });
-          }
-        }
-      }
-    ]
-  }
-}
-
 const markers = (): BytemdPlugin => {
   return {
+    // @ts-expect-error unified 版本冲突导致 Plugin 类型不兼容，运行时正常
     remark: (processor) => processor.use(remarkMark),
     actions: [
       {
@@ -139,6 +46,7 @@ const callouts = (): BytemdPlugin => {
   ];
 
   return {
+    // @ts-expect-error unified 版本冲突导致 Plugin 类型不兼容，运行时正常
     rehype: (processor) => processor.use(rehypeCallouts),
     actions: [
       {
@@ -151,7 +59,10 @@ const callouts = (): BytemdPlugin => {
             handler: {
               type: 'action',
               click: (ctx) => {
-                ctx.appendBlock(`> ${blockType} ${title}\n> `);
+                // 在光标当前位置插入 callout 块
+                const editor = ctx.editor;
+                const cursor = editor.getCursor();
+                editor.replaceRange(`> ${blockType} ${title}\n> `, cursor);
               }
             }
           }))
@@ -170,9 +81,11 @@ const material = (): BytemdPlugin => {
         handler: {
           type: 'action',
           click: (ctx) => {
-            // 触发图片选择弹窗
+            // 在弹窗打开前保存光标位置，避免弹窗导致编辑器失焦后光标丢失
+            const editor = ctx.editor;
+            const cursor = editor.getCursor();
             const event = new CustomEvent('openMaterialModal', {
-              detail: { ctx }
+              detail: { ctx, cursor }
             });
             window.dispatchEvent(event);
           }
@@ -183,7 +96,6 @@ const material = (): BytemdPlugin => {
 }
 
 export default [
-  videos(),
   gfm({ singleTilde: false }),
   markers(),
   gemoji(),

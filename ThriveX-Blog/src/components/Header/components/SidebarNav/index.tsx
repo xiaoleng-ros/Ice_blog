@@ -18,10 +18,10 @@ export default ({ list, open, onClose }: Props) => {
           <div className="flex fixed top-0 left-0 w-full h-full z-[60]">
             <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: '100%', opacity: 1 }} exit={{ width: 0, opacity: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 30, opacity: { duration: 0.2 } }} className="overflow-auto p-5 dark:border-[#2b333e] bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(44,51,62,0.9)] backdrop-blur-[5px] hide_sliding">
               <ul className="flex flex-col space-y-2">
-                {list?.map((one) => (
-                  <div key={one.id}>
-                    {one.type === 'cate' && (
-                      <li className="group/one relative hover:bg-[#e0e6ec] dark:hover:bg-[#495362] rounded-md  ">
+                {list?.map((one) => {
+                  if (one.type === 'cate') {
+                    return (
+                      <li key={one.id} className="group/one relative hover:bg-[#e0e6ec] dark:hover:bg-[#495362] rounded-md">
                         <Link href={`/cate/${one.id}?name=${one.name}`} className={`flex justify-between items-center p-3 px-5 text-[15px] group-hover/one:!text-primary   text-[#333] dark:text-white whitespace-nowrap`} onClick={onClose}>
                           {one.icon} {one.name}
                           <Show is={!!one.children.length}>
@@ -41,10 +41,12 @@ export default ({ list, open, onClose }: Props) => {
                           </ul>
                         </Show>
                       </li>
-                    )}
+                    );
+                  }
 
-                    {one.type === 'nav' && (
-                      <li className="group/one relative hover:bg-[#e0e6ec] dark:hover:bg-[#495362] rounded-md  ">
+                  if (one.type === 'nav') {
+                    return (
+                      <li key={one.id} className="group/one relative hover:bg-[#e0e6ec] dark:hover:bg-[#495362] rounded-md">
                         <Link href={one.url} target={`${one.url.startsWith('http') ? '_blank' : '_self'}`} className={`flex justify-between items-center p-3 px-5 text-[15px] group-hover/one:!text-primary   text-[#333] dark:text-white whitespace-nowrap`} onClick={onClose}>
                           {one.icon} {one.name}
                           <Show is={!!one.children.length}>
@@ -64,9 +66,11 @@ export default ({ list, open, onClose }: Props) => {
                           </ul>
                         </Show>
                       </li>
-                    )}
-                  </div>
-                ))}
+                    );
+                  }
+
+                  return null;
+                })}
               </ul>
             </motion.div>
 

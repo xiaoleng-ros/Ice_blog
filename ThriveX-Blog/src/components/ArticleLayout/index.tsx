@@ -21,7 +21,7 @@ export default async ({ page }: { page: number }) => {
     page,
     size: isArticleLayout === 'waterfall' ? 28 : 8
   });
-  data.result = data?.result?.filter((item) => item.config.status !== 'no_home') ?? [];
+  data.result = data?.result?.filter((item) => item.config?.status !== 'no_home') ?? [];
 
   return (
     <div className={`w-full md:w-[90%] ${sidebar?.length ? 'lg:w-[68%] xl:w-[73%]' : 'w-full'} mx-auto transition-width`}>

@@ -381,13 +381,21 @@ export default () => {
   const [tagList, setTagList] = useState<ArticleTag[]>([]);
 
   const getCateList = async () => {
-    const { data } = await getCateListAPI();
-    setCateList((data?.result || []).filter((item: ArticleCate) => item.type === 'cate'));
+    try {
+      const { data } = await getCateListAPI();
+      setCateList((data?.result || []).filter((item: ArticleCate) => item.type === 'cate'));
+    } catch (error) {
+      logger.error('获取分类列表失败:', error);
+    }
   };
 
   const getTagList = async () => {
-    const { data } = await getTagListAPI();
-    setTagList(data as ArticleTag[]);
+    try {
+      const { data } = await getTagListAPI();
+      setTagList((data as ArticleTag[]) || []);
+    } catch (error) {
+      logger.error('获取标签列表失败:', error);
+    }
   };
 
   // 导入文章：收集文件后调用，仅负责解析与提交
@@ -627,7 +635,7 @@ export default () => {
             <Form.Item name="cateId" className="mb-0!">
               <Select
                 allowClear
-                options={cateList}
+                options={cateList ?? []}
                 fieldNames={{ label: 'name', value: 'id' }}
                 placeholder="选择分类"
                 className="w-[160px]!"
@@ -638,7 +646,7 @@ export default () => {
               <Select
                 allowClear
                 showSearch
-                options={tagList}
+                options={tagList ?? []}
                 fieldNames={{ label: 'name', value: 'id' }}
                 placeholder="选择标签"
                 className="w-[140px]!"

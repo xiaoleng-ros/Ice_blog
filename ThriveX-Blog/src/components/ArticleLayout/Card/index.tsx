@@ -58,7 +58,7 @@ const Card = async ({ data }: CardProps) => {
                   <span className="pr-1">
                     <GoTag className="p-1 mt-[-2px] mr-[3px] text-[23px] text-white rounded-full align-middle bg-[#f5a630]" />
                   </span>
-                  <span>{item.cateList[0]?.name}</span>
+                  <span>{item.articleCates?.[0]?.cate?.name}</span>
                 </div>
               </div>
             </Link>

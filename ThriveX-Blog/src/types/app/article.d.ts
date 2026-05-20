@@ -20,9 +20,9 @@ export interface Article {
     content: string,
     cover: string,
     cateIds: string,
-    cateList: Cate[]
+    articleCates?: { cate: Cate }[],
     tagIds: string,
-    tagList: Tag[]
+    articleTags?: { tag: Tag }[],
     view?: number
     comment?: number,
     config: Config,

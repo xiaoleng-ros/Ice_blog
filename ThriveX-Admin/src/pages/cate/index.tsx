@@ -97,29 +97,33 @@ export default () => {
     setBtnLoading(true);
 
     try {
-      form.validateFields().then(async (values: Cate) => {
-        if (values.type === 'cate') values.url = '/';
+      const values = await form.validateFields();
+      if (values.type === 'cate') values.url = '/';
 
-        if (isMethod === 'edit') {
-          await editCateDataAPI({ ...cate, ...values });
-          message.success('🎉 修改分类成功');
-        } else {
-          await addCateDataAPI({ ...cate, ...values });
-          message.success('🎉 新增分类成功');
-        }
+      // 将 order 和 level 转为数字类型，避免 Prisma Int 字段类型校验失败
+      values.order = Number(values.order) || 0;
+      values.level = Number(values.level);
 
-        await getCateList();
+      if (isMethod === 'edit') {
+        await editCateDataAPI({ ...cate, ...values });
+        message.success('🎉 修改分类成功');
+      } else {
+        await addCateDataAPI({ ...cate, ...values });
+        message.success('🎉 新增分类成功');
+      }
 
-        form.resetFields();
-        setCate({} as Cate);
+      await getCateList();
 
-        setIsModelOpen(false);
-        setIsMethod('create');
-      });
+      form.resetFields();
+      setCate({} as Cate);
 
-      setBtnLoading(false);
-    } catch (error) {
-      logger.error(error);
+      setIsModelOpen(false);
+      setIsMethod('create');
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      logger.error(err);
+      message.error(err?.message || '操作失败');
+    } finally {
       setBtnLoading(false);
     }
   };

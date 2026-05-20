@@ -49,7 +49,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     title: article.title,
     description: article.description ?? article.title,
-    keywords: article.tagList?.map((tag) => tag.name).join(',') ?? '',
+    keywords: article.articleTags?.map((at: {tag: {name: string}}) => at.tag.name).join(',') ?? '',
     authors: [{ name: webConfig?.title ?? 'ThriveX' }],
     openGraph: {
       type: 'article',
@@ -120,7 +120,7 @@ export default async (props: Props) => {
                   <span className={`${iconSty} bg-[#A543E6]`}>
                     <IoMdPricetags />
                   </span>
-                  <span>所属分类：{data?.cateList[0]?.name}</span>
+                  <span>所属分类：{data?.articleCates?.[0]?.cate?.name}</span>
                 </div>
 
                 <div className="flex mb-2">
@@ -152,7 +152,7 @@ export default async (props: Props) => {
             <MD data={data?.content} />
 
             <div className="w-full">
-              <Tag data={data?.tagList} />
+              <Tag data={data?.articleTags?.map((at) => at.tag) ?? []} />
 
               <Copyright />
               <RandomArticle />

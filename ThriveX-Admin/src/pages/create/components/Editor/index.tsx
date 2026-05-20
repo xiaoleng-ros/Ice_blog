@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Spin } from 'antd';
 import axios from 'axios';
 
@@ -7,6 +7,8 @@ import plugins from './plugins';
 import 'highlight.js/styles/vs2015.css';
 import 'bytemd/dist/index.css';
 import zh from 'bytemd/lib/locales/zh_Hans.json';
+
+import type { BytemdEditorContext } from 'bytemd';
 
 import { baseURL } from '@/utils/request';
 import { useUserStore } from '@/stores';
@@ -20,15 +22,33 @@ interface Props {
   onChange: (value: string) => void;
 }
 
+// CodeMirror 编辑器实例的接口定义（bytemd 底层使用 CodeMirror 5）
+interface CodeMirrorInstance {
+  getCursor(): { line: number; ch: number };
+  replaceRange(text: string, pos: { line: number; ch: number }): void;
+  setCursor(pos: { line: number; ch: number }): void;
+  focus(): void;
+}
+
+// 挂载了 CodeMirror 实例的 DOM 元素
+interface CodeMirrorElement extends HTMLElement {
+  CodeMirror: CodeMirrorInstance;
+}
+
 const EditorMD = ({ value, onChange }: Props) => {
   const store = useUserStore();
   const [loading, setLoading] = useState(false);
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
-  const [currentCtx, setCurrentCtx] = useState<{ appendBlock: (block: string) => void }>();
+  // 使用 useRef 保存编辑器上下文和光标位置，避免弹窗导致焦点丢失后光标错位
+  const currentCtxRef = useRef<BytemdEditorContext | null>(null);
+  // 保存打开弹窗前的光标位置，弹窗期间编辑器失焦，getCursor() 不再准确
+  const cursorPosRef = useRef<{ line: number; ch: number } | null>(null);
 
   useEffect(() => {
     const handleOpenMaterialModal = (event: CustomEvent) => {
-      setCurrentCtx(event.detail.ctx);
+      // 同时保存编辑器上下文和打开弹窗时的光标位置
+      currentCtxRef.current = event.detail.ctx;
+      cursorPosRef.current = event.detail.cursor;
       setIsMaterialModalOpen(true);
     };
 
@@ -40,6 +60,11 @@ const EditorMD = ({ value, onChange }: Props) => {
   }, []);
 
   const uploadImages = async (files: File[]) => {
+    // 在异步上传前保存光标位置，避免 bytemd 的 appendBlock 将图片插入到错误位置
+    const cmElement = document.querySelector('.bytemd .CodeMirror') as CodeMirrorElement | null;
+    const cm = cmElement?.CodeMirror;
+    const cursor = cm?.getCursor();
+
     try {
       setLoading(true);
       // 处理成后端需要的格式
@@ -65,14 +90,18 @@ const EditorMD = ({ value, onChange }: Props) => {
       // 注意：这里用的是 axios 直接请求，没有经过 request 拦截器处理
       // 所以 response.data 是后端返回的完整对象 { code, message, data }
       const result = response.data;
-      
+
       // 如果 result 是数组，说明直接返回了 URL 数组
       if (Array.isArray(result)) {
         logger.log('返回数组:', result);
-        // bytemd 期望返回包含 url 属性的对象数组
+        if (cursor && cm) {
+          // 在光标位置插入图片，bypass bytemd 的 appendBlock
+          insertImagesAtCursor(cm, cursor, result, files);
+          return [];
+        }
         return result.map(url => ({ url }));
       }
-      
+
       // 否则按标准响应格式 { code, message, data } 处理
       if (result.code !== 200 || !result.data) {
         logger.error('上传失败:', result.message);
@@ -82,13 +111,35 @@ const EditorMD = ({ value, onChange }: Props) => {
       // 返回图片 URL 对象数组（bytemd 要求的格式）
       logger.log('返回 data:', result.data);
       const urls = result.data || [];
-      // bytemd 期望返回包含 url 属性的对象数组
+      if (cursor && cm) {
+        insertImagesAtCursor(cm, cursor, Array.isArray(urls) ? urls : [urls], files);
+        return [];
+      }
       return Array.isArray(urls) ? urls.map(url => ({ url })) : [];
     } catch (error) {
       logger.error(error);
       setLoading(false);
       return [];
     }
+  };
+
+  const insertImagesAtCursor = (
+    cm: CodeMirrorInstance,
+    cursor: { line: number; ch: number },
+    urls: string[],
+    files: File[]
+  ) => {
+    const markdown = urls
+      .map((url, i) => `![${files[i]?.name || '图片'}](${url})`)
+      .join('\n');
+    cm.replaceRange(markdown, cursor);
+    // bytemd 的 handleImageUpload 会在 uploadImages 返回后同步执行
+    // appendBlock/setSelection/focus，使用 setTimeout 将光标定位到插入内容之后
+    setTimeout(() => {
+      const endLine = cursor.line + markdown.split('\n').length;
+      cm.setCursor({ line: endLine, ch: 0 });
+      cm.focus();
+    }, 0);
   };
 
   return (
@@ -101,11 +152,14 @@ const EditorMD = ({ value, onChange }: Props) => {
         open={isMaterialModalOpen}
         onClose={() => setIsMaterialModalOpen(false)}
         onSelect={(urls) => {
-          if (currentCtx) {
-            // 在光标位置插入图片
-            urls.forEach((url) => {
-              currentCtx.appendBlock(`![图片](${url})`);
-            });
+          const ctx = currentCtxRef.current;
+          const cursor = cursorPosRef.current;
+          if (ctx && cursor) {
+            const editor = ctx.editor;
+            // 恢复编辑器焦点，然后使用提前保存的光标位置插入图片
+            editor.focus();
+            const markdown = urls.map((url) => `![图片](${url})`).join('\n');
+            editor.replaceRange(markdown, cursor);
           }
         }}
       />

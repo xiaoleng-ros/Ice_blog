@@ -113,10 +113,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <BaiduStatis />
       </head>
 
-      {/* 监听路由变化 */}
-      <RouteChangeHandler />
-
       <body id="root" className={`dark:!bg-black-a`}>
+        {/* 监听路由变化 */}
+        <RouteChangeHandler />
         {/* 数据注入 */}
         <InjectData />
         {/* 🎉 礼花效果 */}

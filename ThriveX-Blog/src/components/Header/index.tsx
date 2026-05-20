@@ -88,11 +88,10 @@ export default () => {
             </li>
 
             {/* 文章分类 */}
-            {cateList?.map((one) => (
-              <div key={one.id}>
-                {/* 渲染分类 */}
-                {one.type === 'cate' && (
-                  <li className="group/one relative">
+            {cateList?.map((one) => {
+              if (one.type === 'cate') {
+                return (
+                  <li key={one.id} className="group/one relative">
                     <Link href={`/cate/${one.id}?name=${one.name}`} target={`${one.url.startsWith('http') ? '_blank' : '_self'}`} className={`flex items-center p-5 text-[15px] group-hover/one:!text-primary   ${isPathSty || isScrolled ? 'text-[#333] dark:text-white' : 'text-white'}`}>
                       {one.icon} {one.name}
                       <Show is={!!one.children.length}>
@@ -112,11 +111,12 @@ export default () => {
                       </ul>
                     </Show>
                   </li>
-                )}
+                );
+              }
 
-                {/* 渲染导航 */}
-                {one.type === 'nav' && (
-                  <li className="group/one relative">
+              if (one.type === 'nav') {
+                return (
+                  <li key={one.id} className="group/one relative">
                     <Link href={one.url} className={`flex items-center p-5 px-10 text-[15px] group-hover/one:!text-primary ${isPathSty || isScrolled ? 'text-[#333] dark:text-white' : 'text-white'}`}>
                       {one.icon} {one.name}
                       {/* 如果有子分类就显示下拉三角 */}
@@ -137,9 +137,11 @@ export default () => {
                       </ul>
                     </Show>
                   </li>
-                )}
-              </div>
-            ))}
+                );
+              }
+
+              return null;
+            })}
           </ul>
 
           {/* 主题切换开关 */}

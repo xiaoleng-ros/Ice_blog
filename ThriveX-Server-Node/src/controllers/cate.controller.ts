@@ -10,12 +10,23 @@ class CateController {
     try {
       const { name, icon, url, mark, level, order, type } = req.body;
       const cate = await prisma.cate.create({
-        data: { name, icon, url, mark, level, order, type },
+        data: {
+          name,
+          icon,
+          url,
+          mark,
+          level: level != null ? Number(level) : null,
+          order: order != null ? Number(order) : 0,
+          type,
+        },
       });
       res.json(success(cate));
-    } catch (err) {
+    } catch (err: any) {
       console.error('addCate error:', err);
-      res.json(error('创建分类失败'));
+      const message = err?.code === 'P2002'
+        ? '分类名称或标识已存在，请更换后重试'
+        : '创建分类失败';
+      res.json(error(message));
     }
   }
 
@@ -50,12 +61,23 @@ class CateController {
       const { id, name, icon, url, mark, level, order, type } = req.body;
       await prisma.cate.update({
         where: { id },
-        data: { name, icon, url, mark, level, order, type },
+        data: {
+          name,
+          icon,
+          url,
+          mark,
+          level: level != null ? Number(level) : null,
+          order: order != null ? Number(order) : 0,
+          type,
+        },
       });
       res.json(success());
-    } catch (err) {
+    } catch (err: any) {
       console.error('editCate error:', err);
-      res.json(error('编辑分类失败'));
+      const message = err?.code === 'P2002'
+        ? '分类名称或标识已存在，请更换后重试'
+        : '编辑分类失败';
+      res.json(error(message));
     }
   }
 
