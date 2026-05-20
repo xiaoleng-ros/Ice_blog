@@ -25,6 +25,9 @@ export default () => {
   const id = +params.get('id')!;
   const isDraftParams = Boolean(params.get('draft'));
 
+  // 保存新建草稿后返回的文章 id，用于后续保存走更新逻辑
+  const createdDraftIdRef = useRef<number | null>(null);
+
   const [data, setData] = useState<Article>({} as Article);
   const [content, setContent] = useState('');
   const [publishOpen, setPublishOpen] = useState(false);
@@ -92,10 +95,14 @@ export default () => {
     try {
       setLoading(true);
 
-      if (id) {
+      // 优先使用 URL 参数中的 id，其次使用新建草稿后保存的 id
+      const currentId = id || createdDraftIdRef.current;
+
+      if (currentId) {
         // 更新已有文章
         await editArticleDataAPI({
           ...data,
+          id: currentId,
           content,
           config: {
             ...data.config,
@@ -108,7 +115,7 @@ export default () => {
         // 新建草稿
         const now = new Date();
         const defaultTitle = `草稿 ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
-        await addArticleDataAPI({
+        const result = await addArticleDataAPI({
           title: data.title || defaultTitle,
           description: data.description || '',
           content,
@@ -125,6 +132,14 @@ export default () => {
           },
           createTime: Date.now().toString(),
         });
+
+        // 保存后端返回的文章 id，后续保存走更新逻辑
+        const newId = result?.data?.id;
+        if (newId) {
+          createdDraftIdRef.current = newId;
+          setData((prev) => ({ ...prev, id: newId }));
+        }
+
         message.success('已保存到草稿箱');
       }
 

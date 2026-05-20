@@ -3,7 +3,7 @@ import { Article, ArticleFilterQueryParams } from '@/types/app/article';
 
 // 新增文章
 export const addArticleDataAPI = (data: Article) =>
-  Request('POST', '/article', { data });
+  Request<{ id: number }>('POST', '/article', { data });
 
 // 删除文章
 export const delArticleDataAPI = (id: number, isDel?: boolean) =>

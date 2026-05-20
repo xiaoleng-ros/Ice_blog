@@ -54,7 +54,7 @@ class ArticleController {
         },
       });
 
-      res.json(success());
+      res.json(success({ id: article.id }));
     } catch (err) {
       console.error('addArticle error:', err);
       res.json(error('创建文章失败'));
@@ -267,21 +267,24 @@ class ArticleController {
 
       const articleConfigWhere: any = {};
       
+      // 默认过滤草稿，除非明确指定 isDraft 参数
       if (isDraft !== undefined) {
         articleConfigWhere.isDraft = isDraft === '1' || isDraft === 'true';
+      } else {
+        articleConfigWhere.isDraft = false;
       }
       
       if (isDel !== undefined) {
         articleConfigWhere.isDel = isDel === '1' || isDel === 'true';
+      } else {
+        articleConfigWhere.isDel = false;
       }
       
       if (status) {
         articleConfigWhere.status = status as string;
       }
       
-      if (Object.keys(articleConfigWhere).length > 0) {
-        where.articleConfig = articleConfigWhere;
-      }
+      where.articleConfig = articleConfigWhere;
 
       const pageNum = parseInt(page as string) || 1;
       const sizeNum = parseInt(size as string) || 10;
@@ -318,25 +321,50 @@ class ArticleController {
   async getArticleByCate(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { cate_id } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const size = parseInt(req.query.size as string) || 10;
+      const skip = (page - 1) * size;
 
-      const articleCates = await prisma.articleCate.findMany({
-        where: { cateId: parseInt(cate_id) },
-        include: {
-          article: {
-            include: {
-              articleConfig: true,
-              articleCates: { include: { cate: true } },
-              articleTags: { include: { tag: true } },
+      const cateId = parseInt(cate_id);
+
+      const [articleCates, total] = await Promise.all([
+        prisma.articleCate.findMany({
+          where: { cateId },
+          skip,
+          take: size,
+          include: {
+            article: {
+              include: {
+                articleConfig: true,
+                articleCates: { include: { cate: true } },
+                articleTags: { include: { tag: true } },
+              },
             },
           },
-        },
-      });
+        }),
+        prisma.articleCate.count({
+          where: {
+            cateId,
+            article: {
+              articleConfig: {
+                isDel: false,
+              },
+            },
+          },
+        }),
+      ]);
 
       const articles = articleCates
         .filter((ac: { article: { articleConfig: { isDel: boolean } | null } }) => ac.article.articleConfig && !ac.article.articleConfig.isDel)
         .map((ac: { article: any }) => ac.article);
 
-      res.json(success(articles));
+      res.json(success({
+        result: articles,
+        total,
+        page,
+        size,
+        pages: Math.ceil(total / size),
+      }));
     } catch (err) {
       console.error('getArticleByCate error:', err);
       res.json(error('获取分类文章失败'));
@@ -346,25 +374,50 @@ class ArticleController {
   async getArticleByTag(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { tag_id } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const size = parseInt(req.query.size as string) || 10;
+      const skip = (page - 1) * size;
 
-      const articleTags = await prisma.articleTag.findMany({
-        where: { tagId: parseInt(tag_id) },
-        include: {
-          article: {
-            include: {
-              articleConfig: true,
-              articleCates: { include: { cate: true } },
-              articleTags: { include: { tag: true } },
+      const tagId = parseInt(tag_id);
+
+      const [articleTags, total] = await Promise.all([
+        prisma.articleTag.findMany({
+          where: { tagId },
+          skip,
+          take: size,
+          include: {
+            article: {
+              include: {
+                articleConfig: true,
+                articleCates: { include: { cate: true } },
+                articleTags: { include: { tag: true } },
+              },
             },
           },
-        },
-      });
+        }),
+        prisma.articleTag.count({
+          where: {
+            tagId,
+            article: {
+              articleConfig: {
+                isDel: false,
+              },
+            },
+          },
+        }),
+      ]);
 
       const articles = articleTags
         .filter((at: { article: { articleConfig: { isDel: boolean } | null } }) => at.article.articleConfig && !at.article.articleConfig.isDel)
         .map((at: { article: any }) => at.article);
 
-      res.json(success(articles));
+      res.json(success({
+        result: articles,
+        total,
+        page,
+        size,
+        pages: Math.ceil(total / size),
+      }));
     } catch (err) {
       console.error('getArticleByTag error:', err);
       res.json(error('获取标签文章失败'));

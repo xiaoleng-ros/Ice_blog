@@ -49,7 +49,8 @@ interface AssistantResponse {
 
 const PublishForm = ({ data, closeModel }: Props) => {
   const [params] = useSearchParams();
-  const id = +params.get('id')!;
+  // 优先使用 data.id（新建草稿后返回的 id），其次从 URL 参数读取
+  const id = data?.id || +params.get('id')!;
   const isDraftParams = Boolean(params.get('draft'));
 
   const [btnLoading, setBtnLoading] = useState(false);
@@ -78,16 +79,16 @@ const PublishForm = ({ data, closeModel }: Props) => {
 
     logger.log(data,data.tagList);
     
-    const tagIds = data?.tagList!.map((item: Tag) => item.id);
+    const tagIds = data?.tagList?.map((item: Tag) => item.id) ?? [];
 
     const formValues = {
       ...data,
-      status: data.config.status,
-      password: data.config.password,
-      isEncrypt: !!data.config.isEncrypt,
+      status: data.config?.status ?? 'default',
+      password: data.config?.password ?? '',
+      isEncrypt: !!data.config?.isEncrypt,
       cateIds,
       tagIds,
-      createTime: dayjs(+data.createTime!),
+      createTime: dayjs(+(data.createTime ?? Date.now())),
     };
 
     form.setFieldsValue(formValues);
@@ -96,13 +97,21 @@ const PublishForm = ({ data, closeModel }: Props) => {
   }, [data, id]);
 
   const getCateList = async () => {
-    const { data } = await getCateListAPI();
-    setCateList((data?.result ?? []).filter((item: Cate) => item.type === 'cate'));
+    try {
+      const { data } = await getCateListAPI();
+      setCateList((data?.result ?? []).filter((item: Cate) => item.type === 'cate'));
+    } catch (error) {
+      logger.error('获取分类列表失败:', error);
+    }
   };
 
   const getTagList = async () => {
-    const { data } = await getTagListAPI();
-    setTagList((data as Tag[]) ?? []);
+    try {
+      const { data } = await getTagListAPI();
+      setTagList((data as Tag[]) ?? []);
+    } catch (error) {
+      logger.error('获取标签列表失败:', error);
+    }
   };
 
   useEffect(() => {
