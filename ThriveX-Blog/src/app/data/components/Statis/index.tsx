@@ -30,8 +30,11 @@ export default ({ aTotal }: Props) => {
   const [linkList, setLinkList] = useState<Web[]>([]);
 
   const getData = async () => {
-    await Promise.all([getCateListAPI(), getCommentListAPI(), getWebListAPI()]).then(([cateList, commentList, linkList]) => {
-      setCateList(cateList?.data.result ?? []);
+    await Promise.all([getCateListAPI(), getCommentListAPI(), getWebListAPI()]).then(([cateRes, commentList, linkList]) => {
+      // 兼容后端返回的 data 可能是数组或 { result: [] } 格式
+      const cateData = cateRes?.data;
+      const cateArr = Array.isArray(cateData) ? cateData : cateData?.result || [];
+      setCateList(cateArr);
       setCommentList(commentList?.data ?? []);
       setLinkList(linkList?.data ?? []);
     });

@@ -11,13 +11,20 @@ import { addArticleDataAPI, editArticleDataAPI } from '@/api/article';
 import { logger } from '@/utils/logger';
 import { getCateListAPI } from '@/api/cate';
 import useAssistant from '@/hooks/useAssistant';
-import { addTagDataAPI, getTagListAPI } from '@/api/tag';
+import { addTagDataAPI, getTagPagingAPI } from '@/api/tag';
 
 import { Cate } from '@/types/app/cate';
 import { Tag } from '@/types/app/tag';
 import { Article, Status } from '@/types/app/article';
 
 import Material from '@/components/Material';
+
+import './index.scss';
+
+// API 返回数据兼容类型
+interface ApiResponse<T> {
+  result?: T;
+}
 
 interface Props {
   data: Article;
@@ -98,8 +105,10 @@ const PublishForm = ({ data, closeModel }: Props) => {
 
   const getCateList = async () => {
     try {
-      const { data } = await getCateListAPI();
-      setCateList((data?.result ?? []).filter((item: Cate) => item.type === 'cate'));
+      const { data } = await getCateListAPI({ pattern: 'tree' });
+      // 后端返回的 data 可能是数组或 { result: [] } 格式，兼容处理
+      const cateData = Array.isArray(data) ? data : (data as ApiResponse<Cate[]>)?.result || [];
+      setCateList(cateData.filter((item: Cate) => item.type === 'cate'));
     } catch (error) {
       logger.error('获取分类列表失败:', error);
     }
@@ -107,8 +116,11 @@ const PublishForm = ({ data, closeModel }: Props) => {
 
   const getTagList = async () => {
     try {
-      const { data } = await getTagListAPI();
-      setTagList((data as Tag[]) ?? []);
+      const { data } = await getTagPagingAPI({ page: 1, size: 100 });
+      // 分页接口返回 { result: [], total } 格式
+      const tagData = data?.result || [];
+      logger.log('解析后的标签列表:', JSON.stringify(tagData));
+      setTagList(tagData as Tag[]);
     } catch (error) {
       logger.error('获取标签列表失败:', error);
     }
@@ -144,9 +156,8 @@ const PublishForm = ({ data, closeModel }: Props) => {
           }
 
           await addTagDataAPI({ name: item });
-          const { data: list } = await getTagListAPI();
-          // 添加成功后查找对应的标签id
-          const tag2 = list.find((t) => t.name === item)?.id;
+          // 添加成功后，从本地 tagList 中查找新标签的 id
+          const tag2 = tagList.find((t) => t.name === item)?.id;
           if (tag2) tagIds.push(tag2);
         } else {
           tagIds.push(item);
@@ -353,7 +364,17 @@ ${content}
         </Form.Item>
 
         <Form.Item label="选择分类" name="cateIds" rules={[{ required: true, message: '请选择文章分类' }]}>
-          <Cascader options={cateList} maxTagCount="responsive" multiple fieldNames={{ label: 'name', value: 'id' }} placeholder="请选择文章分类" className="w-full" />
+          <Cascader
+            options={cateList}
+            maxTagCount="responsive"
+            multiple
+            fieldNames={{ label: 'name', value: 'id' }}
+            placeholder="请选择文章分类"
+            className="w-full"
+            classNames={{ popup: { root: 'article-cate-cascader' } }}
+            displayRender={(labels) => labels.join(' / ')}
+            changeOnSelect
+          />
         </Form.Item>
 
         <Form.Item label="选择标签" name="tagIds">

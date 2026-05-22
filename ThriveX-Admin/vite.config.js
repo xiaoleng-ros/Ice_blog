@@ -25,6 +25,18 @@ export default defineConfig({
   },
   server: {
     port: 9001,
+    // 优化开发服务器性能
+    hmr: {
+      overlay: false, // 关闭错误覆盖层，提升性能
+    },
+    // 预构建优化
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'react-router-dom'],
+    },
+    // 文件系统监听优化
+    watch: {
+      usePolling: false, // Windows 下关闭 polling 提升性能
+    },
   },
   // 构建配置：生产环境自动移除 console.log/info/debug，保留 warn/error
   build: {

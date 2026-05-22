@@ -4,7 +4,7 @@
   "version": "3.0",
   "type": "module",
   "scripts": {
-    "dev": "eslint . && vite --port 9001",
+    "dev": "vite --port 9001",
     "build": "eslint . && vite build",
     "preview": "vite preview",
     "lint": "eslint ."

@@ -31,7 +31,9 @@ export default () => {
   const [cateList, setCateList] = useState<Cate[]>([]);
   const getCateList = async () => {
     const { data } = await getCateListAPI();
-    setCateList(data?.result ?? []);
+    // 后端返回的 data 可能是数组或 { result: [] } 格式，兼容处理
+    const list = Array.isArray(data) ? data : data?.result || [];
+    setCateList(list);
   };
 
   useEffect(() => {
