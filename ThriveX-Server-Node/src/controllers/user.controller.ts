@@ -197,8 +197,9 @@ class UserController {
 
       const token = createToken({ userId: user.id, username: user.username, role: user.role });
 
+      // Token 有效期改为 30 天
       const expireTime = new Date();
-      expireTime.setDate(expireTime.getDate() + 3);
+      expireTime.setDate(expireTime.getDate() + 30);
 
       await prisma.userToken.create({
         data: {

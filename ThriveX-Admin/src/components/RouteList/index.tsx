@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import DefaultLayout from '@/layout/DefaultLayout';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
@@ -66,11 +66,14 @@ export default () => {
     if (!store.token && !isLoginRoute) return navigate('/login');
   }, [store, isLoginRoute]);
 
+  // 只在页面初始化时校验一次 Token，不阻塞后续操作
+  const hasChecked = useRef(false);
   useEffect(() => {
-    if (store.token) {
+    if (store.token && !hasChecked.current) {
+      hasChecked.current = true;
       checkTokenAPI(store.token).catch(() => {});
     }
-  }, [store, pathname]);
+  }, [store.token]);
 
   if (isLoginRoute) {
     return (
