@@ -210,8 +210,36 @@ const IterativePage = () => {
 
   useEffect(() => {
     const currentYear = dayjs().year();
-    const list = Array.from({ length: 5 }, (_, i) => currentYear - i);
-    setYearList(list.map((value) => ({ value, label: String(value) })));
+
+    // 从 GitHub 获取用户账号创建年份，动态生成从创建年份到今年的列表
+    const fetchEarliestYear = async () => {
+      try {
+        const headers: HeadersInit = { 'Accept': 'application/vnd.github.v3+json' };
+        const token = import.meta.env.VITE_GITHUB_TOKEN;
+        if (token) {
+          headers['Authorization'] = `token ${token}`;
+        }
+        const res = await fetch(
+          'https://api.github.com/users/xiaoleng-ros',
+          { headers }
+        );
+        if (res.ok) {
+          const user = await res.json();
+          if (user.created_at) {
+            const earliestYear = dayjs(user.created_at).year();
+            const list = Array.from({ length: currentYear - earliestYear + 1 }, (_, i) => currentYear - i);
+            setYearList(list.map((value) => ({ value, label: String(value) })));
+            return;
+          }
+        }
+      } catch {
+        // 获取失败则用默认最近 5 年
+      }
+      const list = Array.from({ length: 5 }, (_, i) => currentYear - i);
+      setYearList(list.map((value) => ({ value, label: String(value) })));
+    };
+
+    fetchEarliestYear();
 
     loadData('blog_project_iterative', setBlogData, 'ThriveX-Blog', 'ThriveX-Blog');
     loadData('admin_project_iterative', setAdminData, 'ThriveX-Admin', 'ThriveX-Admin');
