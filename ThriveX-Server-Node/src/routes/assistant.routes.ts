@@ -5,6 +5,7 @@ import { authMiddleware } from '../middlewares/auth.middleware';
 const router = Router();
 
 router.get('/', AssistantController.getAssistantList);
+router.get('/default', AssistantController.getDefaultAssistant);
 router.post('/', authMiddleware, AssistantController.addAssistant);
 router.delete('/:id', authMiddleware, AssistantController.deleteAssistant);
 router.patch('/', authMiddleware, AssistantController.editAssistant);

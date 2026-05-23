@@ -241,6 +241,8 @@ class ArticleController {
 
       const result = {
         ...article,
+        cateList: article.articleCates?.map((ac) => ac.cate) || [],
+        tagList: article.articleTags?.map((at) => at.tag) || [],
         prev: prevArticle || null,
         next: nextArticle || null,
       };
@@ -305,8 +307,15 @@ class ArticleController {
         prisma.article.count({ where }),
       ]);
 
+      // 将 Prisma 返回的 articleCates 和 articleTags 映射为前端期望的 cateList 和 tagList
+      const mappedArticles = articles.map((article) => ({
+        ...article,
+        cateList: article.articleCates?.map((ac) => ac.cate) || [],
+        tagList: article.articleTags?.map((at) => at.tag) || [],
+      }));
+
       res.json(success({
-        result: articles,
+        result: mappedArticles,
         total,
         page: pageNum,
         size: sizeNum,

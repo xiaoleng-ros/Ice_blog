@@ -88,12 +88,13 @@ export default () => {
   };
 
   // 分类/标签：柔和色系，收纳展示（默认显示前 2 个，其余 +N，悬停展示全部）
+  // 移除 'default' 避免某些标签显示为灰色无背景
   const tagColors = [
-    'default',
     'processing',
     'success',
     'warning',
     'cyan',
+    'magenta',
   ] as const;
   const VISIBLE_TAG_COUNT = 1;
 
@@ -383,7 +384,9 @@ export default () => {
   const getCateList = async () => {
     try {
       const { data } = await getCateListAPI();
-      setCateList((data?.result || []).filter((item: ArticleCate) => item.type === 'cate'));
+      // 后端 GET /cate 返回 { records: [], total, ... } 格式，兼容处理
+      const cateData = Array.isArray(data) ? data : data?.records || data?.result || [];
+      setCateList(cateData.filter((item: ArticleCate) => item.type === 'cate'));
     } catch (error) {
       logger.error('获取分类列表失败:', error);
     }

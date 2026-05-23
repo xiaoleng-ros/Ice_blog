@@ -2,7 +2,7 @@ import Request from '@/utils/request'
 import { Tag } from '@/types/app/tag'
 
 // 新增标签
-export const addTagDataAPI = (data: Tag) => Request('POST', '/tag', { data })
+export const addTagDataAPI = (data: Tag) => Request<Tag>('POST', '/tag', { data })
 
 // 删除标签
 export const delTagDataAPI = (id: number) => Request('DELETE', `/tag/${id}`)

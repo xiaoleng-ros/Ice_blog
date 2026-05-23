@@ -69,11 +69,33 @@ class CommentController {
   async getArticleComments(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { article_id } = req.params;
-      const comments = await prisma.comment.findMany({
-        where: { articleId: parseInt(article_id), auditStatus: 1 },
-        orderBy: { createTime: 'desc' },
-      });
-      res.json(success(comments));
+      const { page, size, pageSize } = req.query;
+      const pageNum = parseInt(page as string) || 1;
+      const sizeNum = parseInt((size || pageSize) as string) || 8;
+
+      const where = { articleId: parseInt(article_id), auditStatus: 1 };
+
+      const [comments, total] = await Promise.all([
+        prisma.comment.findMany({
+          where,
+          orderBy: { createTime: 'desc' },
+          skip: (pageNum - 1) * sizeNum,
+          take: sizeNum,
+        }),
+        prisma.comment.count({ where }),
+      ]);
+
+      const totalPages = Math.ceil(total / sizeNum);
+
+      res.json(success({
+        result: comments,
+        total,
+        page: pageNum,
+        size: sizeNum,
+        pages: totalPages,
+        next: pageNum < totalPages,
+        prev: pageNum > 1,
+      }));
     } catch (err) {
       console.error('getArticleComments error:', err);
       res.json(error('获取文章评论失败'));

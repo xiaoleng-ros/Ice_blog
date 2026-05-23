@@ -63,7 +63,8 @@ export default () => {
   };
 
   // 分类/标签：与文章管理一致，柔和色系 + 收纳展示（默认显示前 1 个，其余 +N，悬停展示全部）
-  const tagColors = ['default', 'processing', 'success', 'warning', 'cyan'] as const;
+  // 移除 'default' 避免某些标签显示为灰色无背景
+  const tagColors = ['processing', 'success', 'warning', 'cyan', 'magenta'] as const;
   const VISIBLE_TAG_COUNT = 1;
 
   const renderCollapsibleTags = <T extends { id?: number; name: string }>(list: T[], keyPrefix: string) => {

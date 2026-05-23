@@ -6,14 +6,24 @@ import { success, error } from '../utils/result';
 const prisma = new PrismaClient();
 
 class TagController {
+  /**
+   * 新增标签
+   * @description 如果未提供 mark，则自动从 name 生成（转小写、空格替换为连字符、去除非字母数字中文的字符）
+   */
   async addTag(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { name, icon, mark } = req.body;
-      const tag = await prisma.tag.create({ data: { name, icon, mark } });
+      // 未提供 mark 时自动从 name 生成标识符
+      const tagMark = mark || name.replace(/\s+/g, '-').toLowerCase();
+      const tag = await prisma.tag.create({ data: { name, icon, mark: tagMark } });
       res.json(success(tag));
-    } catch (err) {
+    } catch (err: any) {
       console.error('addTag error:', err);
-      res.json(error('创建标签失败'));
+      // 处理唯一约束冲突（mark 重复）
+      const message = err?.code === 'P2002'
+        ? '标签名称或标识已存在，请更换后重试'
+        : '创建标签失败';
+      res.json(error(message));
     }
   }
 

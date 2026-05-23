@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { getAssistantDefaultAPI } from '@/api/assistant';
 import './index.scss';
 
 interface SummaryProps {
@@ -16,6 +17,18 @@ export default function Summary({ content }: SummaryProps) {
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showSuggestions] = useState(false);
+  const [assistantName, setAssistantName] = useState('DeepSeek R1');
+
+  // 获取默认助手名称
+  useEffect(() => {
+    getAssistantDefaultAPI().then(({ data }) => {
+      if (data?.name) {
+        setAssistantName(data.name);
+      }
+    }).catch(() => {
+      // 获取失败时使用默认值
+    });
+  }, []);
 
   const handleThriveGPTClick = () => {
     
@@ -43,7 +56,7 @@ export default function Summary({ content }: SummaryProps) {
           id="ai-tag"
           title="了解助理"
           onClick={handleThriveGPTClick}
-        >DeepSeek R1</div>
+        >{assistantName}</div>
       </div>
 
       <div className="ai-explanation">

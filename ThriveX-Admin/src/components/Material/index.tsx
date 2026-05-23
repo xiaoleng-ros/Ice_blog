@@ -87,7 +87,8 @@ export default ({ multiple, open, onClose, onSelect, maxCount }: Props) => {
 
       const { data } = await getFileListAPI(dir, { page: isLoadMore ? page + 1 : 1, size: 15 });
 
-      const result = data?.result ?? [];
+      // 后端返回 { records: [], total, page, size, totalPages } 格式
+      const result = data?.records ?? [];
 
       if (!isLoadMore) {
         setFileList(result);

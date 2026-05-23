@@ -316,7 +316,11 @@ class UserController {
         },
       });
 
-      res.json(success(author));
+      // 将 nickname 映射为 name，兼容前端字段名
+      res.json(success({
+        ...author,
+        name: author?.nickname || author?.username || '',
+      }));
     } catch (err) {
       console.error('getAuthor error:', err);
       res.json(error('获取作者信息失败'));

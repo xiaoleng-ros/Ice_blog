@@ -71,6 +71,10 @@ const PublishForm = ({ data, closeModel }: Props) => {
   const [cateList, setCateList] = useState<Cate[]>([]);
   const [tagList, setTagList] = useState<Tag[]>([]);
   const [isEncryptEnabled, setIsEncryptEnabled] = useState(false);
+  // 标记标签列表是否已加载完成
+  const [tagListLoaded, setTagListLoaded] = useState(false);
+  // 标记文章数据是否已加载完成
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
     if (!id) return form.resetFields();
@@ -85,23 +89,35 @@ const PublishForm = ({ data, closeModel }: Props) => {
     });
 
     logger.log(data,data.tagList);
-    
-    const tagIds = data?.tagList?.map((item: Tag) => item.id) ?? [];
 
+    // 不在这设置 tagIds，等 tagList 加载完成后在独立 useEffect 中设置
     const formValues = {
       ...data,
       status: data.config?.status ?? 'default',
       password: data.config?.password ?? '',
       isEncrypt: !!data.config?.isEncrypt,
       cateIds,
-      tagIds,
+      tagIds: [],
       createTime: dayjs(+(data.createTime ?? Date.now())),
     };
 
     form.setFieldsValue(formValues);
     // 设置初始的加密状态
     setIsEncryptEnabled(!!formValues.isEncrypt);
+    // 设置封面预览
+    setCoverPreview(data?.cover || '');
+    // 标记文章数据已加载
+    setDataLoaded(true);
   }, [data, id]);
+
+  // 标签列表加载完成后，再设置表单中的标签值，确保 Select 能映射到标签名称
+  // 同时监听 data 变化，当文章数据从后端加载完成后重新设置
+  useEffect(() => {
+    if (!id || !tagList.length || !dataLoaded) return;
+
+    const tagIds = data?.tagList?.map((item: Tag) => item.id) ?? [];
+    form.setFieldsValue({ tagIds });
+  }, [tagListLoaded, dataLoaded, data]);
 
   const getCateList = async () => {
     try {
@@ -117,12 +133,15 @@ const PublishForm = ({ data, closeModel }: Props) => {
   const getTagList = async () => {
     try {
       const { data } = await getTagPagingAPI({ page: 1, size: 100 });
-      // 分页接口返回 { result: [], total } 格式
-      const tagData = data?.result || [];
+      // 后端 GET /tag 返回的是扁平数组，兼容处理
+      const tagData = Array.isArray(data) ? data : data?.result || [];
       logger.log('解析后的标签列表:', JSON.stringify(tagData));
       setTagList(tagData as Tag[]);
+      // 标记标签列表已加载完成，触发设置表单标签值
+      setTagListLoaded(true);
     } catch (error) {
       logger.error('获取标签列表失败:', error);
+      setTagListLoaded(true);
     }
   };
 
@@ -155,10 +174,10 @@ const PublishForm = ({ data, closeModel }: Props) => {
             continue;
           }
 
-          await addTagDataAPI({ name: item });
-          // 添加成功后，从本地 tagList 中查找新标签的 id
-          const tag2 = tagList.find((t) => t.name === item)?.id;
-          if (tag2) tagIds.push(tag2);
+          // 创建新标签，用返回值直接取 id（不能依赖 tagList state，闭包中是旧值）
+          const tagRes = await addTagDataAPI({ name: item });
+          const newTagId = tagRes?.data?.id;
+          if (newTagId) tagIds.push(newTagId);
         } else {
           tagIds.push(item);
         }
@@ -197,7 +216,7 @@ const PublishForm = ({ data, closeModel }: Props) => {
           });
 
           if (isDraft) {
-            message.success('🎉 保存为草稿成功');
+            message.success(' 保存为草稿成功');
           } else {
             message.success('🎉 发布成功');
           }
@@ -336,8 +355,25 @@ ${content}
     }
   };
 
+  // 封面预览状态
+  const [coverPreview, setCoverPreview] = useState<string>('');
+
   // 文件上传
   const UploadBtn = () => <CloudUploadOutlined className="text-xl cursor-pointer" onClick={() => setIsMaterialModalOpen(true)} />;
+
+  // 处理封面选择
+  const handleCoverSelect = (url: string[]) => {
+    const coverUrl = url[0];
+    form.setFieldValue('cover', coverUrl);
+    setCoverPreview(coverUrl);
+    form.validateFields(['cover']); // 手动触发 cover 字段的校验
+  };
+
+  // 清除封面
+  const handleClearCover = () => {
+    form.setFieldValue('cover', '');
+    setCoverPreview('');
+  };
 
   return (
     <div>
@@ -357,10 +393,25 @@ ${content}
         </Form.Item>
 
         <Form.Item label="文章封面" name="cover" rules={[{ validator: validateURL }]}>
-          <Space.Compact style={{ width: '100%' }}>
-            <Input placeholder="请输入文章封面" prefix={<PictureOutlined />} />
-            <UploadBtn />
-          </Space.Compact>
+          <div className="space-y-2">
+            <Space.Compact style={{ width: '100%' }}>
+              <Input placeholder="请输入文章封面" prefix={<PictureOutlined />} />
+              <UploadBtn />
+            </Space.Compact>
+            {coverPreview && (
+              <div className="relative inline-block">
+                <img src={coverPreview} alt="封面预览" className="w-40 h-24 object-cover rounded-md border border-gray-200" />
+                <Button
+                  size="small"
+                  danger
+                  className="absolute top-1 right-1 w-5 h-5 p-0 flex items-center justify-center rounded-full"
+                  onClick={handleClearCover}
+                >
+                  ×
+                </Button>
+              </div>
+            )}
+          </div>
         </Form.Item>
 
         <Form.Item label="选择分类" name="cateIds" rules={[{ required: true, message: '请选择文章分类' }]}>
@@ -427,10 +478,7 @@ ${content}
         // multiple
         open={isMaterialModalOpen}
         onClose={() => setIsMaterialModalOpen(false)}
-        onSelect={(url) => {
-          form.setFieldValue('cover', url[0]);
-          form.validateFields(['cover']); // 手动触发 image 字段的校验
-        }}
+        onSelect={handleCoverSelect}
       />
     </div>
   );

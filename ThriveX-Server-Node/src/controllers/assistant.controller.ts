@@ -89,6 +89,20 @@ class AssistantController {
     }
   }
 
+  async getDefaultAssistant(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      const assistant = await prisma.assistant.findFirst({ where: { isDefault: true } });
+      if (!assistant) {
+        res.json(success(null));
+        return;
+      }
+      res.json(success({ name: assistant.name, model: assistant.model }));
+    } catch (err) {
+      console.error('getDefaultAssistant error:', err);
+      res.json(error('获取默认助手失败'));
+    }
+  }
+
   async setDefault(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;

@@ -79,7 +79,9 @@ export default () => {
       }
 
       const { data } = await getTagListAPI();
-      setList(data as Tag[]);
+      // 按 ID 升序排列（id 可能为 undefined，使用 ?? 0 处理）
+      const sortedList = (data as Tag[]).sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+      setList(sortedList);
       isFirstLoadRef.current = false;
     } catch (error) {
       logger.error(error);

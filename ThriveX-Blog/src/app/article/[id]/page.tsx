@@ -108,7 +108,7 @@ export default async (props: Props) => {
         <meta name="description" content={data.description} />
 
         <div className="ArticlePage">
-          <Slide>
+          <Slide src={data?.cover || undefined}>
             {/* 星空背景组件 */}
             <Starry />
 
