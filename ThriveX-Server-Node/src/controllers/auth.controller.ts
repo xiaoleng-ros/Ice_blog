@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types/express';
 import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class AuthController {
   async githubLogin(req: AuthRequest, res: Response): Promise<void> {
@@ -48,7 +49,7 @@ class AuthController {
     }
   }
 
-  /** GitHub 账号绑定 — TODO: 需要在 Prisma schema 中添加 githubId 字段后启用数据库写入 */
+  /** GitHub 账号绑定 — 将 GitHub ID 保存到用户记录 */
   async githubBind(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { githubId, userId } = req.body;
@@ -58,11 +59,10 @@ class AuthController {
         return;
       }
 
-      // TODO: 取消注释以下代码，在 Prisma schema 的 User 模型中添加 githubId String? 字段后
-      // await prisma.user.update({
-      //   where: { id: userId },
-      //   data: { githubId: String(githubId) },
-      // });
+      await prisma.user.update({
+        where: { id: userId },
+        data: { githubId: String(githubId) },
+      });
 
       sendSuccess(res, { message: '绑定成功', githubId, userId });
     } catch (err) {

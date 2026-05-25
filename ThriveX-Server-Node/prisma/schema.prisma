@@ -243,6 +243,7 @@ model User {
   email      String?     @db.VarChar(100)
   role       String      @default("user") @db.VarChar(20)
   status     Int         @default(1)
+  githubId   String?     @unique @map("github_id") @db.VarChar(100)
   createTime String?     @map("create_time") @db.VarChar(255)
   userTokens UserToken[]
 
