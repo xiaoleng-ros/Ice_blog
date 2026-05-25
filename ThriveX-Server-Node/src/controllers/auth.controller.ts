@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
+import { sendSuccess, sendError } from '../utils/result';
 
 class AuthController {
   async githubLogin(req: AuthRequest, res: Response): Promise<void> {
@@ -24,7 +24,7 @@ class AuthController {
       const accessToken = tokenData.access_token;
 
       if (!accessToken) {
-        res.json(error('GitHub登录失败'));
+        sendError(res, 'GitHub登录失败', 401);
         return;
       }
 
@@ -36,30 +36,38 @@ class AuthController {
 
       const githubUser: any = await userResponse.json();
 
-      res.json(success({
+      sendSuccess(res, {
         githubId: githubUser.id,
         username: githubUser.login,
         avatar: githubUser.avatar_url,
         email: githubUser.email,
-      }));
+      });
     } catch (err) {
       console.error('githubLogin error:', err);
-      res.json(error('GitHub登录失败'));
+      sendError(res, 'GitHub登录失败', 500);
     }
   }
 
+  /** GitHub 账号绑定 — TODO: 需要在 Prisma schema 中添加 githubId 字段后启用数据库写入 */
   async githubBind(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { githubId, userId } = req.body;
 
-      res.json(success({
-        message: '绑定成功',
-        githubId,
-        userId,
-      }));
+      if (!githubId || !userId) {
+        sendError(res, '缺少 githubId 或 userId', 400);
+        return;
+      }
+
+      // TODO: 取消注释以下代码，在 Prisma schema 的 User 模型中添加 githubId String? 字段后
+      // await prisma.user.update({
+      //   where: { id: userId },
+      //   data: { githubId: String(githubId) },
+      // });
+
+      sendSuccess(res, { message: '绑定成功', githubId, userId });
     } catch (err) {
       console.error('githubBind error:', err);
-      res.json(error('GitHub绑定失败'));
+      sendError(res, 'GitHub绑定失败', 500);
     }
   }
 }

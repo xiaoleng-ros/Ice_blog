@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class StatisController {
   async getVisitorStatis(req: AuthRequest, res: Response): Promise<void> {
@@ -19,10 +17,10 @@ class StatisController {
         articleCount: articles.length,
       };
 
-      res.json(success(visitors));
+      sendSuccess(res, visitors);
     } catch (err) {
       console.error('getVisitorStatis error:', err);
-      res.json(error('获取访客统计失败'));
+      sendError(res, '获取访客统计失败', 400);
     }
   }
 
@@ -48,10 +46,10 @@ class StatisController {
         totalComments: articles.reduce((sum, a) => sum + a.comment, 0),
       };
 
-      res.json(success(statis));
+      sendSuccess(res, statis);
     } catch (err) {
       console.error('getArticleStatis error:', err);
-      res.json(error('获取文章统计失败'));
+      sendError(res, '获取文章统计失败', 400);
     }
   }
 
@@ -71,10 +69,10 @@ class StatisController {
         count: cate._count.articleCates,
       }));
 
-      res.json(success(statis));
+      sendSuccess(res, statis);
     } catch (err) {
       console.error('getCateStatis error:', err);
-      res.json(error('获取分类统计失败'));
+      sendError(res, '获取分类统计失败', 400);
     }
   }
 
@@ -94,10 +92,10 @@ class StatisController {
         count: tag._count.articleTags,
       }));
 
-      res.json(success(statis));
+      sendSuccess(res, statis);
     } catch (err) {
       console.error('getTagStatis error:', err);
-      res.json(error('获取标签统计失败'));
+      sendError(res, '获取标签统计失败', 400);
     }
   }
 
@@ -106,14 +104,14 @@ class StatisController {
       const comments = await prisma.comment.count();
       const auditedComments = await prisma.comment.count({ where: { auditStatus: 1 } });
 
-      res.json(success({
+      sendSuccess(res, {
         total: comments,
         audited: auditedComments,
         unaudited: comments - auditedComments,
-      }));
+      });
     } catch (err) {
       console.error('getCommentStatis error:', err);
-      res.json(error('获取评论统计失败'));
+      sendError(res, '获取评论统计失败', 400);
     }
   }
 }

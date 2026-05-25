@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class WallController {
   async addWall(req: AuthRequest, res: Response): Promise<void> {
@@ -22,10 +20,10 @@ class WallController {
           createdAt: Date.now().toString(),
         },
       });
-      res.json(success(wall));
+      sendSuccess(res, wall);
     } catch (err) {
       console.error('addWall error:', err);
-      res.json(error('添加留言失败'));
+      sendError(res, '添加留言失败', 400);
     }
   }
 
@@ -33,10 +31,10 @@ class WallController {
     try {
       const { id } = req.params;
       await prisma.wall.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteWall error:', err);
-      res.json(error('删除留言失败'));
+      sendError(res, '删除留言失败', 400);
     }
   }
 
@@ -44,10 +42,10 @@ class WallController {
     try {
       const { ids } = req.body;
       await prisma.wall.deleteMany({ where: { id: { in: ids.map((i: any) => parseInt(i)) } } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('batchDeleteWall error:', err);
-      res.json(error('批量删除留言失败'));
+      sendError(res, '批量删除留言失败', 400);
     }
   }
 
@@ -58,10 +56,10 @@ class WallController {
         where: { id: parseInt(id) },
         data: { name, cateId, color, content, avatar, email },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editWall error:', err);
-      res.json(error('编辑留言失败'));
+      sendError(res, '编辑留言失败', 400);
     }
   }
 
@@ -69,10 +67,10 @@ class WallController {
     try {
       const { id } = req.params;
       const wall = await prisma.wall.findUnique({ where: { id: parseInt(id) } });
-      res.json(success(wall));
+      sendSuccess(res, wall);
     } catch (err) {
       console.error('getWall error:', err);
-      res.json(error('获取留言失败'));
+      sendError(res, '获取留言失败', 400);
     }
   }
 
@@ -94,13 +92,13 @@ class WallController {
           }),
           prisma.wall.count({ where }),
         ]);
-        res.json(success({
+        sendSuccess(res, {
           records: walls,
           total,
           page: pageNum,
           size: sizeNum,
           totalPages: Math.ceil(total / sizeNum),
-        }));
+        });
         return;
       }
 
@@ -108,10 +106,10 @@ class WallController {
         where,
         orderBy: { createdAt: 'desc' },
       });
-      res.json(success(walls));
+      sendSuccess(res, walls);
     } catch (err) {
       console.error('getWallList error:', err);
-      res.json(error('获取留言列表失败'));
+      sendError(res, '获取留言列表失败', 400);
     }
   }
 
@@ -140,26 +138,26 @@ class WallController {
         prisma.wall.count({ where }),
       ]);
 
-      res.json(success({
+      sendSuccess(res, {
         records: walls,
         total,
         page: pageNum,
         size: sizeNum,
         totalPages: Math.ceil(total / sizeNum),
-      }));
+      });
     } catch (err) {
       console.error('getWallCateWallList error:', err);
-      res.json(error('获取分类留言失败'));
+      sendError(res, '获取分类留言失败', 400);
     }
   }
 
   async getWallCate(req: AuthRequest, res: Response): Promise<void> {
     try {
       const cates = await prisma.wallCate.findMany({ orderBy: { order: 'asc' } });
-      res.json(success(cates));
+      sendSuccess(res, cates);
     } catch (err) {
       console.error('getWallCate error:', err);
-      res.json(error('获取留言分类失败'));
+      sendError(res, '获取留言分类失败', 400);
     }
   }
 
@@ -167,10 +165,10 @@ class WallController {
     try {
       const { name, icon, order } = req.body;
       const cate = await prisma.wallCate.create({ data: { name, icon, order } });
-      res.json(success(cate));
+      sendSuccess(res, cate);
     } catch (err) {
       console.error('addWallCate error:', err);
-      res.json(error('添加留言分类失败'));
+      sendError(res, '添加留言分类失败', 400);
     }
   }
 
@@ -178,10 +176,10 @@ class WallController {
     try {
       const { id } = req.params;
       await prisma.wallCate.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteWallCate error:', err);
-      res.json(error('删除留言分类失败'));
+      sendError(res, '删除留言分类失败', 400);
     }
   }
 
@@ -192,10 +190,10 @@ class WallController {
         where: { id: parseInt(id) },
         data: { auditStatus: 1 },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('auditWall error:', err);
-      res.json(error('审核留言失败'));
+      sendError(res, '审核留言失败', 400);
     }
   }
 
@@ -204,7 +202,7 @@ class WallController {
       const { id } = req.params;
       const wall = await prisma.wall.findUnique({ where: { id: parseInt(id) } });
       if (!wall) {
-        res.json(error('留言不存在'));
+        sendError(res, '留言不存在', 400);
         return;
       }
       const newIsChoice = wall.isChoice === 1 ? 0 : 1;
@@ -212,10 +210,10 @@ class WallController {
         where: { id: parseInt(id) },
         data: { isChoice: newIsChoice },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('updateChoice error:', err);
-      res.json(error('更新精选状态失败'));
+      sendError(res, '更新精选状态失败', 400);
     }
   }
 }

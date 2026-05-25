@@ -1,8 +1,6 @@
 import Parser from 'rss-parser';
 import NodeCache from 'node-cache';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma';
 const parser = new Parser();
 const rssCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 

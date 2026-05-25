@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class TagController {
   /**
@@ -16,14 +14,14 @@ class TagController {
       // 未提供 mark 时自动从 name 生成标识符
       const tagMark = mark || name.replace(/\s+/g, '-').toLowerCase();
       const tag = await prisma.tag.create({ data: { name, icon, mark: tagMark } });
-      res.json(success(tag));
+      sendSuccess(res, tag);
     } catch (err: any) {
       console.error('addTag error:', err);
       // 处理唯一约束冲突（mark 重复）
       const message = err?.code === 'P2002'
         ? '标签名称或标识已存在，请更换后重试'
         : '创建标签失败';
-      res.json(error(message));
+      sendError(res, message, 400);
     }
   }
 
@@ -31,10 +29,10 @@ class TagController {
     try {
       const { id } = req.params;
       await prisma.tag.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteTag error:', err);
-      res.json(error('删除标签失败'));
+      sendError(res, '删除标签失败', 400);
     }
   }
 
@@ -42,10 +40,10 @@ class TagController {
     try {
       const { id, name, icon, mark } = req.body;
       await prisma.tag.update({ where: { id: parseInt(id) }, data: { name, icon, mark } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editTag error:', err);
-      res.json(error('编辑标签失败'));
+      sendError(res, '编辑标签失败', 400);
     }
   }
 
@@ -53,20 +51,20 @@ class TagController {
     try {
       const { id } = req.params;
       const tag = await prisma.tag.findUnique({ where: { id: parseInt(id) } });
-      res.json(success(tag));
+      sendSuccess(res, tag);
     } catch (err) {
       console.error('getTag error:', err);
-      res.json(error('获取标签失败'));
+      sendError(res, '获取标签失败', 400);
     }
   }
 
   async getTagList(req: AuthRequest, res: Response): Promise<void> {
     try {
       const tags = await prisma.tag.findMany();
-      res.json(success(tags));
+      sendSuccess(res, tags);
     } catch (err) {
       console.error('getTagList error:', err);
-      res.json(error('获取标签列表失败'));
+      sendError(res, '获取标签列表失败', 400);
     }
   }
 
@@ -98,10 +96,10 @@ class TagController {
         ).length,
       }));
 
-      res.json(success(result));
+      sendSuccess(res, result);
     } catch (err) {
       console.error('getTagArticleCount error:', err);
-      res.json(error('获取标签文章数量失败'));
+      sendError(res, '获取标签文章数量失败', 400);
     }
   }
 }

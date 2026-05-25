@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class ConfigController {
   async getWebConfig(req: AuthRequest, res: Response): Promise<void> {
@@ -13,10 +11,10 @@ class ConfigController {
       configs.forEach((cfg: { name: string; value: any }) => {
         configMap[cfg.name] = cfg.value;
       });
-      res.json(success(configMap));
+      sendSuccess(res, configMap);
     } catch (err) {
       console.error('getWebConfig error:', err);
-      res.json(error('获取网站配置失败'));
+      sendError(res, '获取网站配置失败', 400);
     }
   }
 
@@ -29,14 +27,14 @@ class ConfigController {
       
       // 如果配置不存在，返回空数据而不是报错
       if (!config) {
-        res.json(success({ name, value: null }));
+        sendSuccess(res, { name, value: null });
         return;
       }
       
-      res.json(success(config));
+      sendSuccess(res, config);
     } catch (err) {
       console.error('getWebConfigByName error:', err);
-      res.json(error('获取网站配置失败'));
+      sendError(res, '获取网站配置失败', 400);
     }
   }
 
@@ -52,10 +50,10 @@ class ConfigController {
         });
       }
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editWebConfig error:', err);
-      res.json(error('编辑网站配置失败'));
+      sendError(res, '编辑网站配置失败', 400);
     }
   }
 
@@ -66,17 +64,17 @@ class ConfigController {
       // 如果没有提供 pageName，返回所有页面配置列表
       if (!pageName) {
         const configs = await prisma.pageConfig.findMany();
-        res.json(success(configs));
+        sendSuccess(res, configs);
         return;
       }
 
       const config = await prisma.pageConfig.findUnique({
         where: { pageName: pageName as string },
       });
-      res.json(success(config));
+      sendSuccess(res, config);
     } catch (err) {
       console.error('getPageConfig error:', err);
-      res.json(error('获取页面配置失败'));
+      sendError(res, '获取页面配置失败', 400);
     }
   }
 
@@ -90,20 +88,20 @@ class ConfigController {
         create: { pageName, config },
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editPageConfig error:', err);
-      res.json(error('编辑页面配置失败'));
+      sendError(res, '编辑页面配置失败', 400);
     }
   }
 
   async getEnvConfig(req: AuthRequest, res: Response): Promise<void> {
     try {
       const configs = await prisma.envConfig.findMany();
-      res.json(success(configs));
+      sendSuccess(res, configs);
     } catch (err) {
       console.error('getEnvConfig error:', err);
-      res.json(error('获取环境配置失败'));
+      sendError(res, '获取环境配置失败', 400);
     }
   }
 
@@ -114,13 +112,13 @@ class ConfigController {
         where: { name },
       });
       if (!config) {
-        res.json(success(null));
+        sendSuccess(res, null);
         return;
       }
-      res.json(success(config));
+      sendSuccess(res, config);
     } catch (err) {
       console.error('getEnvConfigByName error:', err);
-      res.json(error('获取环境配置失败'));
+      sendError(res, '获取环境配置失败', 400);
     }
   }
 
@@ -130,10 +128,10 @@ class ConfigController {
       const config = await prisma.envConfig.create({
         data: { name, value, notes },
       });
-      res.json(success(config));
+      sendSuccess(res, config);
     } catch (err) {
       console.error('addEnvConfig error:', err);
-      res.json(error('添加环境配置失败'));
+      sendError(res, '添加环境配置失败', 400);
     }
   }
 
@@ -141,10 +139,10 @@ class ConfigController {
     try {
       const { id } = req.params;
       await prisma.envConfig.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteEnvConfig error:', err);
-      res.json(error('删除环境配置失败'));
+      sendError(res, '删除环境配置失败', 400);
     }
   }
 
@@ -155,10 +153,10 @@ class ConfigController {
         where: { id: parseInt(id) },
         data: { name, value, notes },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editEnvConfig error:', err);
-      res.json(error('编辑环境配置失败'));
+      sendError(res, '编辑环境配置失败', 400);
     }
   }
 }

@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class CateController {
   async addCate(req: AuthRequest, res: Response): Promise<void> {
@@ -20,13 +18,13 @@ class CateController {
           type,
         },
       });
-      res.json(success(cate));
+      sendSuccess(res, cate);
     } catch (err: any) {
       console.error('addCate error:', err);
       const message = err?.code === 'P2002'
         ? '分类名称或标识已存在，请更换后重试'
         : '创建分类失败';
-      res.json(error(message));
+      sendError(res, message, 400);
     }
   }
 
@@ -34,10 +32,10 @@ class CateController {
     try {
       const { id } = req.params;
       await prisma.cate.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteCate error:', err);
-      res.json(error('删除分类失败'));
+      sendError(res, '删除分类失败', 400);
     }
   }
 
@@ -45,14 +43,14 @@ class CateController {
     try {
       const { ids } = req.body;
       if (!ids || ids.length === 0) {
-        res.json(error('请提供要删除的分类ID'));
+        sendError(res, '请提供要删除的分类ID', 400);
         return;
       }
       await prisma.cate.deleteMany({ where: { id: { in: ids.map((i: any) => parseInt(i)) } } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('batchDeleteCate error:', err);
-      res.json(error('批量删除分类失败'));
+      sendError(res, '批量删除分类失败', 400);
     }
   }
 
@@ -71,13 +69,13 @@ class CateController {
           type,
         },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err: any) {
       console.error('editCate error:', err);
       const message = err?.code === 'P2002'
         ? '分类名称或标识已存在，请更换后重试'
         : '编辑分类失败';
-      res.json(error(message));
+      sendError(res, message, 400);
     }
   }
 
@@ -85,10 +83,10 @@ class CateController {
     try {
       const { id } = req.params;
       const cate = await prisma.cate.findUnique({ where: { id: parseInt(id) } });
-      res.json(success(cate));
+      sendSuccess(res, cate);
     } catch (err) {
       console.error('getCate error:', err);
-      res.json(error('获取分类失败'));
+      sendError(res, '获取分类失败', 400);
     }
   }
 
@@ -101,7 +99,7 @@ class CateController {
           orderBy: { order: 'asc' },
         });
         const tree = buildCateTree(cates);
-        res.json(success(tree));
+        sendSuccess(res, tree);
         return;
       }
 
@@ -116,21 +114,21 @@ class CateController {
           }),
           prisma.cate.count(),
         ]);
-        res.json(success({
+        sendSuccess(res, {
           records: cates,
           total,
           page: pageNum,
           size: sizeNum,
           totalPages: Math.ceil(total / sizeNum),
-        }));
+        });
         return;
       }
 
       const cates = await prisma.cate.findMany({ orderBy: { order: 'asc' } });
-      res.json(success(cates));
+      sendSuccess(res, cates);
     } catch (err) {
       console.error('getCateList error:', err);
-      res.json(error('获取分类列表失败'));
+      sendError(res, '获取分类列表失败', 400);
     }
   }
 
@@ -150,10 +148,10 @@ class CateController {
         count: cate._count.articleCates,
       }));
 
-      res.json(success(result));
+      sendSuccess(res, result);
     } catch (err) {
       console.error('getCateArticleCount error:', err);
-      res.json(error('获取分类文章数量失败'));
+      sendError(res, '获取分类文章数量失败', 400);
     }
   }
 }

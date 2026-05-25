@@ -1,11 +1,16 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
+import { sendSuccess, sendError } from '../utils/result';
 import { createToken } from '../utils/jwt';
+import { prisma } from '../utils/prisma';
+import NodeCache from 'node-cache';
 
-const prisma = new PrismaClient();
+/** 登录失败计数缓存，TTL 15 分钟自动清除 */
+const loginFailCache = new NodeCache({ stdTTL: 900, checkperiod: 60 });
+
+/** 最大登录失败次数，超过后锁定 15 分钟 */
+const MAX_LOGIN_FAILS = 5;
 
 class UserController {
   async addUser(req: AuthRequest, res: Response): Promise<void> {
@@ -26,10 +31,10 @@ class UserController {
         },
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('addUser error:', err);
-      res.json(error('创建用户失败'));
+      sendError(res, '创建用户失败', 500);
     }
   }
 
@@ -41,10 +46,10 @@ class UserController {
         where: { id: parseInt(id) },
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteUser error:', err);
-      res.json(error('删除用户失败'));
+      sendError(res, '删除用户失败', 500);
     }
   }
 
@@ -56,10 +61,10 @@ class UserController {
         where: { id: { in: ids.map((i: any) => parseInt(i)) } },
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('batchDeleteUser error:', err);
-      res.json(error('批量删除用户失败'));
+      sendError(res, '批量删除用户失败', 500);
     }
   }
 
@@ -78,10 +83,10 @@ class UserController {
         },
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editUser error:', err);
-      res.json(error('编辑用户失败'));
+      sendError(res, '编辑用户失败', 500);
     }
   }
 
@@ -103,10 +108,10 @@ class UserController {
         },
       });
 
-      res.json(success(user));
+      sendSuccess(res, user);
     } catch (err) {
       console.error('getUser error:', err);
-      res.json(error('获取用户失败'));
+      sendError(res, '获取用户失败', 500);
     }
   }
 
@@ -125,10 +130,10 @@ class UserController {
         },
       });
 
-      res.json(success(users));
+      sendSuccess(res, users);
     } catch (err) {
       console.error('getUserList error:', err);
-      res.json(error('获取用户列表失败'));
+      sendError(res, '获取用户列表失败', 500);
     }
   }
 
@@ -162,16 +167,16 @@ class UserController {
         prisma.user.count({ where }),
       ]);
 
-      res.json(success({
+      sendSuccess(res, {
         records: users,
         total,
         page: pageNum,
         size: sizeNum,
         totalPages: Math.ceil(total / sizeNum),
-      }));
+      });
     } catch (err) {
       console.error('getUserPaging error:', err);
-      res.json(error('分页获取用户失败'));
+      sendError(res, '分页获取用户失败', 500);
     }
   }
 
@@ -179,21 +184,36 @@ class UserController {
     try {
       const { username, password } = req.body;
 
+      // 登录失败次数检查（防暴力破解）
+      const cacheKey = `login_fail_${username}`;
+      const failCount: number = loginFailCache.get(cacheKey) || 0;
+
+      if (failCount >= MAX_LOGIN_FAILS) {
+        sendError(res, '登录失败次数过多，请 15 分钟后再试', 429);
+        return;
+      }
+
       const user = await prisma.user.findUnique({
         where: { username },
       });
 
       if (!user) {
-        res.json(error('用户不存在'));
+        loginFailCache.set(cacheKey, failCount + 1);
+        sendError(res, '用户不存在', 401);
         return;
       }
 
       const isValid = await bcrypt.compare(password, user.password);
 
       if (!isValid) {
-        res.json(error('密码错误'));
+        loginFailCache.set(cacheKey, failCount + 1);
+        const remaining = MAX_LOGIN_FAILS - failCount - 1;
+        sendError(res, remaining > 0 ? `密码错误，还剩 ${remaining} 次尝试机会` : '登录失败次数过多，请 15 分钟后再试', remaining > 0 ? 401 : 429);
         return;
       }
+
+      // 登录成功，清除失败计数
+      loginFailCache.del(cacheKey);
 
       // Invalidate all existing tokens for this user
       await prisma.userToken.deleteMany({ where: { userId: user.id } });
@@ -212,7 +232,7 @@ class UserController {
         },
       });
 
-      res.json(success({
+      sendSuccess(res, {
         token,
         userInfo: {
           id: user.id,
@@ -221,10 +241,10 @@ class UserController {
           avatar: user.avatar,
           role: user.role,
         },
-      }, '登录成功'));
+      }, '登录成功');
     } catch (err) {
       console.error('login error:', err);
-      res.json(error('登录失败'));
+      sendError(res, '登录失败', 500);
     }
   }
 
@@ -234,7 +254,7 @@ class UserController {
       const userId = req.user?.userId;
 
       if (!userId) {
-        res.json(error('未登录'));
+        sendError(res, '未登录', 401);
         return;
       }
 
@@ -243,14 +263,14 @@ class UserController {
       });
 
       if (!user) {
-        res.json(error('用户不存在'));
+        sendError(res, '用户不存在', 404);
         return;
       }
 
       const isValid = await bcrypt.compare(oldPass, user.password);
 
       if (!isValid) {
-        res.json(error('原密码错误'));
+        sendError(res, '原密码错误', 400);
         return;
       }
 
@@ -261,10 +281,10 @@ class UserController {
         data: { password: hashedPassword },
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('changePassword error:', err);
-      res.json(error('修改密码失败'));
+      sendError(res, '修改密码失败', 500);
     }
   }
 
@@ -279,10 +299,10 @@ class UserController {
         });
       }
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('logout error:', err);
-      res.json(error('登出失败'));
+      sendError(res, '登出失败', 500);
     }
   }
 
@@ -304,10 +324,10 @@ class UserController {
         },
       });
 
-      res.json(success(user));
+      sendSuccess(res, user);
     } catch (err) {
       console.error('getUserInfo error:', err);
-      res.json(error('获取用户信息失败'));
+      sendError(res, '获取用户信息失败', 500);
     }
   }
 
@@ -326,18 +346,17 @@ class UserController {
       });
 
       if (!author) {
-        res.json(error('未找到作者信息'));
+        sendError(res, '未找到作者信息', 404);
         return;
       }
 
-      // 将 nickname 映射为 name，兼容前端字段名
-      res.json(success({
+      sendSuccess(res, {
         ...author,
         name: author?.nickname || author?.username || '',
-      }));
+      });
     } catch (err) {
       console.error('getAuthor error:', err);
-      res.json(error('获取作者信息失败'));
+      sendError(res, '获取作者信息失败', 500);
     }
   }
 
@@ -346,7 +365,7 @@ class UserController {
       const { token } = req.query;
 
       if (!token || typeof token !== 'string') {
-        res.json(error('Token 不能为空'));
+        sendError(res, 'Token 不能为空', 400);
         return;
       }
 
@@ -355,19 +374,19 @@ class UserController {
       });
 
       if (!tokenRecord) {
-        res.json(error('Token 无效或已过期'));
+        sendError(res, 'Token 无效或已过期', 401);
         return;
       }
 
       if (tokenRecord.expireTime && new Date(tokenRecord.expireTime) < new Date()) {
-        res.json(error('Token 已过期'));
+        sendError(res, 'Token 已过期', 401);
         return;
       }
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('checkToken error:', err);
-      res.json(error('校验 Token 失败'));
+      sendError(res, '校验 Token 失败', 500);
     }
   }
 }

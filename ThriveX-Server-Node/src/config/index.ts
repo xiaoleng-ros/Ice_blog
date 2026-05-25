@@ -24,7 +24,9 @@ export const config = {
       const origins = (process.env.CORS_ORIGIN || 'http://localhost:9000').split(',');
       const env = process.env.NODE_ENV || 'development';
       if (origins.includes('*') && env === 'production') {
-        console.warn('WARNING: CORS_ORIGIN 包含通配符 *，生产环境存在安全风险');
+        // 生产环境强制移除通配符，防止安全风险
+        console.error('ERROR: CORS_ORIGIN 包含通配符 *，生产环境不允许使用，已自动移除');
+        return origins.filter((o: string) => o !== '*');
       }
       return origins;
     })(),

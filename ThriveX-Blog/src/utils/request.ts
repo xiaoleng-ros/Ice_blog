@@ -7,7 +7,7 @@ const url = process.env.NEXT_PUBLIC_PROJECT_API
 const rawCachingTime = process.env.NEXT_PUBLIC_CACHING_TIME;
 const cachingTime = rawCachingTime ? +rawCachingTime : 60;
 // 请求超时时间（毫秒）
-const REQUEST_TIMEOUT = 3000
+const REQUEST_TIMEOUT = 15000
 
 if (!url) {
     logger.error('❌ 环境变量 NEXT_PUBLIC_PROJECT_API 未设置或为空');

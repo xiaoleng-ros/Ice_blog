@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class RecordController {
   async addRecord(req: AuthRequest, res: Response): Promise<void> {
@@ -17,10 +15,10 @@ class RecordController {
           createdAt: Date.now().toString(),
         },
       });
-      res.json(success(record));
+      sendSuccess(res, record);
     } catch (err) {
       console.error('addRecord error:', err);
-      res.json(error('添加记录失败'));
+      sendError(res, '添加记录失败', 400);
     }
   }
 
@@ -28,10 +26,10 @@ class RecordController {
     try {
       const { id } = req.params;
       await prisma.record.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteRecord error:', err);
-      res.json(error('删除记录失败'));
+      sendError(res, '删除记录失败', 400);
     }
   }
 
@@ -42,10 +40,10 @@ class RecordController {
         where: { id: parseInt(id) },
         data: { title, content, images },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editRecord error:', err);
-      res.json(error('编辑记录失败'));
+      sendError(res, '编辑记录失败', 400);
     }
   }
 
@@ -54,10 +52,10 @@ class RecordController {
       const records = await prisma.record.findMany({
         orderBy: { createdAt: 'desc' },
       });
-      res.json(success(records));
+      sendSuccess(res, records);
     } catch (err) {
       console.error('getRecordList error:', err);
-      res.json(error('获取记录列表失败'));
+      sendError(res, '获取记录列表失败', 400);
     }
   }
 
@@ -76,16 +74,16 @@ class RecordController {
         prisma.record.count(),
       ]);
 
-      res.json(success({
+      sendSuccess(res, {
         records,
         total,
         page: pageNum,
         size: sizeNum,
         totalPages: Math.ceil(total / sizeNum),
-      }));
+      });
     } catch (err) {
       console.error('getRecordPaging error:', err);
-      res.json(error('获取记录列表失败'));
+      sendError(res, '获取记录列表失败', 400);
     }
   }
 }

@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class AssistantController {
   async getAssistantList(req: AuthRequest, res: Response): Promise<void> {
@@ -16,10 +14,10 @@ class AssistantController {
         model: a.model,
         isDefault: a.isDefault,
       }));
-      res.json(success(safeAssistants));
+      sendSuccess(res, safeAssistants);
     } catch (err) {
       console.error('getAssistantList error:', err);
-      res.json(error('获取助手列表失败'));
+      sendError(res, '获取助手列表失败', 400);
     }
   }
 
@@ -29,10 +27,10 @@ class AssistantController {
       const assistant = await prisma.assistant.create({
         data: { name, key, url, model, isDefault },
       });
-      res.json(success(assistant));
+      sendSuccess(res, assistant);
     } catch (err) {
       console.error('addAssistant error:', err);
-      res.json(error('添加助手失败'));
+      sendError(res, '添加助手失败', 400);
     }
   }
 
@@ -40,10 +38,10 @@ class AssistantController {
     try {
       const { id } = req.params;
       await prisma.assistant.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteAssistant error:', err);
-      res.json(error('删除助手失败'));
+      sendError(res, '删除助手失败', 400);
     }
   }
 
@@ -54,10 +52,10 @@ class AssistantController {
         where: { id: parseInt(id) },
         data: { name, key, url, model, isDefault },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editAssistant error:', err);
-      res.json(error('编辑助手失败'));
+      sendError(res, '编辑助手失败', 400);
     }
   }
 
@@ -70,7 +68,7 @@ class AssistantController {
         : await prisma.assistant.findFirst({ where: { isDefault: true } });
 
       if (!assistant) {
-        res.json(error('未配置AI助手'));
+        sendError(res, '未配置AI助手', 400);
         return;
       }
 
@@ -89,10 +87,10 @@ class AssistantController {
       const data: any = await response.json();
       const reply = data.choices?.[0]?.message?.content || '抱歉，我现在无法回答您的问题。';
 
-      res.json(success({ reply }));
+      sendSuccess(res, { reply });
     } catch (err) {
       console.error('chat error:', err);
-      res.json(error('AI对话失败'));
+      sendError(res, 'AI对话失败', 400);
     }
   }
 
@@ -100,13 +98,13 @@ class AssistantController {
     try {
       const assistant = await prisma.assistant.findFirst({ where: { isDefault: true } });
       if (!assistant) {
-        res.json(success(null));
+        sendSuccess(res, null);
         return;
       }
-      res.json(success({ name: assistant.name, model: assistant.model }));
+      sendSuccess(res, { name: assistant.name, model: assistant.model });
     } catch (err) {
       console.error('getDefaultAssistant error:', err);
-      res.json(error('获取默认助手失败'));
+      sendError(res, '获取默认助手失败', 400);
     }
   }
 
@@ -119,10 +117,10 @@ class AssistantController {
         prisma.assistant.update({ where: { id: parseInt(id) }, data: { isDefault: true } }),
       ]);
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('setDefault error:', err);
-      res.json(error('设置默认助手失败'));
+      sendError(res, '设置默认助手失败', 400);
     }
   }
 }

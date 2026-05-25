@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
+import { sendSuccess, sendError } from '../utils/result';
 import { sendEmail, generateCommentEmailHtml, generateDismissEmailHtml, generateWallReplyEmailHtml } from '../utils/email';
 
 class EmailController {
@@ -20,10 +20,10 @@ class EmailController {
         html,
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('sendEmail error:', err);
-      res.json(error('发送邮件失败'));
+      sendError(res, '发送邮件失败', 400);
     }
   }
 
@@ -32,7 +32,7 @@ class EmailController {
       const { to, subject, type, recipient, time, content, url } = req.body;
 
       if (!to) {
-        res.json(error('收件人不能为空'));
+        sendError(res, '收件人不能为空', 400);
         return;
       }
 
@@ -50,10 +50,10 @@ class EmailController {
         html,
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('sendDismissEmail error:', err);
-      res.json(error('发送驳回通知邮件失败'));
+      sendError(res, '发送驳回通知邮件失败', 400);
     }
   }
 
@@ -62,7 +62,7 @@ class EmailController {
       const { to, recipient, time, yourContent, replyContent, url } = req.body;
 
       if (!to) {
-        res.json(error('收件人不能为空'));
+        sendError(res, '收件人不能为空', 400);
         return;
       }
 
@@ -80,10 +80,10 @@ class EmailController {
         html,
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('sendWallReplyEmail error:', err);
-      res.json(error('发送留言回复邮件失败'));
+      sendError(res, '发送留言回复邮件失败', 400);
     }
   }
 }

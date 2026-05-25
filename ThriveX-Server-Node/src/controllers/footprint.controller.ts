@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class FootprintController {
   async addFootprint(req: AuthRequest, res: Response): Promise<void> {
@@ -19,10 +17,10 @@ class FootprintController {
           createTime: Date.now().toString(),
         },
       });
-      res.json(success(footprint));
+      sendSuccess(res, footprint);
     } catch (err) {
       console.error('addFootprint error:', err);
-      res.json(error('添加足迹失败'));
+      sendError(res, '添加足迹失败', 400);
     }
   }
 
@@ -30,10 +28,10 @@ class FootprintController {
     try {
       const { id } = req.params;
       await prisma.footprint.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteFootprint error:', err);
-      res.json(error('删除足迹失败'));
+      sendError(res, '删除足迹失败', 400);
     }
   }
 
@@ -44,10 +42,10 @@ class FootprintController {
         where: { id: parseInt(id) },
         data: { title, content, address, position, images },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editFootprint error:', err);
-      res.json(error('编辑足迹失败'));
+      sendError(res, '编辑足迹失败', 400);
     }
   }
 
@@ -56,10 +54,10 @@ class FootprintController {
       const footprints = await prisma.footprint.findMany({
         orderBy: { createTime: 'desc' },
       });
-      res.json(success(footprints));
+      sendSuccess(res, footprints);
     } catch (err) {
       console.error('getFootprintList error:', err);
-      res.json(error('获取足迹列表失败'));
+      sendError(res, '获取足迹列表失败', 400);
     }
   }
 }

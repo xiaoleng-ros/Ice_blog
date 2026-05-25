@@ -1,14 +1,14 @@
 import { Response } from 'express';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
+import { sendSuccess, sendError } from '../utils/result';
 import { isAdmin } from '../utils/auth';
 import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import JSZip from 'jszip';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma';
 
 class ArticleController {
   async addArticle(req: AuthRequest, res: Response): Promise<void> {
@@ -43,21 +43,24 @@ class ArticleController {
         });
       }
 
+      // 加密文章密码使用 bcrypt hash
+      const hashedPassword = config?.password ? await bcrypt.hash(config.password, 10) : '';
+
       await prisma.articleConfig.create({
         data: {
           articleId: article.id,
           status: config?.status || 'default',
-          password: config?.password || '',
+          password: hashedPassword,
           isEncrypt: config?.isEncrypt === 1 || config?.isEncrypt === true,
           isDraft: config?.isDraft === 1 || config?.isDraft === true,
           isDel: config?.isDel === 1 || config?.isDel === true,
         },
       });
 
-      res.json(success({ id: article.id }));
+      sendSuccess(res, { id: article.id });
     } catch (err) {
       console.error('addArticle error:', err);
-      res.json(error('创建文章失败'));
+      sendError(res, '创建文章失败', 400);
     }
   }
 
@@ -76,10 +79,10 @@ class ArticleController {
         });
       }
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteArticle error:', err);
-      res.json(error('删除文章失败'));
+      sendError(res, '删除文章失败', 400);
     }
   }
 
@@ -92,10 +95,10 @@ class ArticleController {
         data: { isDel: false },
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('reductionArticle error:', err);
-      res.json(error('还原文章失败'));
+      sendError(res, '还原文章失败', 400);
     }
   }
 
@@ -108,10 +111,10 @@ class ArticleController {
         data: { isDel: true },
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('batchDeleteArticle error:', err);
-      res.json(error('批量删除文章失败'));
+      sendError(res, '批量删除文章失败', 400);
     }
   }
 
@@ -159,11 +162,14 @@ class ArticleController {
       }
 
       if (config) {
+        // 加密文章密码使用 bcrypt hash
+        const hashedPassword = config.password ? await bcrypt.hash(config.password, 10) : '';
+
         await prisma.articleConfig.update({
           where: { articleId: id },
           data: {
             status: config.status || 'default',
-            password: config.password || '',
+            password: hashedPassword,
             isEncrypt: config.isEncrypt === 1 || config.isEncrypt === true,
             isDraft: config.isDraft === 1 || config.isDraft === true,
             isDel: config.isDel === 1 || config.isDel === true,
@@ -171,10 +177,10 @@ class ArticleController {
         });
       }
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editArticle error:', err);
-      res.json(error('编辑文章失败'));
+      sendError(res, '编辑文章失败', 400);
     }
   }
 
@@ -195,17 +201,19 @@ class ArticleController {
       });
 
       if (!article) {
-        res.json(error('文章不存在'));
+        sendError(res, '文章不存在', 400);
         return;
       }
 
       if (article.articleConfig?.isEncrypt && !admin) {
         if (!password) {
-          res.json(error('请输入文章访问密码', 612));
+          sendError(res, '请输入文章访问密码', 403);
           return;
         }
-        if (password !== article.articleConfig.password) {
-          res.json(error('文章访问密码错误', 613));
+        // 使用 bcrypt 比对加密密码
+        const isPasswordValid = await bcrypt.compare(password as string, article.articleConfig.password || '');
+        if (!isPasswordValid) {
+          sendError(res, '文章访问密码错误', 403);
           return;
         }
       }
@@ -242,10 +250,10 @@ class ArticleController {
         next: nextArticle || null,
       };
 
-      res.json(success(result));
+      sendSuccess(res, result);
     } catch (err) {
       console.error('getArticle error:', err);
-      res.json(error('获取文章失败'));
+      sendError(res, '获取文章失败', 400);
     }
   }
 
@@ -309,16 +317,16 @@ class ArticleController {
         tagList: article.articleTags?.map((at) => at.tag) || [],
       }));
 
-      res.json(success({
+      sendSuccess(res, {
         result: mappedArticles,
         total,
         page: pageNum,
         size: sizeNum,
         pages: Math.ceil(total / sizeNum),
-      }));
+      });
     } catch (err) {
       console.error('getArticleList error:', err);
-      res.json(error('获取文章列表失败'));
+      sendError(res, '获取文章列表失败', 400);
     }
   }
 
@@ -367,16 +375,16 @@ class ArticleController {
 
       const articles = articleCates.map((ac: { article: any }) => ac.article);
 
-      res.json(success({
+      sendSuccess(res, {
         result: articles,
         total,
         page,
         size,
         pages: Math.ceil(total / size),
-      }));
+      });
     } catch (err) {
       console.error('getArticleByCate error:', err);
-      res.json(error('获取分类文章失败'));
+      sendError(res, '获取分类文章失败', 400);
     }
   }
 
@@ -425,42 +433,22 @@ class ArticleController {
 
       const articles = articleTags.map((at: { article: any }) => at.article);
 
-      res.json(success({
+      sendSuccess(res, {
         result: articles,
         total,
         page,
         size,
         pages: Math.ceil(total / size),
-      }));
+      });
     } catch (err) {
       console.error('getArticleByTag error:', err);
-      res.json(error('获取标签文章失败'));
+      sendError(res, '获取标签文章失败', 400);
     }
   }
 
   async getHotArticles(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const articles = await prisma.article.findMany({
-        include: {
-          articleConfig: true,
-        },
-        orderBy: { view: 'desc' },
-        take: 10,
-      });
-
-      const filtered = articles.filter(
-        (a: { articleConfig: { isDel: boolean; status: string } | null }) => a.articleConfig && !a.articleConfig.isDel && a.articleConfig.status === 'default'
-      );
-
-      res.json(success(filtered));
-    } catch (err) {
-      console.error('getHotArticles error:', err);
-      res.json(error('获取热门文章失败'));
-    }
-  }
-
-  async getRandomArticles(req: AuthRequest, res: Response): Promise<void> {
-    try {
+      // 直接在数据库层过滤，避免加载无用数据
       const articles = await prisma.article.findMany({
         include: {
           articleConfig: true,
@@ -471,14 +459,51 @@ class ArticleController {
             status: 'default',
           },
         },
-        take: 100,
+        orderBy: { view: 'desc' },
+        take: 10,
       });
 
-      const shuffled = articles.sort(() => Math.random() - 0.5);
-      res.json(success(shuffled.slice(0, 5)));
+      sendSuccess(res, articles);
+    } catch (err) {
+      console.error('getHotArticles error:', err);
+      sendError(res, '获取热门文章失败', 400);
+    }
+  }
+
+  async getRandomArticles(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      // 先查总数，再随机取偏移量，避免加载大量数据到内存
+      const total = await prisma.article.count({
+        where: {
+          articleConfig: {
+            isDel: false,
+            status: 'default',
+          },
+        },
+      });
+
+      const take = Math.min(5, total);
+      const skip = total > take ? Math.floor(Math.random() * (total - take)) : 0;
+
+      const articles = await prisma.article.findMany({
+        include: {
+          articleConfig: true,
+        },
+        where: {
+          articleConfig: {
+            isDel: false,
+            status: 'default',
+          },
+        },
+        orderBy: { id: 'asc' },
+        skip,
+        take,
+      });
+
+      sendSuccess(res, articles);
     } catch (err) {
       console.error('getRandomArticles error:', err);
-      res.json(error('获取随机文章失败'));
+      sendError(res, '获取随机文章失败', 400);
     }
   }
 
@@ -491,18 +516,21 @@ class ArticleController {
         data: { view: { increment: 1 } },
       });
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('incrementView error:', err);
-      res.json(error('更新浏览量失败'));
+      sendError(res, '更新浏览量失败', 400);
     }
   }
 
   async getArchives(req: AuthRequest, res: Response): Promise<void> {
     try {
+      // 只查询归档需要的字段，减少内存占用
       const articles = await prisma.article.findMany({
-        include: {
-          articleConfig: true,
+        select: {
+          id: true,
+          title: true,
+          createTime: true,
         },
         where: {
           articleConfig: {
@@ -513,20 +541,24 @@ class ArticleController {
         orderBy: { createTime: 'desc' },
       });
 
-      const archives: Record<string, any[]> = {};
+      const archives: Record<string, { id: number; title: string; createTime: string }[]> = {};
 
-      articles.forEach((article: any) => {
+      articles.forEach((article) => {
         const year = (article.createTime || '').substring(0, 4);
         if (!archives[year]) {
           archives[year] = [];
         }
-        archives[year].push(article);
+        archives[year].push({
+          id: article.id,
+          title: article.title,
+          createTime: article.createTime,
+        });
       });
 
-      res.json(success(archives));
+      sendSuccess(res, archives);
     } catch (err) {
       console.error('getArchives error:', err);
-      res.json(error('获取文章归档失败'));
+      sendError(res, '获取文章归档失败', 400);
     }
   }
 
@@ -541,7 +573,7 @@ class ArticleController {
       form.parse(req, async (err, fields, files) => {
         if (err) {
           console.error('importArticle parse error:', err);
-          res.json(error('解析文件失败'));
+          sendError(res, '解析文件失败', 400);
           return;
         }
 
@@ -615,11 +647,11 @@ class ArticleController {
           fs.unlinkSync(filePath);
         }
 
-        res.json(success());
+        sendSuccess(res);
       });
     } catch (err) {
       console.error('importArticle error:', err);
-      res.json(error('导入文章失败'));
+      sendError(res, '导入文章失败', 400);
     }
   }
 
@@ -628,7 +660,7 @@ class ArticleController {
       const { ids } = req.body;
 
       if (ids !== undefined && !Array.isArray(ids)) {
-        res.json(error('参数 ids 必须是数组'));
+        sendError(res, '参数 ids 必须是数组', 400);
         return;
       }
 
@@ -665,7 +697,7 @@ class ArticleController {
       res.send(zipBuffer);
     } catch (err) {
       console.error('exportArticle error:', err);
-      res.json(error('导出文章失败'));
+      sendError(res, '导出文章失败', 400);
     }
   }
 }

@@ -1,7 +1,7 @@
 import app from './app';
 import config from './config';
 import { logger } from './middlewares/logger.middleware';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from './utils/prisma';
 
 // 自定义 JSON 序列化，处理 BigInt 类型
 // Prisma 模型中的 BigInt 字段（如 size）会导致 JSON.stringify 报错
@@ -15,8 +15,6 @@ JSON.stringify = function (value: any, replacer?: any, space?: any): string {
   };
   return originalStringify(value, bigIntReplacer, space);
 };
-
-const prisma = new PrismaClient();
 
 async function main() {
   try {

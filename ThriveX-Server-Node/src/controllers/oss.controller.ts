@@ -1,10 +1,8 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
+import { sendSuccess, sendError } from '../utils/result';
 import { getEnabledPlatforms, switchPlatform, getCurrentPlatform, testConnection, StorageConfig } from '../services/oss.service';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma';
 
 class OssController {
   async getOssList(req: AuthRequest, res: Response): Promise<void> {
@@ -15,10 +13,10 @@ class OssController {
         accessKey: cfg.accessKey ? '***' : '',
         secretKey: cfg.secretKey ? '***' : '',
       }));
-      res.json(success(safeConfigs));
+      sendSuccess(res, safeConfigs);
     } catch (err) {
       console.error('getOssList error:', err);
-      res.json(error('获取OSS配置失败'));
+      sendError(res, '获取OSS配置失败', 400);
     }
   }
 
@@ -28,10 +26,10 @@ class OssController {
         { name: '本地存储', value: 'local' },
         { name: '七牛云', value: 'qiniu' },
       ];
-      res.json(success(platforms));
+      sendSuccess(res, platforms);
     } catch (err) {
       console.error('getOssPlatforms error:', err);
-      res.json(error('获取可用平台失败'));
+      sendError(res, '获取可用平台失败', 400);
     }
   }
 
@@ -42,10 +40,10 @@ class OssController {
         (enabledOss as any).accessKey = enabledOss.accessKey ? '***' : '';
         (enabledOss as any).secretKey = enabledOss.secretKey ? '***' : '';
       }
-      res.json(success(enabledOss));
+      sendSuccess(res, enabledOss);
     } catch (err) {
       console.error('getEnabledOss error:', err);
-      res.json(error('获取当前OSS配置失败'));
+      sendError(res, '获取当前OSS配置失败', 400);
     }
   }
 
@@ -55,7 +53,7 @@ class OssController {
       const oss = await prisma.oss.findUnique({ where: { id: parseInt(id) } });
 
       if (!oss) {
-        res.json(error('OSS配置不存在'));
+        sendError(res, 'OSS配置不存在', 400);
         return;
       }
 
@@ -66,10 +64,10 @@ class OssController {
 
       await switchPlatform(oss.type || 'local');
 
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('enableOss error:', err);
-      res.json(error('启用OSS配置失败'));
+      sendError(res, '启用OSS配置失败', 400);
     }
   }
 
@@ -88,14 +86,14 @@ class OssController {
           status: 0,
         },
       });
-      res.json(success({
+      sendSuccess(res, {
         ...oss,
         accessKey: oss.accessKey ? '***' : '',
         secretKey: oss.secretKey ? '***' : '',
-      }));
+      });
     } catch (err) {
       console.error('addOss error:', err);
-      res.json(error('添加OSS配置失败'));
+      sendError(res, '添加OSS配置失败', 400);
     }
   }
 
@@ -103,10 +101,10 @@ class OssController {
     try {
       const { id } = req.params;
       await prisma.oss.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteOss error:', err);
-      res.json(error('删除OSS配置失败'));
+      sendError(res, '删除OSS配置失败', 400);
     }
   }
 
@@ -133,10 +131,10 @@ class OssController {
         where: { id: parseInt(id) },
         data: updateData,
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editOss error:', err);
-      res.json(error('编辑OSS配置失败'));
+      sendError(res, '编辑OSS配置失败', 400);
     }
   }
 
@@ -146,7 +144,7 @@ class OssController {
       const oss = await prisma.oss.findUnique({ where: { id: parseInt(id) } });
 
       if (!oss) {
-        res.json(error('OSS配置不存在'));
+        sendError(res, 'OSS配置不存在', 400);
         return;
       }
 
@@ -161,10 +159,10 @@ class OssController {
       };
 
       const result = await testConnection(config);
-      res.json(success({ connected: result.success, message: result.message }));
+      sendSuccess(res, { connected: result.success, message: result.message });
     } catch (err: any) {
       console.error('testOssConnection error:', err);
-      res.json(error('测试连接失败'));
+      sendError(res, '测试连接失败', 400);
     }
   }
 }

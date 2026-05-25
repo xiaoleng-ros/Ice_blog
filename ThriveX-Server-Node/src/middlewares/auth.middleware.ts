@@ -1,12 +1,10 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../types/express';
 import { verifyToken } from '../utils/jwt';
-import { PrismaClient } from '@prisma/client';
 import { isBlacklisted } from '../utils/blackList';
 import { getRealIp } from '../utils/ip';
-import { error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 export async function authMiddleware(
   req: AuthRequest,
@@ -17,7 +15,7 @@ export async function authMiddleware(
     const ip = getRealIp(req);
 
     if (isBlacklisted(ip)) {
-      res.json(error('您已被加入黑名单，请稍后再试', 403));
+      sendError(res, '您已被加入黑名单，请稍后再试', 403);
       return;
     }
 
@@ -29,7 +27,7 @@ export async function authMiddleware(
     const token = req.headers.authorization?.replace('Bearer ', '');
 
     if (!token) {
-      res.json(error('请先登录', 401));
+      sendError(res, '请先登录', 401);
       return;
     }
 
@@ -42,7 +40,7 @@ export async function authMiddleware(
       });
 
       if (!user) {
-        res.json(error('用户不存在', 401));
+        sendError(res, '用户不存在', 401);
         return;
       }
 
@@ -54,7 +52,7 @@ export async function authMiddleware(
       });
 
       if (!tokenExists) {
-        res.json(error('无效或过期的 Token', 401));
+        sendError(res, '无效或过期的 Token', 401);
         return;
       }
 
@@ -66,7 +64,7 @@ export async function authMiddleware(
 
       next();
     } catch (err) {
-      res.json(error('Token 验证失败', 401));
+      sendError(res, 'Token 验证失败', 401);
       return;
     }
   } catch (err) {

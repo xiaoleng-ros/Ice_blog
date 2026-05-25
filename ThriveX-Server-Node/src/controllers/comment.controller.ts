@@ -1,31 +1,50 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
-const prisma = new PrismaClient();
+/**
+ * HTML 实体转义，防止 XSS 攻击
+ * @param str 需要转义的字符串
+ * @returns 转义后的安全字符串
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
 
 class CommentController {
   async addComment(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { name, avatar, content, email, url, articleId, commentId } = req.body;
+
+      // 对用户输入进行 XSS 过滤
+      const safeName = escapeHtml(String(name || ''));
+      const safeContent = escapeHtml(String(content || ''));
+      const safeEmail = email ? escapeHtml(String(email)) : null;
+      const safeUrl = url ? escapeHtml(String(url)) : null;
+
       const comment = await prisma.comment.create({
         data: {
-          name,
+          name: safeName,
           avatar,
-          content,
-          email,
-          url,
+          content: safeContent,
+          email: safeEmail,
+          url: safeUrl,
           articleId,
           commentId: commentId || 0,
           auditStatus: 0,
           createTime: Date.now().toString(),
         },
       });
-      res.json(success(comment));
+      sendSuccess(res, comment);
     } catch (err) {
       console.error('addComment error:', err);
-      res.json(error('添加评论失败'));
+      sendError(res, '添加评论失败', 400);
     }
   }
 
@@ -33,10 +52,10 @@ class CommentController {
     try {
       const { id } = req.params;
       await prisma.comment.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteComment error:', err);
-      res.json(error('删除评论失败'));
+      sendError(res, '删除评论失败', 400);
     }
   }
 
@@ -48,10 +67,10 @@ class CommentController {
         where: { id: parseInt(id) },
         data: { auditStatus },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('auditComment error:', err);
-      res.json(error('审核评论失败'));
+      sendError(res, '审核评论失败', 400);
     }
   }
 
@@ -59,10 +78,10 @@ class CommentController {
     try {
       const { id } = req.params;
       const comment = await prisma.comment.findUnique({ where: { id: parseInt(id) } });
-      res.json(success(comment));
+      sendSuccess(res, comment);
     } catch (err) {
       console.error('getComment error:', err);
-      res.json(error('获取评论失败'));
+      sendError(res, '获取评论失败', 400);
     }
   }
 
@@ -87,7 +106,7 @@ class CommentController {
 
       const totalPages = Math.ceil(total / sizeNum);
 
-      res.json(success({
+      sendSuccess(res, {
         result: comments,
         total,
         page: pageNum,
@@ -95,10 +114,10 @@ class CommentController {
         pages: totalPages,
         next: pageNum < totalPages,
         prev: pageNum > 1,
-      }));
+      });
     } catch (err) {
       console.error('getArticleComments error:', err);
-      res.json(error('获取文章评论失败'));
+      sendError(res, '获取文章评论失败', 400);
     }
   }
 
@@ -121,16 +140,16 @@ class CommentController {
         prisma.comment.count({ where }),
       ]);
 
-      res.json(success({
+      sendSuccess(res, {
         records: comments,
         total,
         page: pageNum,
         size: sizeNum,
         totalPages: Math.ceil(total / sizeNum),
-      }));
+      });
     } catch (err) {
       console.error('getCommentList error:', err);
-      res.json(error('获取评论列表失败'));
+      sendError(res, '获取评论列表失败', 400);
     }
   }
 }

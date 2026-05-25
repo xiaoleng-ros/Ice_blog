@@ -1,22 +1,20 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import Parser from 'rss-parser';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
+import { sendSuccess, sendError } from '../utils/result';
 import { listRssFeeds, evictRssCache } from '../services/rss.service';
 import { getClientIp } from '../utils/auth';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma';
 const parser = new Parser();
 
 class RssController {
   async getRssList(req: AuthRequest, res: Response): Promise<void> {
     try {
       const rssFeeds = await listRssFeeds();
-      res.json(success(rssFeeds));
+      sendSuccess(res, rssFeeds);
     } catch (err) {
       console.error('getRssList error:', err);
-      res.json(error('获取RSS订阅列表失败'));
+      sendError(res, '获取RSS订阅列表失败', 400);
     }
   }
 
@@ -32,16 +30,16 @@ class RssController {
       const end = start + sizeNum;
       const records = rssFeeds.slice(start, end);
 
-      res.json(success({
+      sendSuccess(res, {
         records,
         total,
         page: pageNum,
         size: sizeNum,
         totalPages: Math.ceil(total / sizeNum),
-      }));
+      });
     } catch (err) {
       console.error('getRssPaging error:', err);
-      res.json(error('分页获取RSS订阅列表失败'));
+      sendError(res, '分页获取RSS订阅列表失败', 400);
     }
   }
 
@@ -49,10 +47,10 @@ class RssController {
     try {
       evictRssCache();
       const rssFeeds = await listRssFeeds();
-      res.json(success(rssFeeds, 'RSS缓存已刷新'));
+      sendSuccess(res, rssFeeds, 'RSS缓存已刷新');
     } catch (err) {
       console.error('refreshRssCache error:', err);
-      res.json(error('刷新RSS缓存失败'));
+      sendError(res, '刷新RSS缓存失败', 400);
     }
   }
 
@@ -62,10 +60,10 @@ class RssController {
       const rss = await prisma.rss.create({
         data: { name, url, rule, created: Date.now().toString() },
       });
-      res.json(success(rss));
+      sendSuccess(res, rss);
     } catch (err) {
       console.error('addRss error:', err);
-      res.json(error('添加RSS订阅失败'));
+      sendError(res, '添加RSS订阅失败', 400);
     }
   }
 
@@ -73,10 +71,10 @@ class RssController {
     try {
       const { id } = req.params;
       await prisma.rss.delete({ where: { id: parseInt(id) } });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('deleteRss error:', err);
-      res.json(error('删除RSS订阅失败'));
+      sendError(res, '删除RSS订阅失败', 400);
     }
   }
 
@@ -87,10 +85,10 @@ class RssController {
         where: { id: parseInt(id) },
         data: { name, url, rule },
       });
-      res.json(success());
+      sendSuccess(res);
     } catch (err) {
       console.error('editRss error:', err);
-      res.json(error('编辑RSS订阅失败'));
+      sendError(res, '编辑RSS订阅失败', 400);
     }
   }
 
@@ -100,7 +98,7 @@ class RssController {
       const rss = await prisma.rss.findUnique({ where: { id: parseInt(id) } });
 
       if (!rss) {
-        res.json(error('RSS订阅不存在'));
+        sendError(res, 'RSS订阅不存在', 400);
         return;
       }
 
@@ -113,10 +111,10 @@ class RssController {
         pubDate: item.pubDate,
       }));
 
-      res.json(success(items));
+      sendSuccess(res, items);
     } catch (err) {
       console.error('getRssContent error:', err);
-      res.json(error('获取RSS内容失败'));
+      sendError(res, '获取RSS内容失败', 400);
     }
   }
 }

@@ -1,9 +1,7 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../types/express';
-import { success, error } from '../utils/result';
-
-const prisma = new PrismaClient();
+import { sendSuccess, sendError } from '../utils/result';
+import { prisma } from '../utils/prisma';
 
 class HomeController {
   async getHomeData(req: AuthRequest, res: Response): Promise<void> {
@@ -40,16 +38,16 @@ class HomeController {
         configMap[cfg.name] = cfg.value;
       });
 
-      res.json(success({
+      sendSuccess(res, {
         articles,
         swipers,
         cates,
         tags,
         config: configMap,
-      }));
+      });
     } catch (err) {
       console.error('getHomeData error:', err);
-      res.json(error('获取首页数据失败'));
+      sendError(res, '获取首页数据失败', 400);
     }
   }
 }

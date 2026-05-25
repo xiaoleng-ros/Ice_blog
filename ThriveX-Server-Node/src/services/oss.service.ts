@@ -1,11 +1,9 @@
-import { PrismaClient } from '@prisma/client';
 import NodeCache from 'node-cache';
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import * as qiniu from 'qiniu';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma';
 const platformCache = new NodeCache({ stdTTL: 0 });
 
 export interface StorageConfig {
