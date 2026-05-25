@@ -5,12 +5,9 @@ import HeroUIProvider from '@/components/HeroUIProvider';
 import NProgress from '@/components/NProgress';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Tools from '@/components/Tools';
-import Confetti from '@/components/Confetti';
 import RouteChangeHandler from '@/components/RouteChangeHandler';
 
 import { getWebConfig } from '@/lib/data';
-import { Web } from '@/types/app/config';
 
 // 加载样式文件
 import '@/styles/index.scss';
@@ -127,8 +124,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
         {/* 底部组件 */}
         <Footer />
-        {/* 右侧工具栏组件 */}
-        {/* <Tools /> */}
 
         {/* 悬浮块 */}
         <FloatingBlock />
