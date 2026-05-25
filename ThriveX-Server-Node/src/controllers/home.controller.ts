@@ -1,11 +1,20 @@
 import { Response } from 'express';
+import NodeCache from 'node-cache';
 import { AuthRequest } from '../types/express';
 import { sendSuccess, sendError } from '../utils/result';
 import { prisma } from '../utils/prisma';
 
+const homeCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
+
 class HomeController {
   async getHomeData(req: AuthRequest, res: Response): Promise<void> {
     try {
+      const cached = homeCache.get('homeData');
+      if (cached) {
+        sendSuccess(res, cached);
+        return;
+      }
+
       const [articles, swipers, cates, tags, webConfig] = await Promise.all([
         prisma.article.findMany({
           where: {
@@ -38,13 +47,10 @@ class HomeController {
         configMap[cfg.name] = cfg.value;
       });
 
-      sendSuccess(res, {
-        articles,
-        swipers,
-        cates,
-        tags,
-        config: configMap,
-      });
+      const result = { articles, swipers, cates, tags, config: configMap };
+      homeCache.set('homeData', result);
+
+      sendSuccess(res, result);
     } catch (err) {
       console.error('getHomeData error:', err);
       sendError(res, '获取首页数据失败', 400);

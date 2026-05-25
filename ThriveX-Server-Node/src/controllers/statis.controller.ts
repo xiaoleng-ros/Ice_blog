@@ -6,18 +6,16 @@ import { prisma } from '../utils/prisma';
 class StatisController {
   async getVisitorStatis(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const articles = await prisma.article.findMany({
-        select: { view: true },
+      const result = await prisma.article.aggregate({
+        _sum: { view: true },
       });
-      const totalViews = articles.reduce((sum, a) => sum + a.view, 0);
+      const totalViews = result._sum.view || 0;
 
-      const visitors = {
+      sendSuccess(res, {
         totalViews,
         todayViews: totalViews,
-        articleCount: articles.length,
-      };
-
-      sendSuccess(res, visitors);
+        articleCount: await prisma.article.count(),
+      });
     } catch (err) {
       console.error('getVisitorStatis error:', err);
       sendError(res, '获取访客统计失败', 400);
@@ -26,27 +24,25 @@ class StatisController {
 
   async getArticleStatis(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const articles = await prisma.article.findMany({
-        where: {
-          articleConfig: {
-            isDel: false,
+      const [result, total] = await Promise.all([
+        prisma.article.aggregate({
+          where: {
+            articleConfig: { isDel: false },
           },
-        },
-        select: {
-          id: true,
-          view: true,
-          comment: true,
-          createTime: true,
-        },
+          _sum: { view: true, comment: true },
+        }),
+        prisma.article.count({
+          where: {
+            articleConfig: { isDel: false },
+          },
+        }),
+      ]);
+
+      sendSuccess(res, {
+        total,
+        totalViews: result._sum.view || 0,
+        totalComments: result._sum.comment || 0,
       });
-
-      const statis = {
-        total: articles.length,
-        totalViews: articles.reduce((sum, a) => sum + a.view, 0),
-        totalComments: articles.reduce((sum, a) => sum + a.comment, 0),
-      };
-
-      sendSuccess(res, statis);
     } catch (err) {
       console.error('getArticleStatis error:', err);
       sendError(res, '获取文章统计失败', 400);

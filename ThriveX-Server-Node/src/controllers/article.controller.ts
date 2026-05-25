@@ -218,29 +218,32 @@ class ArticleController {
         }
       }
 
-      const prevArticle = await prisma.article.findFirst({
-        where: {
-          id: { lt: parseInt(id) },
-          articleConfig: {
-            isDel: false,
-            status: 'default',
-          },
-        },
-        orderBy: { id: 'desc' },
-        select: { id: true, title: true },
-      });
+      const articleId = parseInt(id);
 
-      const nextArticle = await prisma.article.findFirst({
-        where: {
-          id: { gt: parseInt(id) },
-          articleConfig: {
-            isDel: false,
-            status: 'default',
+      const [prevArticle, nextArticle] = await Promise.all([
+        prisma.article.findFirst({
+          where: {
+            id: { lt: articleId },
+            articleConfig: {
+              isDel: false,
+              status: 'default',
+            },
           },
-        },
-        orderBy: { id: 'asc' },
-        select: { id: true, title: true },
-      });
+          orderBy: { id: 'desc' },
+          select: { id: true, title: true },
+        }),
+        prisma.article.findFirst({
+          where: {
+            id: { gt: articleId },
+            articleConfig: {
+              isDel: false,
+              status: 'default',
+            },
+          },
+          orderBy: { id: 'asc' },
+          select: { id: true, title: true },
+        }),
+      ]);
 
       const result = {
         ...article,

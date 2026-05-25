@@ -1,7 +1,12 @@
 import Parser from 'rss-parser';
 import NodeCache from 'node-cache';
 import { prisma } from '../utils/prisma';
-const parser = new Parser();
+const parser = new Parser({
+  timeout: 10000,
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (compatible; RSS-Feed-Fetcher)',
+  },
+});
 const rssCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 
 interface RssItem {
