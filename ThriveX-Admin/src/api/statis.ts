@@ -15,3 +15,13 @@ export const getTagStatisAPI = () => Request<TagStats>('GET', `/statis/tag`)
 
 // 获取评论统计
 export const getCommentStatisAPI = () => Request<CommentStats>('GET', `/statis/comment`)
+
+// 通用统计数据查询（按类型映射到对应接口）
+export const getStatisAPI = (type: string, startDate?: string, endDate?: string) => {
+  const routeMap: Record<string, string> = {
+    'basic-overview': 'visitor',
+    'new-visitor': 'visitor',
+  };
+  const route = routeMap[type] || type;
+  return Request<unknown>('GET', `/statis/${route}`, { params: { startDate, endDate } });
+}

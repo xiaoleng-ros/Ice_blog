@@ -159,43 +159,45 @@ const ContentMD = ({ data }: Props) => {
   };
 
   // 图片渲染支持懒加载和点击大图预览
-  const renderers = {
-    img: ({ alt, src }: { alt?: string; src?: string }) => {
-      const imgRef = useRef<HTMLImageElement>(null);
+  const LazyImage = ({ alt, src }: { alt?: string; src?: string }) => {
+    const imgRef = useRef<HTMLImageElement>(null);
 
-      useEffect(() => {
-        const img = imgRef.current;
-        if (!img) return;
+    useEffect(() => {
+      const img = imgRef.current;
+      if (!img) return;
 
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                setTimeout(() => {
-                  img.style.filter = 'blur(0px)';
-                }, 400);
-                observer.unobserve(img);
-              }
-            });
-          },
-          { threshold: 0.1 }
-        );
-
-        observer.observe(img);
-
-        return () => {
-          observer.unobserve(img);
-        };
-      }, []);
-
-      return (
-        <PhotoView src={src || ''}>
-          <span className="flex justify-center my-4 dark:brightness-90">
-            <img ref={imgRef} alt={alt} src={src} className="max-h-[500px]" />
-          </span>
-        </PhotoView>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                img.style.filter = 'blur(0px)';
+              }, 400);
+              observer.unobserve(img);
+            }
+          });
+        },
+        { threshold: 0.1 }
       );
-    },
+
+      observer.observe(img);
+
+      return () => {
+        observer.unobserve(img);
+      };
+    }, []);
+
+    return (
+      <PhotoView src={src || ''}>
+        <span className="flex justify-center my-4 dark:brightness-90">
+          <img ref={imgRef} alt={alt} src={src} className="max-h-[500px]" />
+        </span>
+      </PhotoView>
+    );
+  };
+
+  const renderers = {
+    img: ({ alt, src }: { alt?: string; src?: string }) => <LazyImage alt={alt} src={src} />,
     a: ({ href, children }: { href?: string; children?: React.ReactNode }) => {
       if (children === 'douyin-video' && href) {
         const videoId = href.split('/').pop();

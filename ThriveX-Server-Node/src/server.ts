@@ -3,11 +3,17 @@ import config from './config';
 import { logger } from './middlewares/logger.middleware';
 import { PrismaClient } from '@prisma/client';
 
-// 全局 BigInt JSON 序列化支持
+// 自定义 JSON 序列化，处理 BigInt 类型
 // Prisma 模型中的 BigInt 字段（如 size）会导致 JSON.stringify 报错
-// 通过添加 toJSON 方法，使 BigInt 自动转为 Number 再序列化
-(BigInt.prototype as any).toJSON = function () {
-  return Number(this);
+const originalStringify = JSON.stringify;
+JSON.stringify = function (value: any, replacer?: any, space?: any): string {
+  const bigIntReplacer = (key: string, val: unknown) => {
+    if (typeof val === 'bigint') {
+      return Number(val);
+    }
+    return val;
+  };
+  return originalStringify(value, bigIntReplacer, space);
 };
 
 const prisma = new PrismaClient();

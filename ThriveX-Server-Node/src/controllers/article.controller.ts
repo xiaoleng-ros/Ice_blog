@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
 class ArticleController {
   async addArticle(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { title, description, content, cover, cateIds, tagIds, config, createTime } = req.body;
+      const { title, description, content, cover, cateIds, tagIds, config } = req.body;
 
       const article = await prisma.article.create({
         data: {
@@ -21,7 +21,7 @@ class ArticleController {
           description,
           content,
           cover,
-          createTime: createTime || Date.now().toString(),
+          createTime: Date.now().toString(),
         },
       });
 
@@ -210,11 +210,6 @@ class ArticleController {
         }
       }
 
-      if (article.articleConfig?.isEncrypt && !admin) {
-        article.description = '该文章是加密的';
-        article.content = '该文章是加密的';
-      }
-
       const prevArticle = await prisma.article.findFirst({
         where: {
           id: { lt: parseInt(id) },
@@ -338,7 +333,14 @@ class ArticleController {
 
       const [articleCates, total] = await Promise.all([
         prisma.articleCate.findMany({
-          where: { cateId },
+          where: {
+            cateId,
+            article: {
+              articleConfig: {
+                isDel: false,
+              },
+            },
+          },
           skip,
           take: size,
           include: {
@@ -363,9 +365,7 @@ class ArticleController {
         }),
       ]);
 
-      const articles = articleCates
-        .filter((ac: { article: { articleConfig: { isDel: boolean } | null } }) => ac.article.articleConfig && !ac.article.articleConfig.isDel)
-        .map((ac: { article: any }) => ac.article);
+      const articles = articleCates.map((ac: { article: any }) => ac.article);
 
       res.json(success({
         result: articles,
@@ -391,7 +391,14 @@ class ArticleController {
 
       const [articleTags, total] = await Promise.all([
         prisma.articleTag.findMany({
-          where: { tagId },
+          where: {
+            tagId,
+            article: {
+              articleConfig: {
+                isDel: false,
+              },
+            },
+          },
           skip,
           take: size,
           include: {
@@ -416,9 +423,7 @@ class ArticleController {
         }),
       ]);
 
-      const articles = articleTags
-        .filter((at: { article: { articleConfig: { isDel: boolean } | null } }) => at.article.articleConfig && !at.article.articleConfig.isDel)
-        .map((at: { article: any }) => at.article);
+      const articles = articleTags.map((at: { article: any }) => at.article);
 
       res.json(success({
         result: articles,
@@ -466,6 +471,7 @@ class ArticleController {
             status: 'default',
           },
         },
+        take: 100,
       });
 
       const shuffled = articles.sort(() => Math.random() - 0.5);
@@ -510,7 +516,7 @@ class ArticleController {
       const archives: Record<string, any[]> = {};
 
       articles.forEach((article: any) => {
-        const year = article.createTime.substring(0, 4);
+        const year = (article.createTime || '').substring(0, 4);
         if (!archives[year]) {
           archives[year] = [];
         }
@@ -621,8 +627,15 @@ class ArticleController {
     try {
       const { ids } = req.body;
 
-      const where = ids && ids.length > 0
-        ? { id: { in: ids as number[] } }
+      if (ids !== undefined && !Array.isArray(ids)) {
+        res.json(error('参数 ids 必须是数组'));
+        return;
+      }
+
+      const validIds = Array.isArray(ids) ? ids.filter((id: unknown) => typeof id === 'number') : [];
+
+      const where = validIds.length > 0
+        ? { id: { in: validIds } }
         : {};
 
       const articles = await prisma.article.findMany({

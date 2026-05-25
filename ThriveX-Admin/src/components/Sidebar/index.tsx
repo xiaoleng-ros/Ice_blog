@@ -50,7 +50,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     };
     document.addEventListener('click', clickHandler);
     return () => document.removeEventListener('click', clickHandler);
-  });
+  }, [sidebarOpen]);
 
   // 键盘事件处理：按 ESC 键关闭侧边栏
   useEffect(() => {
@@ -60,7 +60,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     };
     document.addEventListener('keydown', keyHandler);
     return () => document.removeEventListener('keydown', keyHandler);
-  });
+  }, [sidebarOpen]);
 
   // 侧边栏展开状态持久化处理
   useEffect(() => {

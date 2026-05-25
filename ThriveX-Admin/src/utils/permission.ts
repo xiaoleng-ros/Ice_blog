@@ -1,103 +1,103 @@
 import { Permission } from '@/types/app/permission';
 
-// 判断是否有权限
-export const useHasPermission = (code: string) => {
+// 判断是否有权限（非 Hook，可以直接在模块作用域使用）
+export const hasPermission = (code: string) => {
     const permission = JSON.parse(localStorage.getItem('user_storage') || '{}')?.state?.permission;
     return permission?.some((permission: Permission) => permission.name === code);
 }
 
 export default {
     user: {
-        add: useHasPermission('user:add'),
-        del: useHasPermission('user:del'),
-        edit: useHasPermission('user:edit'),
-        info: useHasPermission('user:info'),
-        list: useHasPermission('user:list'),
-        pass: useHasPermission('user:pass')
+        add: hasPermission('user:add'),
+        del: hasPermission('user:del'),
+        edit: hasPermission('user:edit'),
+        info: hasPermission('user:info'),
+        list: hasPermission('user:list'),
+        pass: hasPermission('user:pass')
     },
     data: {
-        add: useHasPermission('data:add'),
-        del: useHasPermission('data:del')
+        add: hasPermission('data:add'),
+        del: hasPermission('data:del')
     },
     article: {
-        add: useHasPermission('article:add'),
-        del: useHasPermission('article:del'),
-        reduction: useHasPermission('article:reduction'),
-        edit: useHasPermission('article:edit')
+        add: hasPermission('article:add'),
+        del: hasPermission('article:del'),
+        reduction: hasPermission('article:reduction'),
+        edit: hasPermission('article:edit')
     },
     cate: {
-        add: useHasPermission('cate:add'),
-        del: useHasPermission('cate:del'),
-        edit: useHasPermission('cate:edit')
+        add: hasPermission('cate:add'),
+        del: hasPermission('cate:del'),
+        edit: hasPermission('cate:edit')
     },
     comment: {
-        del: useHasPermission('comment:del'),
-        edit: useHasPermission('comment:edit'),
-        audit: useHasPermission('comment:audit')
+        del: hasPermission('comment:del'),
+        edit: hasPermission('comment:edit'),
+        audit: hasPermission('comment:audit')
     },
     config: {
-        edit: useHasPermission('config:edit')
+        edit: hasPermission('config:edit')
     },
     email: {
-        dismiss: useHasPermission('email:dismiss')
+        dismiss: hasPermission('email:dismiss')
     },
     file: {
-        info: useHasPermission('file:info'),
-        dir: useHasPermission('file:dir'),
-        list: useHasPermission('file:list'),
-        add: useHasPermission('file:add'),
-        del: useHasPermission('file:del')
+        info: hasPermission('file:info'),
+        dir: hasPermission('file:dir'),
+        list: hasPermission('file:list'),
+        add: hasPermission('file:add'),
+        del: hasPermission('file:del')
     },
     oss: {
-        add: useHasPermission('oss:add'),
-        del: useHasPermission('oss:del'),
-        edit: useHasPermission('oss:edit'),
-        info: useHasPermission('oss:info'),
-        list: useHasPermission('oss:list'),
-        enable: useHasPermission('oss:enable'),
-        getEnableOss: useHasPermission('oss:getEnableOss'),
-        getPlatform: useHasPermission('oss:getPlatform')
+        add: hasPermission('oss:add'),
+        del: hasPermission('oss:del'),
+        edit: hasPermission('oss:edit'),
+        info: hasPermission('oss:info'),
+        list: hasPermission('oss:list'),
+        enable: hasPermission('oss:enable'),
+        getEnableOss: hasPermission('oss:getEnableOss'),
+        getPlatform: hasPermission('oss:getPlatform')
     },
     record: {
-        add: useHasPermission('record:add'),
-        del: useHasPermission('record:del'),
-        edit: useHasPermission('record:edit')
+        add: hasPermission('record:add'),
+        del: hasPermission('record:del'),
+        edit: hasPermission('record:edit')
     },
     role: {
-        add: useHasPermission('role:add'),
-        del: useHasPermission('role:del'),
-        edit: useHasPermission('role:edit'),
-        info: useHasPermission('role:info'),
-        list: useHasPermission('role:list'),
-        bindingRoute: useHasPermission('role:bindingRoute')
+        add: hasPermission('role:add'),
+        del: hasPermission('role:del'),
+        edit: hasPermission('role:edit'),
+        info: hasPermission('role:info'),
+        list: hasPermission('role:list'),
+        bindingRoute: hasPermission('role:bindingRoute')
     },
     route: {
-        add: useHasPermission('route:add'),
-        del: useHasPermission('route:del'),
-        edit: useHasPermission('route:edit'),
-        info: useHasPermission('route:info'),
-        list: useHasPermission('route:list')
+        add: hasPermission('route:add'),
+        del: hasPermission('route:del'),
+        edit: hasPermission('route:edit'),
+        info: hasPermission('route:info'),
+        list: hasPermission('route:list')
     },
     swiper: {
-        add: useHasPermission('swiper:add'),
-        del: useHasPermission('swiper:del'),
-        edit: useHasPermission('swiper:edit')
+        add: hasPermission('swiper:add'),
+        del: hasPermission('swiper:del'),
+        edit: hasPermission('swiper:edit')
     },
     tag: {
-        add: useHasPermission('tag:add'),
-        del: useHasPermission('tag:del'),
-        edit: useHasPermission('tag:edit')
+        add: hasPermission('tag:add'),
+        del: hasPermission('tag:del'),
+        edit: hasPermission('tag:edit')
     },
     wall: {
-        del: useHasPermission('wall:del'),
-        edit: useHasPermission('wall:edit'),
-        audit: useHasPermission('wall:audit')
+        del: hasPermission('wall:del'),
+        edit: hasPermission('wall:edit'),
+        audit: hasPermission('wall:audit')
     },
     permission: {
-        add: useHasPermission('permission:add'),
-        del: useHasPermission('permission:del'),
-        edit: useHasPermission('permission:edit'),
-        info: useHasPermission('permission:info'),
-        list: useHasPermission('permission:list')
+        add: hasPermission('permission:add'),
+        del: hasPermission('permission:del'),
+        edit: hasPermission('permission:edit'),
+        info: hasPermission('permission:info'),
+        list: hasPermission('permission:list')
     }
 }

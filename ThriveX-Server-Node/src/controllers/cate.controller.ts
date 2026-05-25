@@ -48,7 +48,7 @@ class CateController {
         res.json(error('请提供要删除的分类ID'));
         return;
       }
-      await prisma.cate.deleteMany({ where: { id: { in: ids } } });
+      await prisma.cate.deleteMany({ where: { id: { in: ids.map((i: any) => parseInt(i)) } } });
       res.json(success());
     } catch (err) {
       console.error('batchDeleteCate error:', err);
@@ -60,7 +60,7 @@ class CateController {
     try {
       const { id, name, icon, url, mark, level, order, type } = req.body;
       await prisma.cate.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: {
           name,
           icon,
@@ -107,7 +107,7 @@ class CateController {
 
       if (page && size) {
         const pageNum = parseInt(page as string) || 1;
-        const sizeNum = parseInt(size as string) || 10;
+        const sizeNum = Math.min(parseInt(size as string) || 10, 100);
         const [cates, total] = await Promise.all([
           prisma.cate.findMany({
             orderBy: { order: 'asc' },

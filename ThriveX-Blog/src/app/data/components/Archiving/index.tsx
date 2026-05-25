@@ -29,7 +29,7 @@ const Title = ({ data }: { data: YearData }) => {
   return (
     <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
       <span className="text-xl font-bold text-slate-800 dark:text-slate-100">
-        {data.year} 年 {data.wordCount / 1000 > 50}
+        {data.year} 年
       </span>
       <span className="text-sm text-slate-500 dark:text-slate-400">
         共 <span className="font-semibold text-primary">{data.total}</span> 篇 · 约{' '}
@@ -148,7 +148,7 @@ export default ({ list }: { list: Article[] }) => {
                     <div className="rounded-xl bg-slate-50/80 dark:bg-slate-800/30 p-4 border border-slate-100 dark:border-slate-700/50">
                       <div className="flex flex-wrap items-center gap-2 mb-3">
                         <span className="text-lg font-semibold text-slate-700 dark:text-slate-200">
-                          {month}月 {item.month[+month].wordCount / 1000 > 10}
+                          {month}月
                         </span>
                         <span className="text-sm text-slate-500 dark:text-slate-400">
                           {item.month[+month].total} 篇 · {(item.month[+month].wordCount / 1000).toFixed(2)}K 字

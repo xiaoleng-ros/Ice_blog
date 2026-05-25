@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'antd/es/form/Form';
 import { App, Button, Form, Input } from 'antd';
-import { UserOutlined, LockOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 import { loginDataAPI } from '@/api/user';
 import { useUserStore } from '@/stores';
@@ -18,8 +18,9 @@ export default () => {
 
   const [form] = useForm();
 
-  const [isPassVisible, setIsPassVisible] = useState(false);
-  const returnUrl = new URLSearchParams(location.search).get('returnUrl') || '/';
+  const rawReturnUrl = new URLSearchParams(location.search).get('returnUrl') || '/';
+  // 防止开放重定向：只允许相对路径
+  const returnUrl = rawReturnUrl.startsWith('/') ? rawReturnUrl : '/';
 
   const onSubmit = async () => {
     try {
@@ -78,7 +79,7 @@ export default () => {
             </Form.Item>
 
             <Form.Item name="password" label={<span className="text-gray-700 font-medium">密码</span>} rules={[{ required: true, message: '请输入密码' }]}>
-              <Input.Password prefix={<LockOutlined className="text-gray-400" />} type={isPassVisible ? 'text' : 'password'} placeholder="请输入密码" className="h-12 rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 transition-colors" iconRender={(visible) => (visible ? <EyeOutlined onClick={() => setIsPassVisible(!isPassVisible)} /> : <EyeInvisibleOutlined onClick={() => setIsPassVisible(!isPassVisible)} />)} />
+              <Input.Password prefix={<LockOutlined className="text-gray-400" />} placeholder="请输入密码" className="h-12 rounded-xl border-gray-200 hover:border-blue-400 focus:border-blue-500 transition-colors" iconRender={(visible) => (visible ? <EyeInvisibleOutlined /> : <EyeInvisibleOutlined />)} />
             </Form.Item>
 
             <Form.Item className="mb-6">

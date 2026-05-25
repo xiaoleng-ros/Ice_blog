@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useBlocker } from 'react-router-dom';
 import { App, Button, Card, Dropdown, MenuProps, Spin, Space, Modal, Tag } from 'antd';
 import { BiSave } from 'react-icons/bi';
 import { AiOutlineEdit, AiOutlineSend } from 'react-icons/ai';
@@ -18,7 +18,6 @@ import PublishForm from './components/PublishForm';
 export default () => {
   const [loading, setLoading] = useState(false);
   const { message } = App.useApp();
-  const location = useLocation();
   const navigate = useNavigate();
 
   const [params] = useSearchParams();
@@ -208,24 +207,22 @@ export default () => {
     };
   }, []);
 
-  // 路由切换时的拦截提示
+  // 使用 useBlocker 拦截所有路由切换（包括 React Router 内部导航）
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasUnsavedChanges.current && currentLocation.pathname !== nextLocation.pathname
+  );
+
   useEffect(() => {
-    const handleRouteChange = () => {
-      if (hasUnsavedChanges.current) {
-        const confirmed = window.confirm('您有未保存的内容，确定要离开吗？');
-        if (!confirmed) {
-          // 阻止路由切换
-          window.history.pushState(null, '', location.pathname);
-        }
+    if (blocker.state === 'blocked') {
+      const confirmed = window.confirm('您有未保存的内容，确定要离开吗？');
+      if (confirmed) {
+        blocker.proceed();
+      } else {
+        blocker.reset();
       }
-    };
-
-    window.addEventListener('popstate', handleRouteChange);
-
-    return () => {
-      window.removeEventListener('popstate', handleRouteChange);
-    };
-  }, [location.pathname]);
+    }
+  }, [blocker.state, blocker]);
 
   useEffect(() => {
     // 点击快捷键保存文章

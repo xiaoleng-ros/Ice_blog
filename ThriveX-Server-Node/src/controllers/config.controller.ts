@@ -152,7 +152,7 @@ class ConfigController {
     try {
       const { id, name, value, notes } = req.body;
       await prisma.envConfig.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: { name, value, notes },
       });
       res.json(success());

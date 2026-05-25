@@ -7,7 +7,12 @@ export const config = {
     url: process.env.DATABASE_URL || '',
   },
   jwt: {
-    secret: process.env.JWT_SECRET || 'yuyang',
+    secret: (() => {
+      if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET environment variable is required');
+      }
+      return process.env.JWT_SECRET;
+    })(),
     expiresIn: process.env.JWT_EXPIRES_IN || '259200000',
   },
   server: {
@@ -15,7 +20,14 @@ export const config = {
     env: process.env.NODE_ENV || 'development',
   },
   cors: {
-    origin: (process.env.CORS_ORIGIN || 'http://localhost:9000').split(','),
+    origin: (() => {
+      const origins = (process.env.CORS_ORIGIN || 'http://localhost:9000').split(',');
+      const env = process.env.NODE_ENV || 'development';
+      if (origins.includes('*') && env === 'production') {
+        console.warn('WARNING: CORS_ORIGIN 包含通配符 *，生产环境存在安全风险');
+      }
+      return origins;
+    })(),
   },
   rateLimit: {
     tokens: parseInt(process.env.RATE_LIMIT_TOKENS || '100', 10),

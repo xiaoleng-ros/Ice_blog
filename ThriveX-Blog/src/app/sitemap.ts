@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 获取所有文章
   const res = await getArticleListAPI();
-  const articles = (res?.data as any)?.records ?? [];
+  const articles = (res?.data as any)?.result ?? [];
 
   // 静态页面
   const staticPages: MetadataRoute.Sitemap = [

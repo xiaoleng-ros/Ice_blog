@@ -43,7 +43,7 @@ class WallController {
   async batchDeleteWall(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { ids } = req.body;
-      await prisma.wall.deleteMany({ where: { id: { in: ids } } });
+      await prisma.wall.deleteMany({ where: { id: { in: ids.map((i: any) => parseInt(i)) } } });
       res.json(success());
     } catch (err) {
       console.error('batchDeleteWall error:', err);
@@ -55,7 +55,7 @@ class WallController {
     try {
       const { id, name, cateId, color, content, avatar, email } = req.body;
       await prisma.wall.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: { name, cateId, color, content, avatar, email },
       });
       res.json(success());
@@ -84,7 +84,7 @@ class WallController {
 
       if (page && size) {
         const pageNum = parseInt(page as string) || 1;
-        const sizeNum = parseInt(size as string) || 10;
+        const sizeNum = Math.min(parseInt(size as string) || 10, 100);
         const [walls, total] = await Promise.all([
           prisma.wall.findMany({
             where,
@@ -128,7 +128,7 @@ class WallController {
       }
 
       const pageNum = parseInt(page as string) || 1;
-      const sizeNum = parseInt(size as string) || 10;
+      const sizeNum = Math.min(parseInt(size as string) || 10, 100);
 
       const [walls, total] = await Promise.all([
         prisma.wall.findMany({

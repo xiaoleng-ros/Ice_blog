@@ -73,7 +73,9 @@ export default () => {
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [jsonValue, setJsonValue] = useState('');
   const [btnLoading, setBtnLoading] = useState(false);
-  const formRef = useRef<{ [key: string]: FormInstance[] }>({ env: Form.useForm(), page: Form.useForm() });
+  const [envForm] = Form.useForm();
+  const [pageForm] = Form.useForm();
+  const formMap = { env: envForm, page: pageForm };
 
   // 获取配置列表
   const fetchList = async (type: 'env' | 'page') => {
@@ -106,7 +108,7 @@ export default () => {
     setIsModalOpen(true);
     const str = JSON.stringify(item.value, null, 2);
     setJsonValue(str);
-    formRef.current[activeTab][0].setFieldsValue({ value: str });
+    formMap[activeTab].setFieldsValue({ value: str });
     setJsonError(null);
   };
 
@@ -114,7 +116,7 @@ export default () => {
   const handleSave = async () => {
     try {
       setBtnLoading(true);
-      const values = await formRef.current[activeTab][0].validateFields();
+      const values = await formMap[activeTab].validateFields();
       let parsed;
       try {
         parsed = JSON.parse(values.value);
@@ -139,11 +141,13 @@ export default () => {
   // JSON 输入变更时校验
   const handleJsonChange = (value: string) => {
     setJsonValue(value);
-    formRef.current[activeTab][0].setFieldsValue({ value });
+    formMap[activeTab].setFieldsValue({ value });
     try {
       JSON.parse(value);
+      setJsonError(null);
     } catch (error) {
       logger.error(error);
+      setJsonError('JSON 格式错误');
     }
   };
 
@@ -152,7 +156,7 @@ export default () => {
     try {
       const formatted = JSON.stringify(JSON.parse(jsonValue), null, 2);
       setJsonValue(formatted);
-      formRef.current[activeTab][0].setFieldsValue({ value: formatted });
+      formMap[activeTab].setFieldsValue({ value: formatted });
       setJsonError(null);
     } catch (error) {
       logger.error(error);
@@ -257,7 +261,7 @@ export default () => {
         />
       </Card>
 
-      <ConfigEditModal key={activeTab} open={isModalOpen} onCancel={() => setIsModalOpen(false)} onSave={handleSave} value={jsonValue} error={jsonError} onChange={handleJsonChange} onFormat={handleFormatJson} loading={btnLoading} title={editItem ? tabConfig[activeTab].modalTitle : ''} form={formRef.current[activeTab][0]} />
+      <ConfigEditModal key={activeTab} open={isModalOpen} onCancel={() => setIsModalOpen(false)} onSave={handleSave} value={jsonValue} error={jsonError} onChange={handleJsonChange} onFormat={handleFormatJson} loading={btnLoading} title={editItem ? tabConfig[activeTab].modalTitle : ''} form={formMap[activeTab]} />
     </div>
   );
 };

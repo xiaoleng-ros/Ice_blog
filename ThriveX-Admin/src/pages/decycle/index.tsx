@@ -20,6 +20,7 @@ export default () => {
   const web = useWebStore((state) => state.web);
 
   const [current, setCurrent] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
   const [articleList, setArticleList] = useState<Article[]>([]);
 
   const [form] = Form.useForm();
@@ -31,8 +32,9 @@ export default () => {
       } else {
         setLoading(true);
       }
-      const { data } = await getArticlePagingAPI({ isDel: 1, page: 1, size: 8 });
+      const { data } = await getArticlePagingAPI({ isDel: 1, page: current, size: 8 });
       setArticleList(data?.result || []);
+      setTotal(data?.total || 0);
       isFirstLoadRef.current = false;
     } catch (error) {
       logger.error(error);
@@ -44,7 +46,7 @@ export default () => {
 
   useEffect(() => {
     getArticleList();
-  }, []);
+  }, [current]);
 
   const delArticleData = async (id: number) => {
     try {
@@ -276,7 +278,7 @@ export default () => {
           pagination={{
             current,
             pageSize: 8,
-            total: articleList.length,
+            total: total,
             showTotal: (totalCount) => (
               <div className="mt-[9px] text-xs text-gray-500 dark:text-gray-400">
                 共 {totalCount} 条数据

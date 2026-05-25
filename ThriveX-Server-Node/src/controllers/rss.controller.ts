@@ -24,7 +24,7 @@ class RssController {
     try {
       const { page, size } = req.query;
       const pageNum = parseInt(page as string) || 1;
-      const sizeNum = parseInt(size as string) || 10;
+      const sizeNum = Math.min(parseInt(size as string) || 10, 100);
 
       const rssFeeds = await listRssFeeds();
       const total = rssFeeds.length;
@@ -84,7 +84,7 @@ class RssController {
     try {
       const { id, name, url, rule } = req.body;
       await prisma.rss.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: { name, url, rule },
       });
       res.json(success());

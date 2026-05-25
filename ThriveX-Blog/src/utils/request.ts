@@ -4,7 +4,8 @@ import { logger } from '@/utils/logger';
 // 最新调整：在 .env 文件中配置项目后端 API 地址
 const url = process.env.NEXT_PUBLIC_PROJECT_API
 // 配置页面缓存时间
-const cachingTime = +process.env.NEXT_PUBLIC_CACHING_TIME!
+const rawCachingTime = process.env.NEXT_PUBLIC_CACHING_TIME;
+const cachingTime = rawCachingTime ? +rawCachingTime : 60;
 // 请求超时时间（毫秒）
 const REQUEST_TIMEOUT = 3000
 
@@ -47,14 +48,17 @@ export const Request = async <T>(method: string, api: string, data?: any, cachin
 
     try {
         const fullUrl = `${url}${api}${query}`;
-        const res = await fetchWithTimeout(fullUrl, {
+        const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
             method,
             headers: {
                 'Content-Type': 'application/json'
             },
-            [method === 'POST' ? 'body' : '']: JSON.stringify(data ? data : {}),
             next: { revalidate: caching ? cachingTime : 1 }
-        }, REQUEST_TIMEOUT)
+        };
+        if (method === 'POST' && data) {
+            fetchOptions.body = JSON.stringify(data);
+        }
+        const res = await fetchWithTimeout(fullUrl, fetchOptions, REQUEST_TIMEOUT)
 
         return res?.json() as Promise<ResponseData<T>>;
     } catch (error) {

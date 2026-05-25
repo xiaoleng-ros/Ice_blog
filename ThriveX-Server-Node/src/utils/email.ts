@@ -4,7 +4,7 @@ import config from '../config';
 const transporter = nodemailer.createTransport({
   host: config.smtp.host,
   port: config.smtp.port,
-  secure: true,
+  secure: config.smtp.port === 465,
   auth: {
     user: config.smtp.user,
     pass: config.smtp.pass,
@@ -31,6 +31,10 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
   }
 }
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 export function generateCommentEmailHtml(
   nickname: string,
   articleTitle: string,
@@ -38,11 +42,11 @@ export function generateCommentEmailHtml(
 ): string {
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #333;">您在 ${nickname} 的博客有新评论</h2>
+      <h2 style="color: #333;">您在 ${escapeHtml(nickname)} 的博客有新评论</h2>
       <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p><strong>文章：</strong>${articleTitle}</p>
+        <p><strong>文章：</strong>${escapeHtml(articleTitle)}</p>
         <p><strong>评论内容：</strong></p>
-        <p style="color: #666;">${commentContent}</p>
+        <p style="color: #666;">${escapeHtml(commentContent)}</p>
       </div>
       <p style="color: #999; font-size: 12px;">请前往博客管理后台审核评论</p>
     </div>
@@ -58,13 +62,13 @@ export function generateDismissEmailHtml(
 ): string {
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #333;">您的${type}申请已被驳回</h2>
+      <h2 style="color: #333;">您的${escapeHtml(type)}申请已被驳回</h2>
       <div style="background: #fff4f4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ff6b6b;">
-        <p><strong>接收方：</strong>${recipient}</p>
-        <p><strong>驳回时间：</strong>${time}</p>
+        <p><strong>接收方：</strong>${escapeHtml(recipient)}</p>
+        <p><strong>驳回时间：</strong>${escapeHtml(time)}</p>
         <p><strong>驳回原因：</strong></p>
-        <p style="color: #666;">${content}</p>
-        <p style="margin-top: 15px;"><a href="${url}" style="display: inline-block; background: #007bff; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px;">查看详情</a></p>
+        <p style="color: #666;">${escapeHtml(content)}</p>
+        <p style="margin-top: 15px;"><a href="${escapeHtml(url)}" style="display: inline-block; background: #007bff; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px;">查看详情</a></p>
       </div>
       <p style="color: #999; font-size: 12px;">请前往博客管理后台修改后重新提交申请</p>
     </div>
@@ -82,17 +86,17 @@ export function generateWallReplyEmailHtml(
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #333;">您有新的留言回复</h2>
       <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p><strong>接收方：</strong>${recipient}</p>
-        <p><strong>回复时间：</strong>${time}</p>
+        <p><strong>接收方：</strong>${escapeHtml(recipient)}</p>
+        <p><strong>回复时间：</strong>${escapeHtml(time)}</p>
         <p style="margin: 15px 0; padding: 15px; background: #fff; border-radius: 4px;">
           <strong style="color: #666;">您的留言：</strong><br/>
-          <span style="color: #333;">${yourContent}</span>
+          <span style="color: #333;">${escapeHtml(yourContent)}</span>
         </p>
         <p style="margin: 15px 0; padding: 15px; background: #e8f4ff; border-radius: 4px;">
           <strong style="color: #007bff;">博主回复：</strong><br/>
-          <span style="color: #333;">${replyContent}</span>
+          <span style="color: #333;">${escapeHtml(replyContent)}</span>
         </p>
-        <p style="margin-top: 15px;"><a href="${url}" style="display: inline-block; background: #28a745; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px;">查看详情</a></p>
+        <p style="margin-top: 15px;"><a href="${escapeHtml(url)}" style="display: inline-block; background: #28a745; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px;">查看详情</a></p>
       </div>
       <p style="color: #999; font-size: 12px;">感谢您的留言！</p>
     </div>

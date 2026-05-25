@@ -11,10 +11,12 @@ const StarrySky = () => {
 
     /*星星的看起来的距离,值越大越远,可自行调制到自己满意的样子*/
     const r = 800;
+    const createdStars: HTMLElement[] = [];
     for (let i = 0; i < stars; i++) {
       const star = document.createElement('div');
       star.classList.add('star_starrySky');
       starsContainer?.appendChild(star);
+      createdStars.push(star);
     }
 
     const starElements = document.querySelectorAll<HTMLElement>('.star_starrySky');
@@ -24,6 +26,10 @@ const StarrySky = () => {
       starElement.style.transformOrigin = `0 0 ${curR}px`;
       starElement.style.transform = `translate3d(0,0,-${curR}px) rotateY(${Math.random() * 360}deg) rotateX(${Math.random() * -50}deg) scale(${s},${s})`;
     });
+
+    return () => {
+      createdStars.forEach((star) => star.remove());
+    };
   }, []);
 
   return (

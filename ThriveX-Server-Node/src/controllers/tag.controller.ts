@@ -41,7 +41,7 @@ class TagController {
   async editTag(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { id, name, icon, mark } = req.body;
-      await prisma.tag.update({ where: { id }, data: { name, icon, mark } });
+      await prisma.tag.update({ where: { id: parseInt(id) }, data: { name, icon, mark } });
       res.json(success());
     } catch (err) {
       console.error('editTag error:', err);

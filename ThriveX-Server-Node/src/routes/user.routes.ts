@@ -3,6 +3,7 @@ import { body } from 'express-validator';
 import UserController from '../controllers/user.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validator.middleware';
+import { apiLimiter } from '../middlewares/rateLimit.middleware';
 
 const router = Router();
 
@@ -65,6 +66,7 @@ router.post(
 
 router.post(
   '/login',
+  apiLimiter,
   [
     body('username').notEmpty().withMessage('用户名不能为空'),
     body('password').notEmpty().withMessage('密码不能为空'),

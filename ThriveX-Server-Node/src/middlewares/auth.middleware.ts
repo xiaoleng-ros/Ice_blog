@@ -74,10 +74,4 @@ export async function authMiddleware(
   }
 }
 
-export function noTokenRequired(
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): void {
-  next();
-}
+

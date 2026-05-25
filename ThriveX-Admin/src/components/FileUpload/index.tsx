@@ -21,7 +21,7 @@ export default ({ multiple, dir, open, onCancel, onSuccess }: Props) => {
   const dragCounterRef = useRef(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [quality, setQuality] = useState(1000);
+  const [quality, setQuality] = useState(1);
   const [isCompressionUpload, setIsCompressionUpload] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -94,7 +94,7 @@ export default ({ multiple, dir, open, onCancel, onSuccess }: Props) => {
 
   const onCloseModel = () => {
     setIsCompressionUpload(false);
-    setQuality(1000);
+    setQuality(1);
     setIsLoading(false);
     onCancel();
   };

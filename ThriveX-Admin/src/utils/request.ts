@@ -15,12 +15,18 @@ export const instance = axios.create({
     timeout: 10000,
 });
 
-// 用于取消请求
-const CancelToken = axios.CancelToken;
-const source = CancelToken.source();
-
 // 标记是否已经处理过401错误
 let isHandling401Error = false;
+
+// 请求取消控制器：401 时批量取消进行中的请求，但不影响后续新请求
+let abortController = new AbortController();
+
+/** 取消所有进行中的请求，并重置控制器供后续请求使用 */
+const cancelAllRequests = (reason: string) => {
+    abortController.abort(reason);
+    // 重新创建控制器，后续新请求不受影响
+    abortController = new AbortController();
+};
 
 // 请求拦截
 instance.interceptors.request.use(
@@ -30,6 +36,9 @@ instance.interceptors.request.use(
 
         // 如果有token就把赋值给请求头
         if (token) config.headers['Authorization'] = `Bearer ${token}`;
+
+        // 注入 AbortController 的 signal，用于 401 时批量取消请求
+        config.signal = abortController.signal;
 
         return config;
     },
@@ -53,6 +62,8 @@ instance.interceptors.response.use(
             if (isHandling401Error) return Promise.reject(res.data);
 
             isHandling401Error = true;
+            // 取消所有进行中的请求，避免无效请求继续发送
+            cancelAllRequests('Token 已过期，取消所有请求');
 
             Modal.error({
                 title: '登录已过期',
@@ -65,7 +76,6 @@ instance.interceptors.response.use(
                 }
             });
 
-            source.cancel('Token 已过期，取消所有请求');
             return Promise.reject(res.data);
         }
 
@@ -82,11 +92,16 @@ instance.interceptors.response.use(
         return res.data;
     },
     (err: AxiosError) => {
+        // 被取消的请求静默处理，不弹出错误提示
+        if (axios.isCancel(err)) return Promise.reject(err);
+
         if (isHandling401Error) return;
 
         // 如果code为401就证明认证失败
         if (err.response?.status === 401) {
             isHandling401Error = true; // 标记为正在处理401错误
+            // 取消所有进行中的请求，避免无效请求继续发送
+            cancelAllRequests('认证失败，取消所有请求');
 
             Modal.error({
                 title: '暂无权限',
@@ -98,9 +113,6 @@ instance.interceptors.response.use(
                     isHandling401Error = false; // 重置标记
                 }
             });
-
-            // 取消后续的所有请求
-            source.cancel('认证失败，取消所有请求');
 
             return Promise.reject(err.response?.data);
         }
@@ -119,7 +131,6 @@ const request = <T>(method: string, url: string, reqParams?: object) => {
         method,
         url,
         ...reqParams,
-        cancelToken: source.token
     });
 };
 

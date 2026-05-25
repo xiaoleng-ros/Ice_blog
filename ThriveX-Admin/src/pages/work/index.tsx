@@ -44,7 +44,7 @@ export default () => {
 
       if (type === 'comment') {
         const { data } = await getCommentListAPI({ query: { status: 0 }, pattern: 'list' });
-        setCommentList(data || []);
+        setCommentList((data as any)?.result ?? data ?? []);
       } else if (type === 'link') {
         const { data } = await getLinkListAPI({ query: { status: 0 } });
         setLinkList(data || []);

@@ -38,7 +38,8 @@ export default create(
       // 退出登录
       quitLogin: () =>
         set(() => {
-          localStorage.clear();
+          const appKeys = ['user_storage', 'config_storage', 'tabs_storage'];
+          appKeys.forEach(key => localStorage.removeItem(key));
           sessionStorage.clear();
           location.href = '/login';
 

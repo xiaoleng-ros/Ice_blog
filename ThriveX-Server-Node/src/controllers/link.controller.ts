@@ -34,7 +34,7 @@ class LinkController {
     try {
       const { id, name, url, logo, description, status, order, typeId } = req.body;
       await prisma.link.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: { name, url, logo, description, status, order, typeId },
       });
       res.json(success());

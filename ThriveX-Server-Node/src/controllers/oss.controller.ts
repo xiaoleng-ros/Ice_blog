@@ -59,14 +59,10 @@ class OssController {
         return;
       }
 
-      await prisma.oss.updateMany({
-        data: { status: 0 },
-      });
-
-      await prisma.oss.update({
-        where: { id: parseInt(id) },
-        data: { status: 1 },
-      });
+      await prisma.$transaction([
+        prisma.oss.updateMany({ data: { status: 0 } }),
+        prisma.oss.update({ where: { id: parseInt(id) }, data: { status: 1 } }),
+      ]);
 
       await switchPlatform(oss.type || 'local');
 
@@ -92,7 +88,11 @@ class OssController {
           status: 0,
         },
       });
-      res.json(success(oss));
+      res.json(success({
+        ...oss,
+        accessKey: oss.accessKey ? '***' : '',
+        secretKey: oss.secretKey ? '***' : '',
+      }));
     } catch (err) {
       console.error('addOss error:', err);
       res.json(error('添加OSS配置失败'));
@@ -130,7 +130,7 @@ class OssController {
       }
 
       await prisma.oss.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: updateData,
       });
       res.json(success());
@@ -164,7 +164,7 @@ class OssController {
       res.json(success({ connected: result.success, message: result.message }));
     } catch (err: any) {
       console.error('testOssConnection error:', err);
-      res.json(error(`测试连接失败: ${err.message || '未知错误'}`));
+      res.json(error('测试连接失败'));
     }
   }
 }

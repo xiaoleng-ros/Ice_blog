@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
-import multer from 'multer';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import path from 'path';
@@ -41,14 +40,6 @@ app.use(compression());
 
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: config.file.maxSize,
-  },
-});
-app.use(upload.any());
 
 app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 

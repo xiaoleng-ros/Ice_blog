@@ -2,10 +2,10 @@ import Request from '@/utils/request'
 import { File, FileDir } from '@/types/app/file'
 
 // 删除文件
-export const delFileDataAPI = (filePath: string) => Request('DELETE', `/file?filePath=${filePath}`)
+export const delFileDataAPI = (filePath: string) => Request('DELETE', `/file?filePath=${encodeURIComponent(filePath)}`)
 
 // 获取文件
-export const getFileDataAPI = (filePath: string) => Request<File>('GET', `/file/info?filePath=${filePath}`)
+export const getFileDataAPI = (filePath: string) => Request<File>('GET', `/file/info?filePath=${encodeURIComponent(filePath)}`)
 
 // 获取文件列表
 export const getFileListAPI = (dir: string, paging?: Page) => Request<Paginate<File[]>>('GET', `/file`, {

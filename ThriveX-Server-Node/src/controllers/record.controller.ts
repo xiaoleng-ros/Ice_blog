@@ -39,7 +39,7 @@ class RecordController {
     try {
       const { id, title, content, images } = req.body;
       await prisma.record.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: { title, content, images },
       });
       res.json(success());
@@ -65,7 +65,7 @@ class RecordController {
     try {
       const { page, size } = req.body;
       const pageNum = parseInt(page as string) || 1;
-      const sizeNum = parseInt(size as string) || 8;
+      const sizeNum = Math.min(parseInt(size as string) || 8, 100);
 
       const [records, total] = await Promise.all([
         prisma.record.findMany({

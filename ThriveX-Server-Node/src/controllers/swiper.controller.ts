@@ -34,7 +34,7 @@ class SwiperController {
     try {
       const { id, title, cover, url, order, status } = req.body;
       await prisma.swiper.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: { title, cover, url, order, status },
       });
       res.json(success());

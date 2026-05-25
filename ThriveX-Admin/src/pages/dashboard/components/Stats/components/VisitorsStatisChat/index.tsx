@@ -6,6 +6,7 @@ import { getStatisAPI } from '@/api/statis';
 import ReactECharts from 'echarts-for-react';
 import { EChartsParams, Result, StatisResponse } from './type';
 import { useConfigStore } from '@/stores';
+import { logger } from '@/utils/logger';
 
 export default () => {
   const colorMode = useConfigStore((state) => state.colorMode);

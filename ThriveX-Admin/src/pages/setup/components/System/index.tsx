@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { useUserStore } from '@/stores';
 import { editAdminPassAPI } from '@/api/user';
+import { logger } from '@/utils/logger';
 import { EditUser } from '@/types/app/user';
 
 const { confirm } = Modal;

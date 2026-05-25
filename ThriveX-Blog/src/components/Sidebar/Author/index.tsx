@@ -21,7 +21,7 @@ const Author = async () => {
   const socialList = theme?.social ?? [];
 
   // 图标列表
-  const images: { [string: string]: string } = {
+  const images: Record<string, string> = {
     CSDN: CSDN,
     Douyin: Douyin,
     GitHub: GitHub,

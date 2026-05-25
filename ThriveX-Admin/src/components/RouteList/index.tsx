@@ -31,35 +31,35 @@ import { useUserStore } from '@/stores';
 import { checkTokenAPI } from '@/api/user';
 import NotFound from '../NotFound';
 
+const routeConfigs = [
+  { path: '/', title: '仪表盘', Component: Home },
+  { path: '/create', title: '发挥灵感', Component: Create },
+  { path: '/create_record', title: '闪念', Component: CreateRecord },
+  { path: '/draft', title: '草稿箱', Component: Draft },
+  { path: '/recycle', title: '回收站', Component: Decycle },
+  { path: '/cate', title: '导航管理', Component: Cate },
+  { path: '/article', title: '文章管理', Component: Article },
+  { path: '/record', title: '说说管理', Component: Record },
+  { path: '/tag', title: '标签管理', Component: Tag },
+  { path: '/comment', title: '评论管理', Component: Comment },
+  { path: '/wall', title: '评论管理', Component: Wall },
+  { path: '/web', title: '网站管理', Component: Web },
+  { path: '/swiper', title: '轮播图管理', Component: Swiper },
+  { path: '/footprint', title: '足迹管理', Component: Footprint },
+  { path: '/storage', title: '存储管理', Component: Storage },
+  { path: '/setup', title: '项目配置', Component: Setup },
+  { path: '/file', title: '文件管理', Component: File },
+  { path: '/iter', title: '项目更新记录', Component: Iterative },
+  { path: '/work', title: '工作台', Component: Work },
+  { path: '/assistant', title: '助手管理', Component: Assistant },
+  { path: '/config', title: '项目配置', Component: Config },
+];
+
 export default () => {
   const navigate = useNavigate();
   const store = useUserStore();
   const { pathname } = useLocation();
   const isLoginRoute = pathname === '/login' || pathname === '/auth';
-
-  const routes = [
-    { path: '/', title: '仪表盘', component: <Home /> },
-    { path: '/create', title: '发挥灵感', component: <Create /> },
-    { path: '/create_record', title: '闪念', component: <CreateRecord /> },
-    { path: '/draft', title: '草稿箱', component: <Draft /> },
-    { path: '/recycle', title: '回收站', component: <Decycle /> },
-    { path: '/cate', title: '导航管理', component: <Cate /> },
-    { path: '/article', title: '文章管理', component: <Article /> },
-    { path: '/record', title: '说说管理', component: <Record /> },
-    { path: '/tag', title: '标签管理', component: <Tag /> },
-    { path: '/comment', title: '评论管理', component: <Comment /> },
-    { path: '/wall', title: '评论管理', component: <Wall /> },
-    { path: '/web', title: '网站管理', component: <Web /> },
-    { path: '/swiper', title: '轮播图管理', component: <Swiper /> },
-    { path: '/footprint', title: '足迹管理', component: <Footprint /> },
-    { path: '/storage', title: '存储管理', component: <Storage /> },
-    { path: '/setup', title: '项目配置', component: <Setup /> },
-    { path: '/file', title: '文件管理', component: <File /> },
-    { path: '/iter', title: '项目更新记录', component: <Iterative /> },
-    { path: '/work', title: '工作台', component: <Work /> },
-    { path: '/assistant', title: '助手管理', component: <Assistant /> },
-    { path: '/config', title: '项目配置', component: <Config /> },
-  ];
 
   useEffect(() => {
     // 如果没有token并且不在登录相关页面就跳转到登录页
@@ -94,14 +94,14 @@ export default () => {
   return (
     <DefaultLayout>
       <Routes>
-        {routes.map(({ path, title, component }) => (
+        {routeConfigs.map(({ path, title, Component }) => (
           <Route
             key={path}
             path={path}
             element={
               <>
                 <PageTitle title={`云岫小筑 - ${title}`} />
-                {component}
+                <Component />
               </>
             }
           />

@@ -6,7 +6,7 @@ export interface Comment {
     url: string,
     content: string,
     articleId?: number,
-    articleTitle?: number,
+    articleTitle?: string,
     commentId?: number,
     auditStatus?: number,
     children?: Comment[],

@@ -9,7 +9,14 @@ class AssistantController {
   async getAssistantList(req: AuthRequest, res: Response): Promise<void> {
     try {
       const assistants = await prisma.assistant.findMany();
-      res.json(success(assistants));
+      const safeAssistants = assistants.map((a: any) => ({
+        id: a.id,
+        name: a.name,
+        url: a.url,
+        model: a.model,
+        isDefault: a.isDefault,
+      }));
+      res.json(success(safeAssistants));
     } catch (err) {
       console.error('getAssistantList error:', err);
       res.json(error('获取助手列表失败'));
@@ -44,7 +51,7 @@ class AssistantController {
     try {
       const { id, name, key, url, model, isDefault } = req.body;
       await prisma.assistant.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: { name, key, url, model, isDefault },
       });
       res.json(success());
@@ -107,14 +114,10 @@ class AssistantController {
     try {
       const { id } = req.params;
 
-      await prisma.assistant.updateMany({
-        data: { isDefault: false },
-      });
-
-      await prisma.assistant.update({
-        where: { id: parseInt(id) },
-        data: { isDefault: true },
-      });
+      await prisma.$transaction([
+        prisma.assistant.updateMany({ data: { isDefault: false } }),
+        prisma.assistant.update({ where: { id: parseInt(id) }, data: { isDefault: true } }),
+      ]);
 
       res.json(success());
     } catch (err) {

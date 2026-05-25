@@ -53,7 +53,7 @@ class UserController {
       const { ids } = req.body;
 
       await prisma.user.deleteMany({
-        where: { id: { in: ids } },
+        where: { id: { in: ids.map((i: any) => parseInt(i)) } },
       });
 
       res.json(success());
@@ -141,7 +141,7 @@ class UserController {
       if (nickname) where.nickname = { contains: nickname as string };
 
       const pageNum = parseInt(page as string) || 1;
-      const sizeNum = parseInt(size as string) || 10;
+      const sizeNum = Math.min(parseInt(size as string) || 10, 100);
 
       const [users, total] = await Promise.all([
         prisma.user.findMany({
@@ -195,6 +195,9 @@ class UserController {
         return;
       }
 
+      // Invalidate all existing tokens for this user
+      await prisma.userToken.deleteMany({ where: { userId: user.id } });
+
       const token = createToken({ userId: user.id, username: user.username, role: user.role });
 
       // Token 有效期改为 30 天
@@ -229,6 +232,11 @@ class UserController {
     try {
       const { oldPass, newPass } = req.body;
       const userId = req.user?.userId;
+
+      if (!userId) {
+        res.json(error('未登录'));
+        return;
+      }
 
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -265,7 +273,7 @@ class UserController {
       const token = req.headers.authorization?.replace('Bearer ', '');
       const userId = req.user?.userId;
 
-      if (token) {
+      if (token && token.length > 0) {
         await prisma.userToken.deleteMany({
           where: { token, userId },
         });
@@ -316,6 +324,11 @@ class UserController {
           role: true,
         },
       });
+
+      if (!author) {
+        res.json(error('未找到作者信息'));
+        return;
+      }
 
       // 将 nickname 映射为 name，兼容前端字段名
       res.json(success({

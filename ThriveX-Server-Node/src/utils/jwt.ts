@@ -3,8 +3,9 @@ import config from '../config';
 import { TokenPayload } from '../types/express';
 
 export function createToken(payload: TokenPayload): string {
+  const expiresIn: unknown = isNaN(Number(config.jwt.expiresIn)) ? config.jwt.expiresIn : parseInt(config.jwt.expiresIn, 10);
   return jwt.sign(payload, config.jwt.secret, {
-    expiresIn: parseInt(config.jwt.expiresIn, 10),
+    expiresIn: expiresIn as number | undefined,
   });
 }
 

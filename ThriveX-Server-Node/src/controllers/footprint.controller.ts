@@ -41,7 +41,7 @@ class FootprintController {
     try {
       const { id, title, content, address, position, images } = req.body;
       await prisma.footprint.update({
-        where: { id },
+        where: { id: parseInt(id) },
         data: { title, content, address, position, images },
       });
       res.json(success());

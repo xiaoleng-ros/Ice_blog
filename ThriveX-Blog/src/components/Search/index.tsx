@@ -73,7 +73,7 @@ export default ({ disclosure }: Props) => {
                   <Input type="text" placeholder="请输入文章关键词" value={searchKey} onChange={onSearchArticle} />
 
                   <div className="mt-4">
-                    {data?.result
+                    {data?.result && data.result.length > 0
                       ? data?.result?.map((item) => (
                           <Link key={item.id} href={`/article/${item.id}`} className="inline-block w-full py-2 px-4 mb-1 text-gray-700 dark:text-[#8c9ab1] hover:!text-primary hover:bg-[#f0f7ff] dark:hover:bg-[#25282d] hover:pl-8 rounded-md transition-[padding]" onClick={onClose}>
                             {item.title}

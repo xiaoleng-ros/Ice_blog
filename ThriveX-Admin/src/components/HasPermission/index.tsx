@@ -1,4 +1,4 @@
-import { useHasPermission } from '@/utils/permission';
+import { hasPermission } from '@/utils/permission';
 
 interface Props {
     code: string;
@@ -6,6 +6,6 @@ interface Props {
 }
 
 export default ({ code, children }: Props) => {
-    const hasPermission = useHasPermission(code);
-    return hasPermission ? children : null;
+    const allowed = hasPermission(code);
+    return allowed ? children : null;
 }

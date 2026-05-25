@@ -543,7 +543,8 @@ export default () => {
       const { code } = await delBatchArticleDataAPI(selectedRowKeys as number[]);
       if (code === 200) {
         message.success('删除成功');
-        await getArticlePagingAPI({ page: 1, size: 8 });
+        setSelectedRowKeys([]);
+        await getArticleList();
       } else {
         message.error('删除失败');
       }
