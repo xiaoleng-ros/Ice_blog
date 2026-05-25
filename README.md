@@ -3,10 +3,10 @@
 > 一个现代化的个人博客系统，采用前后端分离架构，基于 [ThriveX](https://github.com/LiuYuYang01/ThriveX-Admin) 开源项目二次开发 ✨
 
 <p align="center">
-  <img src="https://img.shields.io/badge/React-19-blue?logo=react" alt="React" />
-  <img src="https://img.shields.io/badge/Next.js-15-black?logo=next.js" alt="Next.js" />
-  <img src="https://img.shields.io/badge/Node.js-Express-green?logo=node.js" alt="Node.js" />
-  <img src="https://img.shields.io/badge/PostgreSQL-Neon-blue?logo=postgresql" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License" />
 </p>
 
@@ -28,7 +28,7 @@
 
 ## 🌟 项目起源
 
-本项目 Fork 自 [ThriveX](https://github.com/LiuYuYang01/ThriveX-Admin)（作者：[刘宇阳](https://github.com/LiuYuYang01)，主页：https://liuyuyang.net），在原项目基础上进行**功能扩展**和**技术栈优化**，采用更轻量的 Node.js + Express 替代 Spring Boot，零运维成本部署。
+本项目 Fork 自 [ThriveX](https://github.com/LiuYuYang01/ThriveX-Admin)（作者：[刘宇阳](https://github.com/LiuYuYang01)，主页：https://liuyuyang.net），在原项目基础上进行功能扩展和技术栈优化，采用更轻量的 Node.js + Express 替代 Spring Boot，零运维成本部署。
 
 ### 🎯 为什么选择 Ice Blog？
 
