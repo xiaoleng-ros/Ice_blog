@@ -1,19 +1,15 @@
 import localFont from 'next/font/local';
 import { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-
 import HeroUIProvider from '@/components/HeroUIProvider';
 import NProgress from '@/components/NProgress';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Tools from '@/components/Tools';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Confetti from '@/components/Confetti';
 import RouteChangeHandler from '@/components/RouteChangeHandler';
 
-import { getWebConfigDataAPI } from '@/api/config';
+import { getWebConfig } from '@/lib/data';
 import { Web } from '@/types/app/config';
 
 // 加载样式文件
@@ -31,8 +27,7 @@ const LXGWWenKai = localFont({
 
 // 生成动态metadata
 export async function generateMetadata(): Promise<Metadata> {
-  const response = await getWebConfigDataAPI<{ value: Web }>('web');
-  const data = response?.data?.value as Web;
+  const data = await getWebConfig('web');
 
   return {
     title: {
@@ -95,8 +90,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const response = await getWebConfigDataAPI<{ value: Web }>('web');
-  const data = response?.data?.value as Web;
+  const data = await getWebConfig('web');
 
   return (
     <html lang="zh-CN" className={LXGWWenKai.className}>

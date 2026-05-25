@@ -1,5 +1,3 @@
-import type { Dayjs } from 'dayjs';
-
 export interface Record {
     id?: number,
     content: string,

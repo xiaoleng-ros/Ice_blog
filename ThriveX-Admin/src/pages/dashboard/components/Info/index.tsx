@@ -14,13 +14,15 @@ export default function InfoCard() {
 
   const getData = async () => {
     try {
-      const { data: commentData } = await getCommentListAPI({ query: { status: 0 }, pattern: 'list' });
-      const { data: linkData } = await getLinkListAPI({ query: { status: 0 } });
-      const { data: wallData } = await getWallListAPI({ query: { status: 0 } });
+      const [commentData, linkData, wallData] = await Promise.all([
+        getCommentListAPI({ query: { status: 0 }, pattern: 'list' }),
+        getLinkListAPI({ query: { status: 0 } }),
+        getWallListAPI({ query: { status: 0 } }),
+      ]);
 
-      setCommentCount(commentData?.result?.length || 0);
-      setLinkCount(linkData?.length || 0);
-      setWallCount(wallData?.length || 0);
+      setCommentCount(commentData.data?.result?.length || 0);
+      setLinkCount(linkData.data?.length || 0);
+      setWallCount(wallData.data?.length || 0);
     } catch (err) {
       logger.error('获取数据失败:', err);
     }

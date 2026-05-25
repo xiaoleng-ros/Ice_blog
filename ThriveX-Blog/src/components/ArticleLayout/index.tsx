@@ -6,14 +6,16 @@ import Card from './Card';
 import Pagination from '../Pagination';
 
 import { getArticlePagingAPI } from '@/api/article';
-import { getWebConfigDataAPI } from '@/api/config';
-import { Theme } from '@/types/app/config';
 import { getSwiperListAPI } from '@/api/swiper';
+import { Theme } from '@/types/app/config';
 
-export default async ({ page }: { page: number }) => {
+interface Props {
+  page: number;
+  theme?: Theme;
+}
+
+export default async ({ page, theme }: Props) => {
   const { data: swiper } = await getSwiperListAPI();
-  const themeResponse = await getWebConfigDataAPI<{ value: Theme }>('theme');
-  const theme = themeResponse?.data?.value as Theme | undefined;
   const sidebar = theme?.right_sidebar ?? [];
 
   const isArticleLayout = theme?.is_article_layout ?? 'classics';
@@ -28,8 +30,8 @@ export default async ({ page }: { page: number }) => {
       {!!swiper?.length && <Swiper data={swiper} />}
       <Dynamic className="my-2" />
 
-      {isArticleLayout === 'classics' && <Classics data={data} />}
-      {isArticleLayout === 'card' && <Card data={data} />}
+      {isArticleLayout === 'classics' && <Classics data={data} theme={theme} />}
+      {isArticleLayout === 'card' && <Card data={data} theme={theme} />}
       {isArticleLayout === 'waterfall' && <Waterfall data={data} />}
 
       {!!data.total && <Pagination total={data?.pages} page={page} className="flex justify-center mt-5" />}

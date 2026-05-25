@@ -9,17 +9,14 @@ import { GoTag } from 'react-icons/go';
 import Empty from '@/components/Empty';
 import Show from '@/components/Show';
 
-import { getWebConfigDataAPI } from '@/api/config';
 import { Theme } from '@/types/app/config';
 
 interface ClassicsProps {
   data: Paginate<Article[]>;
+  theme?: Theme;
 }
 
-const Classics = async ({ data }: ClassicsProps) => {
-  const themeResponse = await getWebConfigDataAPI<{ value: Theme }>('theme');
-  const theme = themeResponse?.data?.value as Theme | undefined;
-
+const Classics = async ({ data, theme }: ClassicsProps) => {
   const covers = theme?.covers ?? '';
   const getCover = () => covers;
 

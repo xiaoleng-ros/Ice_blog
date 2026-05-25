@@ -4,12 +4,13 @@ import RandomArticle from './RandomArticle';
 import Comment from './Comment';
 import RunTime from './RunTime';
 import Study from './Study';
-import { getWebConfigDataAPI } from '@/api/config';
 import { Theme } from '@/types/app/config';
 
-export default async () => {
-  const themeResponse = await getWebConfigDataAPI<{ value: Theme }>('theme');
-  const theme = themeResponse?.data?.value as Theme;
+interface Props {
+  theme?: Theme;
+}
+
+export default async ({ theme }: Props) => {
   const sidebar = theme?.right_sidebar ?? [];
 
   return (

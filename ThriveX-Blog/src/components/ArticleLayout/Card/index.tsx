@@ -9,16 +9,14 @@ import { GoTag } from 'react-icons/go';
 import Empty from '@/components/Empty';
 import Show from '@/components/Show';
 
-import { getWebConfigDataAPI } from '@/api/config';
 import { Theme } from '@/types/app/config';
 
 interface CardProps {
   data: Paginate<Article[]>;
+  theme?: Theme;
 }
 
-const Card = async ({ data }: CardProps) => {
-  const themeResponse = await getWebConfigDataAPI<{ value: Theme }>('theme');
-  const theme = themeResponse?.data?.value as Theme | undefined;
+const Card = async ({ data, theme }: CardProps) => {
   const covers = theme?.covers ?? [];
 
   // 生成文章摘要，取前100个字
