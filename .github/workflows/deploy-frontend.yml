@@ -1,0 +1,40 @@
+name: Deploy Frontend Only
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ThriveX-Blog/**'
+      - 'ThriveX-Admin/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy frontend to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script_stop: true
+          script: |
+            cd /home/ubuntu/Ice_blog
+            git pull origin main
+
+            # 博客前端
+            cd ThriveX-Blog
+            npm install
+            npm run build
+            pm2 restart thrivex-blog || pm2 start npm --name thrivex-blog -- start
+
+            # 管理后台
+            cd ../ThriveX-Admin
+            npm install
+            npm run build
+
+            echo "✅ 前端部署完成"
+            pm2 status

@@ -1,0 +1,34 @@
+name: Deploy Backend Only
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ThriveX-Server-Node/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy backend to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script_stop: true
+          script: |
+            cd /home/ubuntu/Ice_blog
+            git pull origin main
+
+            cd ThriveX-Server-Node
+            npm install --production
+            npx prisma generate
+            npm run build
+            pm2 restart thrivex-api
+
+            echo "✅ 后端部署完成"
+            pm2 status
