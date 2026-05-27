@@ -254,7 +254,7 @@ const IterativePage = () => {
       <div className="max-w-7xl mx-auto mb-4">
         <div className="relative flex flex-col md:flex-row md:items-center justify-center gap-4 bg-white dark:bg-boxdark px-6 py-3 rounded-2xl shadow-xs border border-slate-100 dark:border-strokedark transition-colors">
           <h1 className="flex items-center gap-4 font-extrabold text-slate-800 dark:text-slate-100">
-            <img src="/logo.png" alt="" className="w-8 h-8" />
+            <img src="/logo.png" alt="" className="w-16 h-16" />
             <span className="text-xl font-extrabold text-slate-800 dark:text-slate-100">不断改善、成为最佳</span>
           </h1>
 

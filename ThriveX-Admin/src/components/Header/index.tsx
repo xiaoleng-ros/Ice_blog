@@ -95,7 +95,7 @@ const Header = (props: { sidebarOpen: string | boolean | undefined; setSidebarOp
             </button>
 
             <Link className="block shrink-0 lg:hidden" to="/">
-              <img src={logo} alt="logo" className="w-8" />
+              <img src={logo} alt="logo" className="w-16" />
             </Link>
           </div>
 

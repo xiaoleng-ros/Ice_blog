@@ -310,7 +310,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       {/* Logo 和标题区域 */}
       <div className="flex justify-center items-center gap-2 px-6 py-5 pb-0 lg:pt-6">
         <NavLink to="/" className={`flex items-center ${isSideBarTheme === 'dark' ? 'font-bold text-white' : 'font-medium text-[#555]! dark:text-white!'}`}>
-          <img src={logo} alt="logo" className="w-8 mr-2.5" />
+          <img src={logo} alt="logo" className="w-16 mr-2.5" />
           <div className="text-lg font-bold">云岫小筑</div>
         </NavLink>
 
