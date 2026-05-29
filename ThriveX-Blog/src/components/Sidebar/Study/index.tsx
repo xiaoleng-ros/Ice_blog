@@ -6,7 +6,7 @@ import { MyData } from '@/types/app/my';
 
 export default async () => {
   const { data } = await getPageConfigDataByNameAPI('my');
-  const { technology_stack } = data?.value as MyData;
+  const { technology_stack = [] } = (data?.value as MyData) || {};
   
   return (
     <div className="flex flex-col tw_container bg-white dark:bg-black-b p-4 mb-3 tw_title">

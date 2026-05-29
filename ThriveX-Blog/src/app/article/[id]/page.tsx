@@ -147,21 +147,27 @@ export default async (props: Props) => {
             </div>
           </Slide>
 
-          <div className="w-[90%] xl:w-6/12 mx-auto mt-12 relative">
-            <Summary content={data?.description || ''} />
-            <MD data={data?.content} />
+          <div className="w-[90%] xl:w-4/5 xl:max-w-6xl mx-auto mt-12 relative flex gap-8">
+            {/* 左侧目录 - 仅在大屏显示 */}
+            <div className="hidden xl:block w-[220px] shrink-0">
+              <Nav />
+            </div>
 
-            <div className="w-full">
-              <Tag data={data?.articleTags?.map((at) => at.tag) ?? []} />
+            {/* 文章主体 */}
+            <div className="flex-1 min-w-0">
+              <Summary content={data?.description || ''} />
+              <MD data={data?.content} />
 
-              <Copyright />
-              <RandomArticle />
-              <UpAndDown currentId={id} prev={data?.prev} next={data?.next} />
-              <Comment articleId={id} articleTitle={data.title} />
+              <div className="w-full">
+                <Tag data={data?.articleTags?.map((at) => at.tag) ?? []} />
+
+                <Copyright />
+                <RandomArticle />
+                <UpAndDown currentId={id} prev={data?.prev} next={data?.next} />
+                <Comment articleId={id} articleTitle={data.title} />
+              </div>
             </div>
           </div>
-
-          <Nav />
         </div>
       </>
     );

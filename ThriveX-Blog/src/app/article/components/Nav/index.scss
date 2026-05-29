@@ -3,24 +3,18 @@
 :target::before {
   content: '';
   display: block;
-  height: 80px; // 防止锚点被顶部遮挡
+  height: 80px;
 }
 
-.content-nav-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 49;
-  background: #000;
-  opacity: 0.4;
-  pointer-events: auto;
-}
+.ContentNavSidebar {
+  @apply sticky top-[90px] w-[220px] shrink-0 h-[calc(100vh-110px)] overflow-hidden
+         bg-transparent dark:bg-transparent backdrop-blur-none rounded-none border-none
+         shadow-none flex flex-col mt-[160px] ml-[-40px];
 
-.ContentNavComponent {
   .nav_item::before {
     @apply content-[''] -left-2.5 absolute top-1/2 -translate-y-1/2 w-1 h-[15px] rounded-[20px] bg-primary transition-transform;
   }
 
-  // 动态支持 h1~h6 样式缩进
   @for $i from 1 through 6 {
     .h#{$i} {
       padding-left: #{15 + $i * 10}px;

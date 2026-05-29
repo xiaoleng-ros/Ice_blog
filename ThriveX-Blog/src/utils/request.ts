@@ -17,10 +17,11 @@ if (!url) {
 
 /**
  * 进行中的 GET 请求缓存 Map
- * key: 完整请求 URL, value: Promise
+ * key: 完整请求 URL, value: Promise<ResponseData<T>>
  * 同一个渲染周期内，相同 URL 的 GET 请求会合并为一次实际网络请求
+ * 缓存已解析的 JSON 结果而非 Response 对象，避免 "Body has already been read" 报错
  */
-const inflightRequests = new Map<string, Promise<Response>>();
+const inflightRequests = new Map<string, Promise<any>>();
 
 /**
  * 带超时的 fetch 请求
@@ -69,16 +70,21 @@ export const Request = async <T>(method: string, api: string, data?: any, cachin
         let res: Response;
         
         // GET 请求去重：同一个渲染周期内相同 URL 只发一次网络请求
+        // 缓存已解析的 JSON 结果，防止多个组件共享同一个 Response 时
+        // 出现 "Body has already been read" 错误
         if (method === 'GET') {
             if (inflightRequests.has(fullUrl)) {
-                // 复用正在进行的请求
-                res = await inflightRequests.get(fullUrl)!;
+                // 复用正在进行的请求（已解析的 JSON）
+                return inflightRequests.get(fullUrl)!;
             } else {
-                // 首次请求，存入 Map
-                const promise = fetchWithTimeout(fullUrl, fetchOptions, REQUEST_TIMEOUT);
+                // 首次请求：执行 fetch → 解析 JSON → 存入 Map
+                const promise = (async () => {
+                    const res = await fetchWithTimeout(fullUrl, fetchOptions, REQUEST_TIMEOUT);
+                    return res.json() as Promise<ResponseData<T>>;
+                })();
                 inflightRequests.set(fullUrl, promise);
                 try {
-                    res = await promise;
+                    return await promise;
                 } finally {
                     // 请求完成后清除（无论成功还是失败）
                     inflightRequests.delete(fullUrl);
