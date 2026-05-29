@@ -43,6 +43,24 @@ router.patch(
 );
 
 router.get(
+  '/hot',
+  apiLimiter,
+  ArticleController.getHotArticles
+);
+
+router.get(
+  '/random',
+  apiLimiter,
+  ArticleController.getRandomArticles
+);
+
+router.get(
+  '/archives',
+  apiLimiter,
+  ArticleController.getArchives
+);
+
+router.get(
   '/:id',
   apiLimiter,
   ArticleController.getArticle
@@ -67,26 +85,8 @@ router.get(
 );
 
 router.get(
-  '/hot',
-  apiLimiter,
-  ArticleController.getHotArticles
-);
-
-router.get(
-  '/random',
-  apiLimiter,
-  ArticleController.getRandomArticles
-);
-
-router.get(
   '/view/:id',
   ArticleController.incrementView
-);
-
-router.get(
-  '/archives',
-  apiLimiter,
-  ArticleController.getArchives
 );
 
 router.post(
