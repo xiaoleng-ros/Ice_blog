@@ -5,6 +5,7 @@ import { sendSuccess, sendError } from '../utils/result';
 import { createToken } from '../utils/jwt';
 import { prisma } from '../utils/prisma';
 import NodeCache from 'node-cache';
+import cache from '../utils/cache';
 
 /** 登录失败计数缓存，TTL 15 分钟自动清除 */
 const loginFailCache = new NodeCache({ stdTTL: 900, checkperiod: 60 });
@@ -333,6 +334,13 @@ class UserController {
 
   async getAuthor(req: AuthRequest, res: Response): Promise<void> {
     try {
+      const CACHE_KEY = 'author_info';
+      const cached = cache.get(CACHE_KEY);
+      if (cached) {
+        sendSuccess(res, cached);
+        return;
+      }
+
       const author = await prisma.user.findFirst({
         where: { role: 'admin' },
         select: {
@@ -350,10 +358,12 @@ class UserController {
         return;
       }
 
-      sendSuccess(res, {
+      const result = {
         ...author,
         name: author?.nickname || author?.username || '',
-      });
+      };
+      cache.set(CACHE_KEY, result);
+      sendSuccess(res, result);
     } catch (err) {
       console.error('getAuthor error:', err);
       sendError(res, '获取作者信息失败', 500);

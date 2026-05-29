@@ -16,6 +16,13 @@ if (!url) {
 }
 
 /**
+ * 进行中的 GET 请求缓存 Map
+ * key: 完整请求 URL, value: Promise
+ * 同一个渲染周期内，相同 URL 的 GET 请求会合并为一次实际网络请求
+ */
+const inflightRequests = new Map<string, Promise<Response>>();
+
+/**
  * 带超时的 fetch 请求
  * @param url - 请求地址
  * @param options - fetch 选项
@@ -58,7 +65,28 @@ export const Request = async <T>(method: string, api: string, data?: any, cachin
         if (method === 'POST' && data) {
             fetchOptions.body = JSON.stringify(data);
         }
-        const res = await fetchWithTimeout(fullUrl, fetchOptions, REQUEST_TIMEOUT)
+
+        let res: Response;
+        
+        // GET 请求去重：同一个渲染周期内相同 URL 只发一次网络请求
+        if (method === 'GET') {
+            if (inflightRequests.has(fullUrl)) {
+                // 复用正在进行的请求
+                res = await inflightRequests.get(fullUrl)!;
+            } else {
+                // 首次请求，存入 Map
+                const promise = fetchWithTimeout(fullUrl, fetchOptions, REQUEST_TIMEOUT);
+                inflightRequests.set(fullUrl, promise);
+                try {
+                    res = await promise;
+                } finally {
+                    // 请求完成后清除（无论成功还是失败）
+                    inflightRequests.delete(fullUrl);
+                }
+            }
+        } else {
+            res = await fetchWithTimeout(fullUrl, fetchOptions, REQUEST_TIMEOUT);
+        }
 
         return res?.json() as Promise<ResponseData<T>>;
     } catch (error) {

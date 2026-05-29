@@ -2,15 +2,24 @@ import { Response } from 'express';
 import { AuthRequest } from '../types/express';
 import { sendSuccess, sendError } from '../utils/result';
 import { prisma } from '../utils/prisma';
+import cache from '../utils/cache';
 
 class ConfigController {
   async getWebConfig(req: AuthRequest, res: Response): Promise<void> {
     try {
+      const CACHE_KEY = 'web_config_all';
+      const cached = cache.get(CACHE_KEY);
+      if (cached) {
+        sendSuccess(res, cached);
+        return;
+      }
+
       const configs = await prisma.webConfig.findMany();
       const configMap: Record<string, any> = {};
       configs.forEach((cfg: { name: string; value: any }) => {
         configMap[cfg.name] = cfg.value;
       });
+      cache.set(CACHE_KEY, configMap);
       sendSuccess(res, configMap);
     } catch (err) {
       console.error('getWebConfig error:', err);
@@ -21,6 +30,13 @@ class ConfigController {
   async getWebConfigByName(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { name } = req.params;
+      const CACHE_KEY = `web_config_${name}`;
+      const cached = cache.get(CACHE_KEY);
+      if (cached) {
+        sendSuccess(res, cached);
+        return;
+      }
+
       const config = await prisma.webConfig.findUnique({
         where: { name },
       });
@@ -31,6 +47,7 @@ class ConfigController {
         return;
       }
       
+      cache.set(CACHE_KEY, config);
       sendSuccess(res, config);
     } catch (err) {
       console.error('getWebConfigByName error:', err);
@@ -48,7 +65,11 @@ class ConfigController {
           update: { value: value as any },
           create: { name, value: value as any },
         });
+        // 编辑后清除对应缓存，确保下次读取到最新数据
+        cache.del(`web_config_${name}`);
       }
+      // 清除全量配置缓存
+      cache.del('web_config_all');
 
       sendSuccess(res);
     } catch (err) {
