@@ -67,14 +67,36 @@ export default () => {
         social: values.social
           ? values.social
               .split('\n')
-              .filter((item: string) => item.trim())
+              .map((item: string) => item.trim())
+              .filter((item: string) => item)
               .map((item: string) => {
+                // 去掉常见的 markdown 符号（反引号、星号等）
+                const cleanLine = item.replace(/[`*]/g, '').trim();
+
+                // 优先尝试标准 JSON 解析
                 try {
-                  return JSON.parse(item);
+                  const obj = JSON.parse(cleanLine);
+                  return {
+                    name: String(obj.name || '').trim(),
+                    url: String(obj.url || '').trim(),
+                  };
                 } catch {
-                  return { name: item.trim(), url: item.trim() };
+                  // JSON 解析失败，宽松提取 "name" 和 "url" 字段
+                  const nameMatch = cleanLine.match(/"name"\s*:\s*"([^"]*)"/);
+                  const urlMatch = cleanLine.match(/"url"\s*:\s*"([^"]*)"/);
+                  if (nameMatch && urlMatch) {
+                    return { name: nameMatch[1].trim(), url: urlMatch[1].trim() };
+                  }
+
+                  // 兜底：尝试按 "name url" 空格分隔
+                  const parts = cleanLine.split(/\s+/);
+                  if (parts.length >= 2) {
+                    return { name: parts[0].trim(), url: parts.slice(1).join(' ').trim() };
+                  }
+                  return { name: cleanLine, url: cleanLine };
                 }
               })
+              .filter((item: { name: string; url: string }) => item.name && item.url)
           : [],
         swiper_text: values.swiper_text ? values.swiper_text.split('\n').filter((item: string) => item.trim()) : [],
         covers: values.covers ? values.covers.split('\n').filter((item: string) => item.trim()) : [],
@@ -161,21 +183,37 @@ export default () => {
 
           <Divider>社交网站</Divider>
           <Form.Item name="social" label="社交网站">
-            <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} size="large" placeholder="请输入社交网站" />
+            <Input.TextArea
+              autoSize={{ minRows: 4, maxRows: 8 }}
+              size="large"
+              placeholder={'每行一个，格式为 JSON，例如：\n{"name": "GitHub", "url": "https://github.com/xxx"}\n{"name": "RedBook", "url": "https://www.xiaohongshu.com/user/xxx"}\n{"name": "Bilibili", "url": "https://space.bilibili.com/xxx"}\n\n内置 name：CSDN / Douyin / GitHub / Gitee / Juejin / QQ / Weixin / RedBook / Bilibili（区分大小写）。url 不要加反引号。'}
+            />
           </Form.Item>
-          <Alert title="请务必确保每一项格式正确，否则会导致网站无法访问" type="info" className="mt-2" />
+          <Alert
+            title='每行一条 JSON：{"name":"图标名","url":"链接"}，name 必须是 CSDN / Douyin / GitHub / Gitee / Juejin / QQ / Weixin / RedBook / Bilibili 之一；url 不要用反引号包裹。name 允许前后空格，会自动 trim。'
+            type="info"
+            className="mt-2"
+          />
 
           <Divider>文章随机封面</Divider>
           <Form.Item name="covers" label="文章随机封面">
-            <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} size="large" placeholder="请输入文章随机封面" />
+            <Input.TextArea
+              autoSize={{ minRows: 3, maxRows: 6 }}
+              size="large"
+              placeholder={'每行一个图片地址，文章没有封面时从中随机抽取，例如：\nhttps://example.com/cover1.jpg\nhttps://example.com/cover2.png'}
+            />
           </Form.Item>
-          <Alert title="以换行分隔，每行表示一段文本" type="info" className="mt-2" />
+          <Alert title="每行一个图片 URL（http/https 链接），文章未设置封面时随机展示，建议至少 3 张以上" type="info" className="mt-2" />
 
           <Divider>作者推荐文章</Divider>
           <Form.Item name="reco_article" label="作者推荐文章">
-            <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} size="large" placeholder="请输入作者推荐文章ID" />
+            <Input.TextArea
+              autoSize={{ minRows: 3, maxRows: 6 }}
+              size="large"
+              placeholder={'每行一个文章 ID，可到 文章管理 列表中查看，例如：\n1\n5\n12'}
+            />
           </Form.Item>
-          <Alert title="以换行分隔，每行表示一段文本" type="info" className="mt-2" />
+          <Alert title="每行一个文章 ID（数字），用于侧边栏「作者推荐」模块按顺序展示，ID 不存在则跳过" type="info" className="mt-2" />
 
           <Divider>侧边栏</Divider>
           <Checkbox.Group

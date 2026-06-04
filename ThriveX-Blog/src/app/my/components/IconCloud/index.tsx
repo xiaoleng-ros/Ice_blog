@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useId, useState } from 'react';
 import { Cloud, fetchSimpleIcons, type ICloud, renderSimpleIcon, type SimpleIcon } from 'react-icon-cloud';
 
 export const cloudProps: Omit<ICloud, 'children'> = {
@@ -25,12 +25,10 @@ export const cloudProps: Omit<ICloud, 'children'> = {
     outlineColour: '#0000',
     maxSpeed: 0.04,
     minSpeed: 0.02,
-    // dragControl: false,
   },
 };
 
 export const renderCustomIcon = (icon: SimpleIcon, theme: string) => {
-  // 为特定图标自定义颜色
   const bgHex = theme === 'light' ? '#f3f2ef' : '#080510';
   const fallbackHex = theme === 'light' ? '#6e6e73' : '#ffffff';
 
@@ -55,6 +53,12 @@ type IconData = Awaited<ReturnType<typeof fetchSimpleIcons>>;
 
 export default function IconCloud({ iconSlugs }: { iconSlugs: string[] }) {
   const [data, setData] = useState<IconData | null>(null);
+  /**
+   * 使用 React.useId() 生成稳定的 ID
+   * 替代 react-icon-cloud 内部的 Math.random() guid()
+   * 解决 SSR/CSR 水合不匹配问题（服务端和客户端生成不同 UUID）
+   */
+  const stableId = useId().replace(/:/g, '');
 
   useEffect(() => {
     fetchSimpleIcons({ slugs: iconSlugs }).then(setData);
@@ -67,7 +71,7 @@ export default function IconCloud({ iconSlugs }: { iconSlugs: string[] }) {
   }, [data]);
 
   return (
-    <Cloud {...cloudProps}>
+    <Cloud {...cloudProps} id={stableId}>
       <>{renderedIcons}</>
     </Cloud>
   );

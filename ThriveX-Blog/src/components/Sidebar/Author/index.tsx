@@ -8,6 +8,8 @@ import Gitee from '@/assets/svg/socializing/Gitee.svg';
 import Juejin from '@/assets/svg/socializing/Juejin.svg';
 import QQ from '@/assets/svg/socializing/QQ.svg';
 import Weixin from '@/assets/svg/socializing/Weixin.svg';
+import RedBook from '@/assets/svg/socializing/RedBook.svg';
+import Bilibili from '@/assets/svg/socializing/Bilibili.svg';
 
 import { getAuthorDataAPI } from '@/api/user';
 import { getWebConfigDataAPI } from '@/api/config';
@@ -29,9 +31,11 @@ const Author = async () => {
     Juejin: Juejin,
     QQ: QQ,
     Weixin: Weixin,
+    RedBook: RedBook,
+    Bilibili: Bilibili,
   };
 
-  const getIcon = (name: string) => images[name];
+  const getIcon = (name: string) => images[name?.trim()];
 
   return (
     <div
@@ -43,7 +47,7 @@ const Author = async () => {
     >
       {/* 作者头像 */}
       <div className="avatar flex justify-center items-center w-[90px] h-[90px] rounded-full bg-white shadow-md overflow-hidden">
-        <img src={user?.avatar} alt="" className="w-[90%] h-[90%] rounded-full transition-transform hover:scale-110" />
+        <img src={user?.avatar || null} alt="" className="w-[90%] h-[90%] rounded-full transition-transform hover:scale-110" />
       </div>
 
       {/* 作者介绍 */}
@@ -61,7 +65,7 @@ const Author = async () => {
         <div className="list flex justify-evenly w-[70%] mx-auto pt-6">
           {socialList?.map((item: Social, index: number) => (
             <a key={index} href={item?.url} target="_blank" rel="noopener noreferrer">
-              <Image src={getIcon(item?.name)} alt={item?.name} title={item?.name} className="w-[23px] h-[23px]" />
+              {getIcon(item?.name) ? <Image src={getIcon(item?.name)} alt={item?.name} title={item?.name} className="w-[23px] h-[23px]" /> : null}
             </a>
           ))}
         </div>
