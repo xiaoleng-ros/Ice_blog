@@ -120,6 +120,9 @@ const CommentForm = ({ articleId }: Props) => {
 
     // 提交成功后把评论的数据持久化到本地
     localStorage.setItem('comment_data', JSON.stringify(data));
+
+    // 触发评论数更新事件（Hero 区 CommentCount 组件会监听）
+    window.dispatchEvent(new Event('comment-submitted'));
   };
 
   // 处理人机验证成功回调

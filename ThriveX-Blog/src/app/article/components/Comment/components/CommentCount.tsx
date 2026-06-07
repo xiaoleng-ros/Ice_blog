@@ -17,5 +17,12 @@ export default function CommentCount({ articleId }: { articleId: number }) {
 
   useEffect(() => { fetchCount(); }, [fetchCount]);
 
+  // 评论提交后立即刷新计数
+  useEffect(() => {
+    const onComment = () => fetchCount();
+    window.addEventListener('comment-submitted', onComment);
+    return () => window.removeEventListener('comment-submitted', onComment);
+  }, [fetchCount]);
+
   return <>{count ?? '...'}</>;
 }
