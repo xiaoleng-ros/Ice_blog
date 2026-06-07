@@ -11,6 +11,7 @@ import Copyright from '../components/Copyright';
 import UpAndDown from '../components/UpAndDown';
 import RandomArticle from '../components/RandomArticle';
 import Comment from '../components/Comment';
+import CommentCount from '../components/Comment/components/CommentCount';
 import MD from '../components/MD';
 import Summary from '../components/Summary';
 import Nav from '../components/Nav';
@@ -137,7 +138,7 @@ export default async (props: Props) => {
                   <span className={`${iconSty} bg-[#4FA759]`}>
                     <AiOutlineComment />
                   </span>
-                  <span>评论数量：{data?.comment}</span>
+                  <span>评论数量：<CommentCount articleId={id} /></span>
                 </div>
 
                 <div className="flex mb-2">
