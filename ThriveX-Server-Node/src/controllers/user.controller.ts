@@ -169,7 +169,7 @@ class UserController {
       ]);
 
       sendSuccess(res, {
-        records: users,
+        result: users,
         total,
         page: pageNum,
         size: sizeNum,

@@ -12,7 +12,6 @@ interface Paginate<T> {
   pages: number;
   total: number;
   result: T;
-  records?: T;
 }
 
 interface Page {

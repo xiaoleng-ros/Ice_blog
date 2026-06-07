@@ -110,12 +110,12 @@ class CommentController {
 
   async getArticleComments(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { article_id } = req.params;
+      const { articleId } = req.params;
       const { page, size, pageSize } = req.query;
       const pageNum = parseInt(page as string) || 1;
       const sizeNum = parseInt((size || pageSize) as string) || 8;
 
-      const where = { articleId: parseInt(article_id), auditStatus: 1 };
+      const where = { articleId: parseInt(articleId), auditStatus: 1 };
 
       const [comments, total] = await Promise.all([
         prisma.comment.findMany({

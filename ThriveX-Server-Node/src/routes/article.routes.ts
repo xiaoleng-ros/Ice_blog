@@ -19,7 +19,7 @@ router.post(
 );
 
 router.delete(
-  '/:id/:is_del',
+  '/:id/:isDel',
   authMiddleware,
   ArticleController.deleteArticle
 );
@@ -73,13 +73,13 @@ router.get(
 );
 
 router.get(
-  '/cate/:cate_id',
+  '/cate/:cateId',
   apiLimiter,
   ArticleController.getArticleByCate
 );
 
 router.get(
-  '/tag/:tag_id',
+  '/tag/:tagId',
   apiLimiter,
   ArticleController.getArticleByTag
 );

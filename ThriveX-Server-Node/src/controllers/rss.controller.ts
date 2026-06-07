@@ -28,10 +28,10 @@ class RssController {
       const total = rssFeeds.length;
       const start = (pageNum - 1) * sizeNum;
       const end = start + sizeNum;
-      const records = rssFeeds.slice(start, end);
+      const result = rssFeeds.slice(start, end);
 
       sendSuccess(res, {
-        records,
+        result,
         total,
         page: pageNum,
         size: sizeNum,

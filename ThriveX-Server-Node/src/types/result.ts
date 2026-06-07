@@ -11,7 +11,7 @@ export interface ResultData {
 }
 
 export interface Paginate<T> {
-  records: T[];
+  result: T[];
   total: number;
   page: number;
   size: number;

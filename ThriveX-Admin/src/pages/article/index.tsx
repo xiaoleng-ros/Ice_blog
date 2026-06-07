@@ -384,8 +384,7 @@ export default () => {
   const getCateList = async () => {
     try {
       const { data } = await getCateListAPI();
-      // 后端 GET /cate 返回 { records: [], total, ... } 格式，兼容处理
-      const cateData = Array.isArray(data) ? data : data?.records || data?.result || [];
+      const cateData = data ?? [];
       setCateList(cateData.filter((item: ArticleCate) => item.type === 'cate'));
     } catch (error) {
       logger.error('获取分类列表失败:', error);
