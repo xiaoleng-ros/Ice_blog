@@ -50,6 +50,13 @@ class CommentController {
           createTime: Date.now().toString(),
         },
       });
+
+      // 同步更新文章评论计数
+      await prisma.article.update({
+        where: { id: parseInt(articleId) },
+        data: { comment: { increment: 1 } },
+      });
+
       sendSuccess(res, comment);
     } catch (err) {
       console.error('addComment error:', err);
@@ -60,7 +67,14 @@ class CommentController {
   async deleteComment(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      await prisma.comment.delete({ where: { id: parseInt(id) } });
+      const comment = await prisma.comment.findUnique({ where: { id: parseInt(id) } });
+      if (comment) {
+        await prisma.comment.delete({ where: { id: parseInt(id) } });
+        await prisma.article.update({
+          where: { id: comment.articleId },
+          data: { comment: { decrement: 1 } },
+        });
+      }
       sendSuccess(res);
     } catch (err) {
       console.error('deleteComment error:', err);

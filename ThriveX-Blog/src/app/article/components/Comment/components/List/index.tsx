@@ -46,6 +46,9 @@ const CommentList = forwardRef(({ id, reply }: Props, ref) => {
   // 这里的逻辑有点乱，暂时先这样，有空再优化！！！
   return (
     <div className="CommentListComponent">
+      <div className="comment-count mb-4 text-sm text-gray-500 dark:text-gray-400">
+        共 {data.total ?? 0} 条评论
+      </div>
       <Show is={!!data.result?.length}>
         <ul className="list">
           {data.result?.map((one) => (
