@@ -1,4 +1,4 @@
-﻿import { getArticleDataAPI, recordViewAPI } from '@/api/article';
+﻿import { getArticleDataAPI } from '@/api/article';
 import { getWebConfigDataAPI } from '@/api/config';
 import { Web } from '@/types/app/config';
 import { Metadata } from 'next';
@@ -12,6 +12,7 @@ import UpAndDown from '../components/UpAndDown';
 import RandomArticle from '../components/RandomArticle';
 import Comment from '../components/Comment';
 import CommentCount from '../components/Comment/components/CommentCount';
+import ViewCount from '../components/ViewCount';
 import MD from '../components/MD';
 import Summary from '../components/Summary';
 import Nav from '../components/Nav';
@@ -98,9 +99,6 @@ export default async (props: Props) => {
     return <NotFound />;
   }
 
-  // 记录文章访问量
-  await recordViewAPI(id);
-
   // 鍥炬爣鏍峰紡
   const iconSty = 'flex justify-center items-center w-5 h-5 rounded-full text-xs mr-1';
 
@@ -131,7 +129,7 @@ export default async (props: Props) => {
                   <span className={`${iconSty} bg-[#EA3B24]`}>
                     <FaHotjar />
                   </span>
-                  <span>阅读量：{data?.view}</span>
+                  <span>阅读量：<ViewCount articleId={id} /></span>
                 </div>
 
                 <div className="flex mb-2">
