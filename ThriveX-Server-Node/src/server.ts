@@ -2,6 +2,7 @@ import app from './app';
 import config from './config';
 import { logger } from './middlewares/logger.middleware';
 import { prisma } from './utils/prisma';
+import { init as initSensitive } from './utils/sensitive';
 
 /**
  * 数据库心跳保活定时器引用
@@ -44,6 +45,9 @@ async function main() {
   try {
     await prisma.$connect();
     logger.info('Database connected successfully');
+
+    // 加载敏感词库到 Trie 树内存
+    initSensitive();
 
     // 启动数据库心跳保活（防止 Neon Serverless 冷启动延迟）
     startDatabaseHeartbeat();

@@ -99,6 +99,7 @@ const CommentForm = ({ articleId }: Props) => {
     });
 
     if (code !== 200) {
+      setLoading(false);
       captchaRef.current?.resetCaptcha();
       return toast.error('发布评论失败：' + message, toastConfig);
     }
