@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import JSZip from 'jszip';
 import { prisma } from '../utils/prisma';
+import cache from '../utils/cache';
 
 class ArticleController {
   async addArticle(req: AuthRequest, res: Response): Promise<void> {
@@ -57,6 +58,9 @@ class ArticleController {
         },
       });
 
+      // 新增文章后清除热门/随机文章缓存
+      cache.del('article_hot');
+      cache.del('article_random');
       sendSuccess(res, { id: article.id });
     } catch (err) {
       console.error('addArticle error:', err);
@@ -79,6 +83,8 @@ class ArticleController {
         });
       }
 
+      cache.del('article_hot');
+      cache.del('article_random');
       sendSuccess(res);
     } catch (err) {
       console.error('deleteArticle error:', err);
@@ -95,6 +101,8 @@ class ArticleController {
         data: { isDel: false },
       });
 
+      cache.del('article_hot');
+      cache.del('article_random');
       sendSuccess(res);
     } catch (err) {
       console.error('reductionArticle error:', err);
@@ -111,6 +119,8 @@ class ArticleController {
         data: { isDel: true },
       });
 
+      cache.del('article_hot');
+      cache.del('article_random');
       sendSuccess(res);
     } catch (err) {
       console.error('batchDeleteArticle error:', err);
@@ -177,6 +187,8 @@ class ArticleController {
         });
       }
 
+      cache.del('article_hot');
+      cache.del('article_random');
       sendSuccess(res);
     } catch (err) {
       console.error('editArticle error:', err);
@@ -451,7 +463,13 @@ class ArticleController {
 
   async getHotArticles(req: AuthRequest, res: Response): Promise<void> {
     try {
-      // 直接在数据库层过滤，避免加载无用数据
+      const CACHE_KEY = 'article_hot';
+      const cached = cache.get(CACHE_KEY);
+      if (cached) {
+        sendSuccess(res, cached);
+        return;
+      }
+
       const articles = await prisma.article.findMany({
         include: {
           articleConfig: true,
@@ -466,6 +484,7 @@ class ArticleController {
         take: 10,
       });
 
+            cache.set('article_hot', articles);
       sendSuccess(res, articles);
     } catch (err) {
       console.error('getHotArticles error:', err);
@@ -475,7 +494,13 @@ class ArticleController {
 
   async getRandomArticles(req: AuthRequest, res: Response): Promise<void> {
     try {
-      // 先查总数，再随机取偏移量，避免加载大量数据到内存
+      const CACHE_KEY = 'article_random';
+      const cached = cache.get(CACHE_KEY);
+      if (cached) {
+        sendSuccess(res, cached);
+        return;
+      }
+
       const total = await prisma.article.count({
         where: {
           articleConfig: {
@@ -503,6 +528,7 @@ class ArticleController {
         take,
       });
 
+            cache.set('article_random', articles);
       sendSuccess(res, articles);
     } catch (err) {
       console.error('getRandomArticles error:', err);
@@ -706,3 +732,6 @@ class ArticleController {
 }
 
 export default new ArticleController();
+
+
+

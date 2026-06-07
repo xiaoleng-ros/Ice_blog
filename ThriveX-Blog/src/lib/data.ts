@@ -1,4 +1,4 @@
-import { cache } from 'react'
+﻿import { cache } from 'react'
 import { Request } from '@/utils'
 import type { Theme, Web } from '@/types/app/config'
 
@@ -8,7 +8,7 @@ import type { Theme, Web } from '@/types/app/config'
  * 管理后台修改配置后前端能立即获取最新值
  */
 export const getWebConfig = cache(async (name: string) => {
-  const response = await Request<{ value: Web }>('GET', `/config/web/${name}`, undefined, false)
+  const response = await Request<{ value: Web }>('GET', `/config/web/${name}`, undefined, true)
   return response?.data?.value as Web | undefined
 })
 
@@ -18,6 +18,6 @@ export const getWebConfig = cache(async (name: string) => {
  * 管理后台修改侧边栏/文章布局等配置后前端能立即获取最新值
  */
 export const getThemeConfig = cache(async () => {
-  const response = await Request<{ value: Theme }>('GET', '/config/web/theme', undefined, false)
+  const response = await Request<{ value: Theme }>('GET', '/config/web/theme', undefined, true)
   return response?.data?.value as Theme | undefined
 })

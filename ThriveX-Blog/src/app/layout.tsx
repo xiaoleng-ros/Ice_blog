@@ -1,4 +1,4 @@
-import localFont from 'next/font/local';
+﻿import localFont from 'next/font/local';
 import { Metadata } from 'next';
 
 import HeroUIProvider from '@/components/HeroUIProvider';
@@ -22,7 +22,10 @@ const LXGWWenKai = localFont({
   display: 'swap',
 });
 
-// 生成动态metadata
+// ISR: 每60秒重新生成布局（配合 Data Cache 减少重复数据库查询）
+export const revalidate = 60;
+
+// 生成动态 metadata
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getWebConfig('web');
 
@@ -92,7 +95,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="zh-CN" className={LXGWWenKai.className}>
       <head>
-        {/* 动态favicon */}
+        {/* 动态 favicon */}
         {data?.favicon && (
           <>
             <link rel="icon" type="image/x-icon" href={data.favicon} />

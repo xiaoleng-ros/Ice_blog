@@ -139,7 +139,7 @@ class FileController {
       ]);
 
       sendSuccess(res, {
-        records: files,
+        result: files,
         total,
         page: pageNum,
         size: sizeNum,

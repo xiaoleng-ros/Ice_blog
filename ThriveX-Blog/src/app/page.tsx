@@ -1,9 +1,12 @@
-import Slide from '@/components/Slide';
+﻿import Slide from '@/components/Slide';
 import Typed from '@/components/Typed';
 import Starry from '@/components/Starry';
 import Container from '@/components/Container';
 import ArticleLayout from '@/components/ArticleLayout';
 import Sidebar from '@/components/Sidebar';
+
+// ISR: 每60秒重新生成首页
+export const revalidate = 60;
 
 import { getThemeConfig } from '@/lib/data';
 

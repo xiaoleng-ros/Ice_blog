@@ -1,8 +1,11 @@
-import { getCateArticleListAPI } from '@/api/cate';
+﻿import { getCateArticleListAPI } from '@/api/cate';
 import Starry from '@/components/Starry';
 import Slide from '@/components/Slide';
 import Classics from '@/components/ArticleLayout/Classics';
 import Pagination from '@/components/Pagination';
+
+// ISR: 每60秒重新生成分类页面
+export const revalidate = 60;
 
 interface Props {
   params: Promise<{ id: number }>;

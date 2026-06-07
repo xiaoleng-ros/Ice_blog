@@ -1,7 +1,8 @@
-import { Response } from 'express';
+﻿import { Response } from 'express';
 import { AuthRequest } from '../types/express';
 import { sendSuccess, sendError } from '../utils/result';
 import { prisma } from '../utils/prisma';
+import cache from '../utils/cache';
 
 class CateController {
   async addCate(req: AuthRequest, res: Response): Promise<void> {
@@ -19,6 +20,7 @@ class CateController {
         },
       });
       sendSuccess(res, cate);
+      cache.del('cate_list_tree');
     } catch (err: any) {
       console.error('addCate error:', err);
       const message = err?.code === 'P2002'
@@ -33,9 +35,10 @@ class CateController {
       const { id } = req.params;
       await prisma.cate.delete({ where: { id: parseInt(id) } });
       sendSuccess(res);
+      cache.del('cate_list_tree');
     } catch (err) {
       console.error('deleteCate error:', err);
-      sendError(res, '删除分类失败', 400);
+      sendError(res, '鍒犻櫎鍒嗙被澶辫触', 400);
     }
   }
 
@@ -43,14 +46,15 @@ class CateController {
     try {
       const { ids } = req.body;
       if (!ids || ids.length === 0) {
-        sendError(res, '请提供要删除的分类ID', 400);
+        sendError(res, '璇锋彁渚涜鍒犻櫎鐨勫垎绫籌D', 400);
         return;
       }
       await prisma.cate.deleteMany({ where: { id: { in: ids.map((i: any) => parseInt(i)) } } });
       sendSuccess(res);
+      cache.del('cate_list_tree');
     } catch (err) {
       console.error('batchDeleteCate error:', err);
-      sendError(res, '批量删除分类失败', 400);
+      sendError(res, '鎵归噺鍒犻櫎鍒嗙被澶辫触', 400);
     }
   }
 
@@ -70,6 +74,7 @@ class CateController {
         },
       });
       sendSuccess(res);
+      cache.del('cate_list_tree');
     } catch (err: any) {
       console.error('editCate error:', err);
       const message = err?.code === 'P2002'
@@ -86,7 +91,7 @@ class CateController {
       sendSuccess(res, cate);
     } catch (err) {
       console.error('getCate error:', err);
-      sendError(res, '获取分类失败', 400);
+      sendError(res, '鑾峰彇鍒嗙被澶辫触', 400);
     }
   }
 
@@ -95,10 +100,17 @@ class CateController {
       const { pattern, page, size } = req.query;
 
       if (pattern === 'tree') {
+        const CACHE_KEY = 'cate_list_tree';
+        const cached = cache.get(CACHE_KEY);
+        if (cached) {
+          sendSuccess(res, cached);
+          return;
+        }
         const cates = await prisma.cate.findMany({
           orderBy: { order: 'asc' },
         });
         const tree = buildCateTree(cates);
+        cache.set(CACHE_KEY, tree);
         sendSuccess(res, tree);
         return;
       }
@@ -128,7 +140,7 @@ class CateController {
       sendSuccess(res, cates);
     } catch (err) {
       console.error('getCateList error:', err);
-      sendError(res, '获取分类列表失败', 400);
+      sendError(res, '鑾峰彇鍒嗙被鍒楄〃澶辫触', 400);
     }
   }
 
@@ -151,7 +163,7 @@ class CateController {
       sendSuccess(res, result);
     } catch (err) {
       console.error('getCateArticleCount error:', err);
-      sendError(res, '获取分类文章数量失败', 400);
+      sendError(res, '鑾峰彇鍒嗙被鏂囩珷鏁伴噺澶辫触', 400);
     }
   }
 }
@@ -182,3 +194,5 @@ function buildCateTree(cates: any[]): any[] {
 }
 
 export default new CateController();
+
+

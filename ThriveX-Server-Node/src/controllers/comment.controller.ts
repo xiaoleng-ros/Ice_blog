@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../types/express';
 import { sendSuccess, sendError } from '../utils/result';
 import { prisma } from '../utils/prisma';
+import { hasSensitiveWord } from '../utils/sensitive';
 
 /**
  * HTML 实体转义，防止 XSS 攻击
@@ -22,6 +23,14 @@ class CommentController {
     try {
       const { name, avatar, content, email, url, articleId, commentId } = req.body;
 
+      // 敏感词检测
+      const sensitiveText = `${name}${content}`;
+      const hit = hasSensitiveWord(sensitiveText);
+      if (hit) {
+        sendError(res, `评论包含敏感词，请修改后重试`, 400);
+        return;
+      }
+
       // 对用户输入进行 XSS 过滤
       const safeName = escapeHtml(String(name || ''));
       const safeContent = escapeHtml(String(content || ''));
@@ -35,9 +44,9 @@ class CommentController {
           content: safeContent,
           email: safeEmail,
           url: safeUrl,
-          articleId,
+          articleId: parseInt(articleId),
           commentId: commentId || 0,
-          auditStatus: 0,
+          auditStatus: 1,
           createTime: Date.now().toString(),
         },
       });
@@ -141,7 +150,7 @@ class CommentController {
       ]);
 
       sendSuccess(res, {
-        records: comments,
+        result: comments,
         total,
         page: pageNum,
         size: sizeNum,

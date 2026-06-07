@@ -1,4 +1,4 @@
-import { getArticleDataAPI, recordViewAPI } from '@/api/article';
+﻿import { getArticleDataAPI, recordViewAPI } from '@/api/article';
 import { getWebConfigDataAPI } from '@/api/config';
 import { Web } from '@/types/app/config';
 import { Metadata } from 'next';
@@ -23,6 +23,9 @@ import { LuTimer } from 'react-icons/lu';
 import dayjs from 'dayjs';
 import Encrypt from '@/components/Encrypt';
 import NotFound from '@/app/not-found';
+
+// ISR: 每60秒重新生成文章详情页
+export const revalidate = 60;
 
 interface Props {
   params: Promise<{ id: number }>;
@@ -97,7 +100,7 @@ export default async (props: Props) => {
   // 记录文章访问量
   await recordViewAPI(id);
 
-  // 图标样式
+  // 鍥炬爣鏍峰紡
   const iconSty = 'flex justify-center items-center w-5 h-5 rounded-full text-xs mr-1';
 
   // 如果文章没有加密或者密码正确，则显示文章
