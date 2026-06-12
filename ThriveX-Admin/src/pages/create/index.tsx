@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useSearchParams, useNavigate, useBlocker } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { App, Button, Card, Dropdown, MenuProps, Spin, Space, Modal, Tag } from 'antd';
 import { BiSave } from 'react-icons/bi';
 import { AiOutlineEdit, AiOutlineSend } from 'react-icons/ai';
@@ -207,22 +207,38 @@ export default () => {
     };
   }, []);
 
-  // 使用 useBlocker 拦截所有路由切换（包括 React Router 内部导航）
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      hasUnsavedChanges.current && currentLocation.pathname !== nextLocation.pathname
-  );
+  // 拦截路由切换（BrowserRouter 不支持 useBlocker，通过 history API 拦截）
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    if (blocker.state === 'blocked') {
-      const confirmed = window.confirm('您有未保存的内容，确定要离开吗？');
-      if (confirmed) {
-        blocker.proceed();
-      } else {
-        blocker.reset();
+    const handlePopState = () => {
+      if (hasUnsavedChanges.current) {
+        if (!window.confirm('您有未保存的内容，确定要离开吗？')) {
+          window.history.pushState(null, '', pathname);
+        }
       }
-    }
-  }, [blocker.state, blocker]);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    const origPushState = window.history.pushState.bind(window.history);
+    window.history.pushState = function (...args) {
+      if (hasUnsavedChanges.current) {
+        const nextPath = typeof args[2] === 'string' ? args[2] : '';
+        if (nextPath && nextPath !== pathname) {
+          if (!window.confirm('您有未保存的内容，确定要离开吗？')) {
+            return;
+          }
+        }
+      }
+      return origPushState(...args);
+    };
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.history.pushState = origPushState;
+    };
+  }, [pathname]);
 
   useEffect(() => {
     // 点击快捷键保存文章
