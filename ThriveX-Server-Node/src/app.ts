@@ -8,6 +8,7 @@ import config from './config';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 import { logRequest } from './middlewares/logger.middleware';
+import { apiCache, cacheStatsHandler } from './middlewares/cache.middleware';
 
 const app = express();
 
@@ -60,6 +61,12 @@ app.use((req, res, next) => {
 if (process.env.NODE_ENV !== 'production') {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
+
+// 缓存统计接口（注册在 API 路由之前，避免被其他路由覆盖）
+app.get('/api/cache/stats', cacheStatsHandler);
+
+// API 自动缓存中间件：GET 自动缓存，写操作自动失效缓存
+app.use('/api', apiCache);
 
 app.get('/', (req, res) => {
   res.send(`
