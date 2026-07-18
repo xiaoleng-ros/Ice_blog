@@ -384,7 +384,7 @@ export default () => {
   const getCateList = async () => {
     try {
       const { data } = await getCateListAPI();
-      const cateData = data ?? [];
+      const cateData = data?.result ?? [];
       setCateList(cateData.filter((item: ArticleCate) => item.type === 'cate'));
     } catch (error) {
       logger.error('获取分类列表失败:', error);

@@ -1,8 +1,9 @@
-﻿import { getCateArticleListAPI } from '@/api/cate';
+import { getCateArticleListAPI } from '@/api/cate';
 import Starry from '@/components/Starry';
 import Slide from '@/components/Slide';
 import Classics from '@/components/ArticleLayout/Classics';
 import Pagination from '@/components/Pagination';
+import { Article } from '@/types/app/article';
 
 // ISR: 每60秒重新生成分类页面
 export const revalidate = 60;
@@ -20,6 +21,8 @@ export default async (props: Props) => {
   const name = searchParams.name;
 
   const { data } = await getCateArticleListAPI(id, page);
+  // 后端异常时 data 可能为 undefined，使用默认值避免渲染报错
+  const cateData = data ?? ({ result: [], total: 0, pages: 0, next: false, prev: false, page: 1, size: 8 } as Paginate<Article[]>);
 
   return (
     <>
@@ -34,15 +37,15 @@ export default async (props: Props) => {
           {/* 分类信息 */}
           <div className="absolute top-[40%] left-[50%] transform -translate-x-1/2 w-[80%] text-center text-white text-[20px] xs:text-[25px] sm:text-[30px] custom_text_shadow">
             <span>
-              该分类：{name} ~ 共计{data?.total}篇文章
+              该分类：{name} ~ 共计{cateData?.total}篇文章
             </span>
           </div>
         </Slide>
 
         <div className="md:w-full lg:w-[900px] lg:mx-auto px-4 lg:p-0 my-5">
-          <Classics data={data} />
+          <Classics data={cateData} />
 
-          {data?.total && <Pagination total={data?.pages} page={page} path={`?name=${name}`} className="flex justify-center mt-5" />}
+          {!!cateData?.total && <Pagination total={cateData?.pages} page={page} path={`?name=${name}`} className="flex justify-center mt-5" />}
         </div>
       </div>
     </>

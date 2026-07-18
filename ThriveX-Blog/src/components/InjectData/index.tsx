@@ -15,7 +15,7 @@ export default () => {
   // 获取作者信息
   const getAuthorData = useCallback(async () => {
     const { data: user } = await getAuthorDataAPI();
-    setAuthor(user);
+    if (user) setAuthor(user);
   }, [setAuthor]);
 
   const { setWeb, setTheme, setOther } = useConfigStore();

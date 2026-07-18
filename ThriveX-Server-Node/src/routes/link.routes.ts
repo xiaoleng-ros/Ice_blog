@@ -2,7 +2,7 @@ import { Router } from 'express';
 import LinkController from '../controllers/link.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/', authMiddleware, LinkController.addLink);
 router.delete('/:id', authMiddleware, LinkController.deleteLink);

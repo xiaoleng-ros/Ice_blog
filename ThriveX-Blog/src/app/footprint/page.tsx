@@ -12,6 +12,13 @@ import { getGaodeMapConfigDataAPI } from '@/api/config';
 import { logger } from '@/utils/logger';
 import './page.scss';
 
+// 扩展 Window 接口以支持高德地图安全密钥配置
+declare global {
+  interface Window {
+    _AMapSecurityConfig?: { securityJsCode: string };
+  }
+}
+
 const breakpointColumnsObj = {
   default: 4,
   1024: 3,
@@ -23,12 +30,12 @@ export default function MapContainer() {
   const [isDismissable, setIsDismissable] = useState(true);
   const [list, setList] = useState<Footprint[]>([]);
   const [data, setData] = useState<Footprint>({} as Footprint);
-  let map: any = null;
-  let infoWindow: any = null;
+  let map!: AMap.Map;
+  let infoWindow!: AMap.InfoWindow;
 
   const getFootprintList = async () => {
     const { data } = await getFootprintListAPI();
-    setList(data);
+    setList(data ?? []);
   };
 
   useEffect(() => {
@@ -43,7 +50,7 @@ export default function MapContainer() {
       const { data } = await getGaodeMapConfigDataAPI();
       const { key_code, security_code } = data as { key_code: string; security_code: string };
 
-      (window as any)._AMapSecurityConfig = {
+      window._AMapSecurityConfig = {
         securityJsCode: security_code,
       };
 

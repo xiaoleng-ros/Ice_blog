@@ -2,7 +2,7 @@ import { Router } from 'express';
 import OssController from '../controllers/oss.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.get('/', authMiddleware, OssController.getOssList);
 router.get('/platforms', OssController.getOssPlatforms);

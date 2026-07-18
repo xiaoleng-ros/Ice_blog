@@ -11,7 +11,7 @@ const upload = multer({
   },
 });
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/upload', authMiddleware, upload.any(), FileController.uploadFile);
 router.delete('/:id', authMiddleware, FileController.deleteFile);

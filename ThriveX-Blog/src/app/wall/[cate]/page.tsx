@@ -26,7 +26,8 @@ export default () => {
   useEffect(() => {
     const fetchCateList = async () => {
       const { data } = await getCateListAPI();
-      const sorted = [...data].sort((a, b) => a.order - b.order);
+      const list = Array.isArray(data) ? data : [];
+      const sorted = [...list].sort((a, b) => a.order - b.order);
       setCateList(sorted);
     };
     fetchCateList();

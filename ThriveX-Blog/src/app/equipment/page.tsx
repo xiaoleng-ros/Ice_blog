@@ -9,7 +9,8 @@ interface Equipment {
 
 export default async () => {
   const { data } = await getPageConfigDataByNameAPI('equipment');
-  const value = data?.value as { list: Equipment[] };
+  // 后端异常时 data 可能为 undefined，使用空对象兜底
+  const value = (data?.value ?? {}) as { list: Equipment[] };
 
   const defaultItem = {
     name: '未命名设备',
@@ -25,7 +26,7 @@ export default async () => {
     items: [] as Equipment['items'],
   };
 
-  const safeList: Equipment[] = (value.list ?? []).map((group) => ({
+  const safeList: Equipment[] = (value?.list ?? []).map((group) => ({
     ...defaultGroup,
     ...group,
     items: (group?.items ?? []).map((item) => ({

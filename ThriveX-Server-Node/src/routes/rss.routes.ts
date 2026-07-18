@@ -2,7 +2,7 @@ import { Router } from 'express';
 import RssController from '../controllers/rss.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.get('/', RssController.getRssList);
 router.get('/paging', RssController.getRssPaging);

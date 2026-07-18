@@ -1,4 +1,4 @@
-﻿import Dynamic from './components/Dynamic';
+import Dynamic from './components/Dynamic';
 import Swiper from '../Swiper';
 import Classics from './Classics';
 import Waterfall from './Waterfall';
@@ -8,6 +8,7 @@ import Pagination from '../Pagination';
 import { getArticlePagingAPI } from '@/api/article';
 import { getSwiperListAPI } from '@/api/swiper';
 import { Theme } from '@/types/app/config';
+import { Article } from '@/types/app/article';
 
 interface Props {
   page: number;
@@ -29,18 +30,20 @@ export default async ({ page, theme }: Props) => {
 
   const swiper = swiperRes?.data;
   const { data } = articleRes;
-  data.result = data?.result?.filter((item) => item.config?.status !== 'no_home') ?? [];
+  // 后端异常时 data 可能为 undefined，使用默认值避免解构报错
+  const articleData = data ?? ({ result: [], total: 0, pages: 0, next: false, prev: false, page: 1, size: 8 } as Paginate<Article[]>);
+  articleData.result = articleData?.result?.filter((item: Article) => item.config?.status !== 'no_home') ?? [];
 
   return (
     <div className={`w-full md:w-[90%] ${sidebar?.length ? 'lg:w-[68%] xl:w-[73%]' : 'w-full'} mx-auto transition-width`}>
       {!!swiper?.length && <Swiper data={swiper} />}
       <Dynamic className="my-2" />
 
-      {isArticleLayout === 'classics' && <Classics data={data} theme={theme} />}
-      {isArticleLayout === 'card' && <Card data={data} theme={theme} />}
-      {isArticleLayout === 'waterfall' && <Waterfall data={data} />}
+      {isArticleLayout === 'classics' && <Classics data={articleData} theme={theme} />}
+      {isArticleLayout === 'card' && <Card data={articleData} theme={theme} />}
+      {isArticleLayout === 'waterfall' && <Waterfall data={articleData} />}
 
-      {!!data.total && <Pagination total={data?.pages} page={page} className="flex justify-center mt-5" />}
+      {!!articleData.total && <Pagination total={articleData?.pages} page={page} className="flex justify-center mt-5" />}
     </div>
   );
 };

@@ -5,19 +5,19 @@ import { Other, Theme, Web } from '@/types/app/config';
 interface ConfigState {
   // 是否暗黑模式
   isDark: boolean;
-  setIsDark: (status: boolean) => void;
+  setIsDark: (_status: boolean) => void;
 
   // 网站配置
   web: Web;
-  setWeb: (data: Web) => void;
+  setWeb: (_data: Web) => void;
 
   // 主题配置
   theme: Theme;
-  setTheme: (data: Theme) => void;
+  setTheme: (_data: Theme) => void;
 
   // 其他配置
   other: Other;
-  setOther: (data: Other) => void;
+  setOther: (_data: Other) => void;
 }
 
 export default create<ConfigState>()(

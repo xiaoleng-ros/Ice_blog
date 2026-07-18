@@ -47,7 +47,7 @@ const Author = async () => {
     >
       {/* 作者头像 */}
       <div className="avatar flex justify-center items-center w-[90px] h-[90px] rounded-full bg-white shadow-md overflow-hidden">
-        <img src={user?.avatar || null} alt="" className="w-[90%] h-[90%] rounded-full transition-transform hover:scale-110" />
+        <img src={user?.avatar || undefined} alt="" className="w-[90%] h-[90%] rounded-full transition-transform hover:scale-110" />
       </div>
 
       {/* 作者介绍 */}

@@ -1,12 +1,10 @@
 import { Response } from 'express';
-import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../types/express';
 import { sendSuccess, sendError } from '../utils/result';
 import { isAdmin } from '../utils/auth';
 import formidable from 'formidable';
 import fs from 'fs';
-import path from 'path';
 import JSZip from 'jszip';
 import { prisma } from '../utils/prisma';
 import cache from '../utils/cache';

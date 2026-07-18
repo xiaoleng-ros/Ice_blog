@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types/express';
 import { sendSuccess, sendError } from '../utils/result';
-import { getEnabledPlatforms, switchPlatform, getCurrentPlatform, testConnection, StorageConfig } from '../services/oss.service';
+import { switchPlatform, testConnection, StorageConfig } from '../services/oss.service';
 import { prisma } from '../utils/prisma';
 
 class OssController {
@@ -73,7 +73,7 @@ class OssController {
 
   async addOss(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { platform, accessKey, secretKey, bucket, endPoint, domain, basePath } = req.body;
+      const { platform, accessKey, secretKey, bucket, endPoint, domain } = req.body;
 
       const oss = await prisma.oss.create({
         data: {

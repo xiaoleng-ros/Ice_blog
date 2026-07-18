@@ -5,7 +5,7 @@ import { authMiddleware } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validator.middleware';
 import { apiLimiter } from '../middlewares/rateLimit.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.get(
   '/author',

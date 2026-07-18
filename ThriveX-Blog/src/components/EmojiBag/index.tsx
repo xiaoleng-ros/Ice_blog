@@ -250,7 +250,7 @@ const emojiData = {
 };
 
 interface Props {
-  onEmojiSelect?: (emoji: string) => void;
+  onEmojiSelect?: (_emoji: string) => void;
   className?: string;
 }
 

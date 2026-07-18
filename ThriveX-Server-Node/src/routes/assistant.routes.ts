@@ -2,7 +2,7 @@ import { Router } from 'express';
 import AssistantController from '../controllers/assistant.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.get('/', AssistantController.getAssistantList);
 router.get('/default', AssistantController.getDefaultAssistant);

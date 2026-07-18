@@ -18,6 +18,9 @@ export const instance = axios.create({
 // 标记是否已经处理过401错误
 let isHandling401Error = false;
 
+/** 判断是否为 Axios 错误（封装为类型保护，解决 TS 上下文推断异常） */
+const isAxiosError = (error: unknown): error is AxiosError => axios.isAxiosError(error);
+
 // 请求取消控制器：401 时批量取消进行中的请求，但不影响后续新请求
 let abortController = new AbortController();
 
@@ -42,7 +45,10 @@ instance.interceptors.request.use(
 
         return config;
     },
-    (err: AxiosError) => {
+    (err: unknown) => {
+        // 仅处理 Axios 错误，其它错误原样抛出
+        if (!isAxiosError(err)) return Promise.reject(err);
+
         getNotification().error({
             title: '请求异常',
             description: err.message,
@@ -51,6 +57,50 @@ instance.interceptors.request.use(
         return Promise.reject(err);
     }
 );
+
+/** 响应错误处理器：axios 拦截器上下文会错误推断 AxiosError 为 never，使用显式结构类型绕过 */
+const responseErrorHandler = (err: unknown) => {
+    // 将错误断言为仅包含所需字段的结构类型，避免依赖 axios 的 AxiosError 推断
+    const error = err as {
+        response?: { status?: number; data?: unknown };
+        message?: string;
+    };
+
+    // 被取消的请求静默处理，不弹出错误提示
+    if (axios.isCancel(err)) return Promise.reject(err);
+
+    // 仅处理 Axios 错误，其它错误原样抛出
+    if (!isAxiosError(err)) return Promise.reject(err);
+
+    if (isHandling401Error) return;
+
+    // 如果code为401就证明认证失败
+    if (error.response?.status === 401) {
+        isHandling401Error = true; // 标记为正在处理401错误
+        // 取消所有进行中的请求，避免无效请求继续发送
+        cancelAllRequests('认证失败，取消所有请求');
+
+        Modal.error({
+            title: '暂无权限',
+            content: '🔒️ 登录已过期，请重新登录?',
+            okText: '去登录',
+            onOk: () => {
+                const store = useUserStore.getState()
+                store.quitLogin()
+                isHandling401Error = false; // 重置标记
+            }
+        });
+
+        return Promise.reject(error.response?.data);
+    }
+
+    getNotification().error({
+        title: '程序异常',
+        description: error.message || '未知错误',
+    })
+
+    return Promise.reject(err);
+};
 
 // 响应拦截
 instance.interceptors.response.use(
@@ -91,39 +141,7 @@ instance.interceptors.response.use(
 
         return res.data;
     },
-    (err: AxiosError) => {
-        // 被取消的请求静默处理，不弹出错误提示
-        if (axios.isCancel(err)) return Promise.reject(err);
-
-        if (isHandling401Error) return;
-
-        // 如果code为401就证明认证失败
-        if (err.response?.status === 401) {
-            isHandling401Error = true; // 标记为正在处理401错误
-            // 取消所有进行中的请求，避免无效请求继续发送
-            cancelAllRequests('认证失败，取消所有请求');
-
-            Modal.error({
-                title: '暂无权限',
-                content: '🔒️ 登录已过期，请重新登录?',
-                okText: '去登录',
-                onOk: () => {
-                    const store = useUserStore.getState()
-                    store.quitLogin()
-                    isHandling401Error = false; // 重置标记
-                }
-            });
-
-            return Promise.reject(err.response?.data);
-        }
-
-        getNotification().error({
-            title: '程序异常',
-            description: err.message || '未知错误',
-        })
-
-        return Promise.reject(err);
-    }
+    responseErrorHandler
 );
 
 const request = <T>(method: string, url: string, reqParams?: object) => {

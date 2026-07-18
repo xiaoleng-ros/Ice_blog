@@ -13,7 +13,8 @@ import { MyData } from '@/types/app/my';
 
 export default async () => {
   const { data } = await getPageConfigDataByNameAPI('my');
-  const value = data?.value as MyData;
+  // 后端异常时 data 可能为 undefined，使用空对象兜底
+  const value = (data?.value ?? {}) as MyData;
 
   const defaultInfoOne = {
     name: '未命名',
@@ -38,14 +39,14 @@ export default async () => {
   const defaultHometown = [0, 0] as MyData['hometown'];
 
   const safeData: MyData = {
-    info_style: value.info_style || 'info_one',
-    info_one: { ...defaultInfoOne, ...(value.info_one || {}) },
-    info_two: { ...defaultInfoTwo, ...(value.info_two || {}) },
-    character: value.character ?? defaultCharacter,
-    goals: value.goals ?? defaultGoals,
-    project: value.project ?? defaultProject,
-    technology_stack: value.technology_stack ?? defaultTechStack,
-    hometown: value.hometown ?? defaultHometown,
+    info_style: value?.info_style || 'info_one',
+    info_one: { ...defaultInfoOne, ...(value?.info_one || {}) },
+    info_two: { ...defaultInfoTwo, ...(value?.info_two || {}) },
+    character: value?.character ?? defaultCharacter,
+    goals: value?.goals ?? defaultGoals,
+    project: value?.project ?? defaultProject,
+    technology_stack: value?.technology_stack ?? defaultTechStack,
+    hometown: value?.hometown ?? defaultHometown,
   };
 
   const { info_style, info_one, info_two, character, goals, project, technology_stack, hometown } = safeData;

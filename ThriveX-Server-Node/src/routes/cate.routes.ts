@@ -2,7 +2,7 @@ import { Router } from 'express';
 import CateController from '../controllers/cate.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/', authMiddleware, CateController.addCate);
 router.delete('/batch', authMiddleware, CateController.batchDeleteCate);

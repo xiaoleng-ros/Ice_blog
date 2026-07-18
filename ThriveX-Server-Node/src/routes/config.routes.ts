@@ -2,7 +2,7 @@ import { Router } from 'express';
 import ConfigController from '../controllers/config.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.get('/web', ConfigController.getWebConfig);
 router.get('/web/:name', ConfigController.getWebConfigByName);

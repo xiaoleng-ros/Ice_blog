@@ -14,15 +14,18 @@ import './index.scss';
 
 interface Props {
   id: number;
-  reply: (id: number, name: string) => void;
+  reply: (_id: number, _name: string) => void;
 }
 
 const CommentList = forwardRef(({ id, reply }: Props, ref) => {
-  const [data, setData] = useState<Paginate<Comment[]>>({} as Paginate<Comment[]>);
+  const [data, setData] = useState<Paginate<Comment[]> | undefined>(undefined);
   const getCommentList = async (page: number = 1) => {
     const { data } = await getArticleCommentListAPI(+id!, { page, size: 8 });
     setData(data);
   };
+
+  // 评论数据兜底：后端异常或为空时返回安全默认值
+  const commentData = data ?? { total: 0, pages: 0, result: [] };
 
   useEffect(() => {
     getCommentList();
@@ -47,11 +50,11 @@ const CommentList = forwardRef(({ id, reply }: Props, ref) => {
   return (
     <div className="CommentListComponent">
       <div className="comment-count mb-4 text-sm text-gray-500 dark:text-gray-400">
-        共 {data.total ?? 0} 条评论
+        共 {commentData.total ?? 0} 条评论
       </div>
-      <Show is={!!data.result?.length}>
+      <Show is={!!commentData.result?.length}>
         <ul className="list">
-          {data.result?.map((one) => (
+          {commentData.result?.map((one) => (
             <li className="item" key={one.id}>
               <div className="comment_user_one">
                 {one.avatar ? <img src={one.avatar} alt="" className="avatar" /> : <RandomAvatar className="avatar" />}
@@ -190,7 +193,7 @@ const CommentList = forwardRef(({ id, reply }: Props, ref) => {
         </ul>
       </Show>
 
-      {!data.result?.length ? <Empty info="评论列表为空~"></Empty> : <Pagination showControls total={data.pages} page={page} onChange={onPaginateChange} className="flex justify-center mt-2" classNames={{ item: 'shadow-none bg-transparent dark:hover:!bg-black-b  ', prev: 'dark:bg-black-b  ', next: 'dark:bg-black-b  ' }} />}
+      {!commentData.result?.length ? <Empty info="评论列表为空~"></Empty> : <Pagination showControls total={commentData.pages} page={page} onChange={onPaginateChange} className="flex justify-center mt-2" classNames={{ item: 'shadow-none bg-transparent dark:hover:!bg-black-b  ', prev: 'dark:bg-black-b  ', next: 'dark:bg-black-b  ' }} />}
     </div>
   );
 });

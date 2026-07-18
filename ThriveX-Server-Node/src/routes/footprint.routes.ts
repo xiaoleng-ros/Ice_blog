@@ -2,7 +2,7 @@ import { Router } from 'express';
 import FootprintController from '../controllers/footprint.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/', authMiddleware, FootprintController.addFootprint);
 router.delete('/:id', authMiddleware, FootprintController.deleteFootprint);
