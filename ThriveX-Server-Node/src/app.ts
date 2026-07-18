@@ -10,7 +10,7 @@ import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 import { logRequest } from './middlewares/logger.middleware';
 import { apiCache, cacheStatsHandler } from './middlewares/cache.middleware';
 
-const app = express();
+const app: express.Application = express();
 
 const swaggerOptions = {
   definition: {
