@@ -47,6 +47,11 @@ export const config = {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
+  cache: {
+    enabled: process.env.CACHE_ENABLED !== 'false',
+    stdTTL: parseInt(process.env.CACHE_TTL || '300', 10),
+    maxKeys: parseInt(process.env.CACHE_MAX_KEYS || '1000', 10),
+  },
 };
 
 export default config;

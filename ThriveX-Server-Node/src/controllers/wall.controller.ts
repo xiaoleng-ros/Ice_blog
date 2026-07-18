@@ -93,7 +93,7 @@ class WallController {
           prisma.wall.count({ where }),
         ]);
         sendSuccess(res, {
-          records: walls,
+          result: walls,
           total,
           page: pageNum,
           size: sizeNum,
@@ -139,7 +139,7 @@ class WallController {
       ]);
 
       sendSuccess(res, {
-        records: walls,
+        result: walls,
         total,
         page: pageNum,
         size: sizeNum,

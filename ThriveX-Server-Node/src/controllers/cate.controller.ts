@@ -127,7 +127,7 @@ class CateController {
           prisma.cate.count(),
         ]);
         sendSuccess(res, {
-          records: cates,
+          result: cates,
           total,
           page: pageNum,
           size: sizeNum,

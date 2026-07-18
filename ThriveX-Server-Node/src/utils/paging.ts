@@ -14,9 +14,9 @@ export interface PaginateOptions<T = any> {
 }
 
 export function filter<T>(data: Paginate<T>): Record<string, any> {
-  const { records, total, page, size, totalPages } = data;
+  const { result, total, page, size, totalPages } = data;
   return {
-    records,
+    result,
     total,
     page,
     size,
@@ -27,7 +27,7 @@ export function filter<T>(data: Paginate<T>): Record<string, any> {
 export function calculatePagination(total: number, page: number, size: number): Paginate<any> {
   const totalPages = Math.ceil(total / size);
   return {
-    records: [],
+    result: [],
     total,
     page,
     size,
@@ -44,14 +44,14 @@ export async function paginate<T>(
   if (include) findArgs.include = include;
   if (orderBy) findArgs.orderBy = orderBy;
 
-  const [records, total] = await Promise.all([
+  const [result, total] = await Promise.all([
     model.findMany(findArgs) as Promise<T[]>,
     model.count({ where }),
   ]);
 
   const page = Math.floor(skip / take) + 1;
   return {
-    records,
+    result,
     total,
     page,
     size: take,

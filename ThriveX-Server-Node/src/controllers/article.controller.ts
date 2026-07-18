@@ -70,9 +70,9 @@ class ArticleController {
 
   async deleteArticle(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { id, is_del } = req.params;
+      const { id, isDel } = req.params;
 
-      if (is_del === '1') {
+      if (isDel === '1') {
         await prisma.article.delete({
           where: { id: parseInt(id) },
         });
@@ -347,12 +347,12 @@ class ArticleController {
 
   async getArticleByCate(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { cate_id } = req.params;
+      const { cateId: cateIdStr } = req.params;
       const page = parseInt(req.query.page as string) || 1;
       const size = parseInt(req.query.size as string) || 10;
       const skip = (page - 1) * size;
 
-      const cateId = parseInt(cate_id);
+      const cateId = parseInt(cateIdStr);
 
       const [articleCates, total] = await Promise.all([
         prisma.articleCate.findMany({
@@ -405,12 +405,12 @@ class ArticleController {
 
   async getArticleByTag(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { tag_id } = req.params;
+      const { tagId: tagIdStr } = req.params;
       const page = parseInt(req.query.page as string) || 1;
       const size = parseInt(req.query.size as string) || 10;
       const skip = (page - 1) * size;
 
-      const tagId = parseInt(tag_id);
+      const tagId = parseInt(tagIdStr);
 
       const [articleTags, total] = await Promise.all([
         prisma.articleTag.findMany({

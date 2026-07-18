@@ -8,7 +8,7 @@ router.post('/', authMiddleware, RecordController.addRecord);
 router.delete('/:id', authMiddleware, RecordController.deleteRecord);
 router.patch('/', authMiddleware, RecordController.editRecord);
 router.get('/', RecordController.getRecordList);
-router.post('/list', RecordController.getRecordList);
-router.post('/paging', RecordController.getRecordPaging);
+router.get('/list', RecordController.getRecordList);
+router.get('/paging', RecordController.getRecordPaging);
 
 export default router;

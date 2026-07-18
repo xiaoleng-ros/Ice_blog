@@ -61,23 +61,22 @@ class RecordController {
 
   async getRecordPaging(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { page, size } = req.body;
-      const pageNum = parseInt(page as string) || 1;
-      const sizeNum = Math.min(parseInt(size as string) || 8, 100);
+      const page = parseInt(req.query.page as string) || 1;
+      const sizeNum = Math.min(parseInt(req.query.size as string) || 8, 100);
 
-      const [records, total] = await Promise.all([
+      const [result, total] = await Promise.all([
         prisma.record.findMany({
           orderBy: { createdAt: 'desc' },
-          skip: (pageNum - 1) * sizeNum,
+          skip: (page - 1) * sizeNum,
           take: sizeNum,
         }),
         prisma.record.count(),
       ]);
 
       sendSuccess(res, {
-        records,
+        result,
         total,
-        page: pageNum,
+        page,
         size: sizeNum,
         totalPages: Math.ceil(total / sizeNum),
       });
