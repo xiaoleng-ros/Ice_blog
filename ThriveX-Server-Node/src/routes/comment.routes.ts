@@ -3,7 +3,7 @@ import CommentController from '../controllers/comment.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { apiLimiter } from '../middlewares/rateLimit.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/', apiLimiter, CommentController.addComment);
 router.delete('/:id', authMiddleware, CommentController.deleteComment);

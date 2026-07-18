@@ -17,7 +17,7 @@ export default () => {
 
   const getCateArticleCount = async () => {
     const { data } = await getCateArticleCountAPI();
-    setList(data?.map(({ count, name }) => ({ value: count, name })) ?? []);
+    setList(data?.map(({ count, name }: { count: number; name: string }) => ({ value: count, name })) ?? []);
   };
 
   useEffect(() => {

@@ -19,7 +19,7 @@ import emailRoutes from './email.routes';
 import homeRoutes from './home.routes';
 import authRoutes from './auth.routes';
 
-const router = Router();
+const router: Router = Router();
 
 router.use('/article', articleRoutes);
 router.use('/user', userRoutes);

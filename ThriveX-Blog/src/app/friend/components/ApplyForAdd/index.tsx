@@ -40,7 +40,7 @@ export default () => {
   const [typeList, setTypeList] = useState<WebType[]>([]);
   const getWebTypeList = async () => {
     const { data } = await getWebTypeListAPI();
-    setTypeList(data?.filter((item) => !item.isAdmin) ?? []);
+    setTypeList(data?.filter((item: WebType) => !item.isAdmin) ?? []);
   };
 
   useEffect(() => {

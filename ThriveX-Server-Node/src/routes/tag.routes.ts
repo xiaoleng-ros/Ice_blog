@@ -2,7 +2,7 @@ import { Router } from 'express';
 import TagController from '../controllers/tag.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/', authMiddleware, TagController.addTag);
 router.delete('/:id', authMiddleware, TagController.deleteTag);

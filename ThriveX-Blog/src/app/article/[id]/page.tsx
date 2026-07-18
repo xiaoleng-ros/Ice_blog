@@ -1,6 +1,7 @@
-﻿import { getArticleDataAPI } from '@/api/article';
+import { getArticleDataAPI } from '@/api/article';
 import { getWebConfigDataAPI } from '@/api/config';
 import { Web } from '@/types/app/config';
+import { Tag as TagType } from '@/types/app/tag';
 import { Metadata } from 'next';
 
 import Starry from '@/components/Starry';
@@ -95,11 +96,11 @@ export default async (props: Props) => {
 
   const errorCodes = [400, 404, 611];
 
-  if (errorCodes.includes(code ?? 200)) {
+  if (errorCodes.includes(code ?? 200) || !data) {
     return <NotFound />;
   }
 
-  // 鍥炬爣鏍峰紡
+  // 图标样式
   const iconSty = 'flex justify-center items-center w-5 h-5 rounded-full text-xs mr-1';
 
   // 如果文章没有加密或者密码正确，则显示文章
@@ -158,10 +159,10 @@ export default async (props: Props) => {
             {/* 文章主体 */}
             <div className="flex-1 min-w-0">
               <Summary content={data?.description || ''} />
-              <MD data={data?.content} />
+              <MD data={data?.content || ''} />
 
               <div className="w-full">
-                <Tag data={data?.articleTags?.map((at) => at.tag) ?? []} />
+                <Tag data={data?.articleTags?.map((at: { tag: TagType }) => at.tag) ?? []} />
 
                 <Copyright />
                 <RandomArticle />

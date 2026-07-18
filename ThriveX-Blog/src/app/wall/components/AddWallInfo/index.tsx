@@ -39,7 +39,7 @@ export default () => {
   const [cateList, setCateList] = useState<Cate[]>([]);
   const getCateList = async () => {
     const { data } = await getCateListAPI();
-    setCateList(data?.filter((item) => item.id !== 1));
+    setCateList((data ?? []).filter((item: Cate) => item.id !== 1));
   };
   useEffect(() => {
     // 页面加载后检查是否有需要显示的消息

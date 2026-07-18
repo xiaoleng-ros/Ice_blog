@@ -2,7 +2,7 @@ import { Router } from 'express';
 import SwiperController from '../controllers/swiper.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/', authMiddleware, SwiperController.addSwiper);
 router.delete('/:id', authMiddleware, SwiperController.deleteSwiper);

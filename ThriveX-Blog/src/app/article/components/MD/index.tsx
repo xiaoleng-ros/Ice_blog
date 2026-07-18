@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
+import type { ExtraProps } from 'react-markdown';
 import { useConfigStore } from '@/stores';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 import { ToastContainer, toast } from 'react-toastify';
@@ -196,6 +197,12 @@ const ContentMD = ({ data }: Props) => {
     );
   };
 
+  // 代码行内/块级组件 props 类型（继承 react-markdown 默认 code 组件 props，node 放宽为 unknown 以读取 value）
+  type CodeProps = React.HTMLAttributes<HTMLElement> & ExtraProps & {
+    node?: unknown;
+    inline?: boolean;
+  };
+
   const renderers = {
     img: ({ alt, src }: { alt?: string; src?: string }) => <LazyImage alt={alt} src={src} />,
     a: ({ href, children }: { href?: string; children?: React.ReactNode }) => {
@@ -209,7 +216,7 @@ const ContentMD = ({ data }: Props) => {
       }
       return <a href={href}>{children}</a>;
     },
-    code: ({ node, inline, className = '', children, ...props }: any) => {
+    code: ({ node, inline, className = '', children, ...props }: CodeProps) => {
       const match = /language-(\w+)/.exec(className || '');
 
       if (inline || !match) {
@@ -221,7 +228,7 @@ const ContentMD = ({ data }: Props) => {
       }
 
       const language = match[1].toLowerCase();
-      const codeString = node?.value ?? String(children);
+      const codeString = (node as { value?: string } | undefined)?.value ?? String(children);
 
       return <CodeBlock language={language} value={codeString} />;
     },

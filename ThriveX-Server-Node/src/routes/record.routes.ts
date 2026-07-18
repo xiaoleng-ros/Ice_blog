@@ -2,7 +2,7 @@ import { Router } from 'express';
 import RecordController from '../controllers/record.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/', authMiddleware, RecordController.addRecord);
 router.delete('/:id', authMiddleware, RecordController.deleteRecord);

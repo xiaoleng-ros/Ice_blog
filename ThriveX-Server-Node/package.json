@@ -11,8 +11,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
-    "test": "jest"
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [
     "blog",

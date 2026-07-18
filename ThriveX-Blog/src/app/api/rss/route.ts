@@ -8,6 +8,15 @@ import { getWebConfigDataAPI } from '@/api/config';
 import { getAuthorDataAPI } from '@/api/user';
 import { getRecordPagingAPI } from '@/api/record';
 
+// RSS 数据项统一类型：文章和说说合并后所需字段
+interface RssItem {
+  id?: number | string;
+  title?: string;
+  content?: string;
+  description?: string;
+  createTime?: string | number;
+}
+
 export async function GET() {
   const webResponse = await getWebConfigDataAPI<{ value: Web }>('web');
   const web = webResponse?.data?.value || {} as Web;
@@ -19,7 +28,7 @@ export async function GET() {
   const recordList = record?.result ?? [];
 
   // 合并文章和说说，并根据时间排序
-  const list = [...articleList, ...recordList].sort((a: any, b: any) => {
+  const list = [...articleList, ...recordList].sort((a: RssItem, b: RssItem) => {
     const timeA = a.createTime ? +a.createTime : 0;
     const timeB = b.createTime ? +b.createTime : 0;
     return timeB - timeA;
@@ -47,7 +56,7 @@ export async function GET() {
     feed: siteUrl + '/api/rss',
   });
 
-  list.forEach((item: any) => {
+  list.forEach((item: RssItem) => {
     feed.addItem({
       id: String(item.id || ''),
       title: item?.title || truncateContent(item?.content) || '',
@@ -77,9 +86,11 @@ export async function GET() {
   });
 }
 
-// 截取说说内容
-function truncateContent(content: string) {
+// 截取说说内容（兼容未定义内容）
+function truncateContent(content?: string) {
   const maxLength = 20;
+
+  if (!content) return '';
 
   if (content.length > maxLength) {
     return content.substring(0, maxLength) + '...';

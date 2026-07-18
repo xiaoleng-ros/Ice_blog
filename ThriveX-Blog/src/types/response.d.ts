@@ -1,7 +1,8 @@
 interface ResponseData<T> {
     code: number,
     message: string
-    data: T
+    // 请求失败时 data 为 undefined，调用方需使用 ?? 等默认值处理
+    data: T | undefined
 }
 
 interface Paginate<T> {

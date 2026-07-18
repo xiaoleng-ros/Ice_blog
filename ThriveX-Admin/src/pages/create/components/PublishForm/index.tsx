@@ -21,11 +21,6 @@ import Material from '@/components/Material';
 
 import './index.scss';
 
-// API 返回数据兼容类型
-interface ApiResponse<T> {
-  result?: T;
-}
-
 interface Props {
   data: Article;
   closeModel: () => void;

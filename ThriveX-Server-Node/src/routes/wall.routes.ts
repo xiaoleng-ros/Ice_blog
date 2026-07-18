@@ -2,7 +2,7 @@ import { Router } from 'express';
 import WallController from '../controllers/wall.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/', WallController.addWall);
 router.delete('/batch', authMiddleware, WallController.batchDeleteWall);

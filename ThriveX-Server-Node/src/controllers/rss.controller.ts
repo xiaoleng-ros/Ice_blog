@@ -3,7 +3,6 @@ import Parser from 'rss-parser';
 import { AuthRequest } from '../types/express';
 import { sendSuccess, sendError } from '../utils/result';
 import { listRssFeeds, evictRssCache } from '../services/rss.service';
-import { getClientIp } from '../utils/auth';
 import { prisma } from '../utils/prisma';
 const parser = new Parser();
 

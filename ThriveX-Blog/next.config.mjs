@@ -4,8 +4,10 @@ const nextConfig = {
     // distDir: 'next',
     // 关闭严格模式
     reactStrictMode: false,
-    // 启用 standalone 输出模式（用于 Docker 部署）
-    output: 'standalone',
+    // 启用 standalone 输出模式（用于 Linux/Docker 部署）
+    // 在 Windows 本地构建时，standalone 会因无法创建符号链接而失败，
+    // 因此根据平台动态选择输出模式，保证 Windows 开发/构建可用
+    output: process.platform === 'win32' ? undefined : 'standalone',
     // 配置图片来源
     images: {
         remotePatterns: [

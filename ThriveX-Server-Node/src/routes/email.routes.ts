@@ -2,7 +2,7 @@ import { Router } from 'express';
 import EmailController from '../controllers/email.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
-const router = Router();
+const router: Router = Router();
 
 router.post('/send', authMiddleware, EmailController.sendEmail);
 router.post('/dismiss', authMiddleware, EmailController.sendDismissEmail);

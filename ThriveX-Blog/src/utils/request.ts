@@ -18,7 +18,7 @@ if (!baseUrl) {
  * 同一个渲染周期内，相同 URL 的 GET 请求会合并为一次实际网络请求
  * 缓存已解析的 JSON 结果而非 Response 对象，避免 "Body has already been read" 报错
  */
-const inflightRequests = new Map<string, Promise<any>>();
+const inflightRequests = new Map<string, Promise<ResponseData<unknown>>>();
 
 /**
  * 带超时的 fetch 请求
@@ -77,14 +77,15 @@ const safeParseJSON = async <T>(res: Response, fullUrl: string): Promise<Respons
     return res.json() as Promise<ResponseData<T>>;
 };
 
-export const Request = async <T>(method: string, api: string, data?: any, caching = true) => {
+export const Request = async <T>(method: string, api: string, data?: unknown, caching = true) => {
     if (!baseUrl) {
         logger.error(' 请求被阻止: NEXT_PUBLIC_PROJECT_API 未定义');
         logger.error('请求路径:', api);
-        return { code: 500, message: 'API URL not configured', data: {} as T };
+        return { code: 500, message: 'API URL not configured', data: undefined };
     }
 
-    const query = params(data?.params ?? {});
+    // data 类型为 unknown，仅读取其中的 params 字段用于拼接查询字符串
+    const query = params(((data as { params?: Record<string, string | number | boolean | null | undefined> })?.params) ?? {});
 
     try {
         const fullUrl = `${baseUrl}${api}${query}`;
@@ -118,7 +119,7 @@ export const Request = async <T>(method: string, api: string, data?: any, cachin
         // 出现 "Body has already been read" 错误
         if (method === 'GET') {
             if (inflightRequests.has(fullUrl)) {
-                return inflightRequests.get(fullUrl)!;
+                return inflightRequests.get(fullUrl)! as Promise<ResponseData<T>>;
             } else {
                 const promise = (async () => {
                     const res = await fetchWithTimeout(fullUrl, fetchOptions, REQUEST_TIMEOUT);
@@ -141,6 +142,6 @@ export const Request = async <T>(method: string, api: string, data?: any, cachin
             : '请求失败';
         logger.error(`❌ ${errorMessage}:`, error);
         logger.error('请求路径:', api);
-        return { code: 500, message: errorMessage, data: {} as T };
+        return { code: 500, message: errorMessage, data: undefined };
     }
 }

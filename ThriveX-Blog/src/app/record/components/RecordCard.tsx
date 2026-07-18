@@ -69,7 +69,7 @@ export default function RecordCard({ id, content, images, createTime, user }: Re
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-3">
               <img
-                src={user?.avatar || null}
+                src={user?.avatar || undefined}
                 alt={user?.name ?? '作者头像'}
                 width={40}
                 height={40}

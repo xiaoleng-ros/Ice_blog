@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import StatisController from '../controllers/statis.controller';
 
-const router = Router();
+const router: Router = Router();
 
 router.get('/visitor', StatisController.getVisitorStatis);
 router.get('/article', StatisController.getArticleStatis);
