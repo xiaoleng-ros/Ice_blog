@@ -284,24 +284,32 @@ class ArticleController {
       }
 
       const articleConfigWhere: any = {};
-      
-      // 默认过滤草稿，除非明确指定 isDraft 参数
-      if (isDraft !== undefined) {
-        articleConfigWhere.isDraft = isDraft === '1' || isDraft === 'true';
+
+      // 安全修复：草稿与已删除文章仅管理员可见
+      // 非管理员强制 isDraft=false & isDel=false，防止越权拉取未发布内容
+      const admin = isAdmin(req);
+      if (admin) {
+        // 仅管理员可以按参数过滤草稿/已删除
+        if (isDraft !== undefined) {
+          articleConfigWhere.isDraft = isDraft === '1' || isDraft === 'true';
+        } else {
+          articleConfigWhere.isDraft = false;
+        }
+        if (isDel !== undefined) {
+          articleConfigWhere.isDel = isDel === '1' || isDel === 'true';
+        } else {
+          articleConfigWhere.isDel = false;
+        }
       } else {
+        // 非管理员强制只看已发布、未删除、非草稿
         articleConfigWhere.isDraft = false;
-      }
-      
-      if (isDel !== undefined) {
-        articleConfigWhere.isDel = isDel === '1' || isDel === 'true';
-      } else {
         articleConfigWhere.isDel = false;
       }
-      
+
       if (status) {
         articleConfigWhere.status = status as string;
       }
-      
+
       where.articleConfig = articleConfigWhere;
 
       const pageNum = parseInt(page as string) || 1;
@@ -469,8 +477,23 @@ class ArticleController {
       }
 
       const articles = await prisma.article.findMany({
-        include: {
-          articleConfig: true,
+        // 安全修复：用 select 显式指定字段，剥离 articleConfig.password（加密文章密码哈希）
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          cover: true,
+          view: true,
+          comment: true,
+          createTime: true,
+          articleConfig: {
+            select: {
+              status: true,
+              isEncrypt: true,
+              isDraft: true,
+              isDel: true,
+            },
+          },
         },
         where: {
           articleConfig: {
@@ -482,7 +505,7 @@ class ArticleController {
         take: 10,
       });
 
-            cache.set('article_hot', articles);
+      cache.set('article_hot', articles);
       sendSuccess(res, articles);
     } catch (err) {
       console.error('getHotArticles error:', err);
@@ -512,8 +535,23 @@ class ArticleController {
       const skip = total > take ? Math.floor(Math.random() * (total - take)) : 0;
 
       const articles = await prisma.article.findMany({
-        include: {
-          articleConfig: true,
+        // 安全修复：用 select 显式指定字段，剥离 articleConfig.password
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          cover: true,
+          view: true,
+          comment: true,
+          createTime: true,
+          articleConfig: {
+            select: {
+              status: true,
+              isEncrypt: true,
+              isDraft: true,
+              isDel: true,
+            },
+          },
         },
         where: {
           articleConfig: {
@@ -526,7 +564,7 @@ class ArticleController {
         take,
       });
 
-            cache.set('article_random', articles);
+      cache.set('article_random', articles);
       sendSuccess(res, articles);
     } catch (err) {
       console.error('getRandomArticles error:', err);

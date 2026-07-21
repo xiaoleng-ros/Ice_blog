@@ -123,6 +123,17 @@ class CommentController {
           orderBy: { createTime: 'desc' },
           skip: (pageNum - 1) * sizeNum,
           take: sizeNum,
+          // 公开接口：剥离 email/url 等隐私字段，防止访客拉取评论者邮箱
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            content: true,
+            articleId: true,
+            commentId: true,
+            auditStatus: true,
+            createTime: true,
+          },
         }),
         prisma.comment.count({ where }),
       ]);

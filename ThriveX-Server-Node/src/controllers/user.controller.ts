@@ -348,7 +348,6 @@ class UserController {
           username: true,
           nickname: true,
           avatar: true,
-          email: true,
           role: true,
         },
       });

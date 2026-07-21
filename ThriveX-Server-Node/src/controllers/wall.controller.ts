@@ -3,6 +3,19 @@ import { AuthRequest } from '../types/express';
 import { sendSuccess, sendError } from '../utils/result';
 import { prisma } from '../utils/prisma';
 
+/** 公开接口字段过滤：剥离 email 和 ip 字段，防止隐私泄露 */
+const PUBLIC_WALL_SELECT = {
+  id: true,
+  name: true,
+  cateId: true,
+  color: true,
+  content: true,
+  avatar: true,
+  auditStatus: true,
+  isChoice: true,
+  createdAt: true,
+} as const;
+
 class WallController {
   async addWall(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -66,7 +79,11 @@ class WallController {
   async getWall(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const wall = await prisma.wall.findUnique({ where: { id: parseInt(id) } });
+      // 公开接口：仅返回审核通过（auditStatus=1）的留言，并剥离 email/ip
+      const wall = await prisma.wall.findFirst({
+        where: { id: parseInt(id), auditStatus: 1 },
+        select: PUBLIC_WALL_SELECT,
+      });
       sendSuccess(res, wall);
     } catch (err) {
       console.error('getWall error:', err);
@@ -77,7 +94,8 @@ class WallController {
   async getWallList(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { cateId, page, size } = req.query;
-      const where: any = {};
+      // 公开接口：强制只返回审核通过的留言，防止未审核内容（含邮箱）泄露
+      const where: any = { auditStatus: 1 };
       if (cateId) where.cateId = parseInt(cateId as string);
 
       if (page && size) {
@@ -89,6 +107,7 @@ class WallController {
             orderBy: { createdAt: 'desc' },
             skip: (pageNum - 1) * sizeNum,
             take: sizeNum,
+            select: PUBLIC_WALL_SELECT,
           }),
           prisma.wall.count({ where }),
         ]);
@@ -105,6 +124,7 @@ class WallController {
       const walls = await prisma.wall.findMany({
         where,
         orderBy: { createdAt: 'desc' },
+        select: PUBLIC_WALL_SELECT,
       });
       sendSuccess(res, walls);
     } catch (err) {
@@ -117,7 +137,8 @@ class WallController {
     try {
       const { cateId } = req.params;
       const { page, size } = req.query;
-      const where: any = {};
+      // 公开接口：强制只返回审核通过的留言
+      const where: any = { auditStatus: 1 };
 
       if (cateId === '7') {
         where.isChoice = 1;
@@ -134,6 +155,7 @@ class WallController {
           orderBy: { createdAt: 'desc' },
           skip: (pageNum - 1) * sizeNum,
           take: sizeNum,
+          select: PUBLIC_WALL_SELECT,
         }),
         prisma.wall.count({ where }),
       ]);
