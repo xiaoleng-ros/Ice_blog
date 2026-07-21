@@ -7,8 +7,9 @@ export const getArticleDataAPI = async (id: number, password?: string) => {
 }
 
 // 获取文章列表
-export const getArticleListAPI = async () => {
-    return await Request<Paginate<Article[]>>('GET', `/article`,);
+// options.revalidate: 自定义缓存时间（秒），用于 SEO 路由等长缓存场景
+export const getArticleListAPI = async (options?: { revalidate?: number }) => {
+    return await Request<Paginate<Article[]>>('GET', `/article`, undefined, true, options?.revalidate);
 }
 
 // 分页获取文章数据

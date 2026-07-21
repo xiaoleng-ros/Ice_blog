@@ -77,7 +77,15 @@ const safeParseJSON = async <T>(res: Response, fullUrl: string): Promise<Respons
     return res.json() as Promise<ResponseData<T>>;
 };
 
-export const Request = async <T>(method: string, api: string, data?: unknown, caching = true) => {
+export const Request = async <T>(
+    method: string,
+    api: string,
+    data?: unknown,
+    caching = true,
+    // 新增：自定义 revalidate 时间（秒），优先级高于环境变量 NEXT_PUBLIC_CACHING_TIME
+    // 用于 SEO 路由等需要长缓存的场景，避免与默认短缓存冲突
+    customRevalidate?: number,
+) => {
     if (!baseUrl) {
         logger.error(' 请求被阻止: NEXT_PUBLIC_PROJECT_API 未定义');
         logger.error('请求路径:', api);
@@ -93,6 +101,7 @@ export const Request = async <T>(method: string, api: string, data?: unknown, ca
         /**
          * 缓存策略：
          * - caching=true: 使用 Next.js 数据缓存，revalidate 为配置的缓存时间
+         *   若传入 customRevalidate，则使用自定义时间（用于 SEO 等长缓存场景）
          * - caching=false: 不缓存，每次请求都获取最新数据
          *   使用 cache: 'no-store' 而非 revalidate: 1，
          *   避免短时间缓存过期后重新验证时缓存了错误响应
@@ -105,7 +114,8 @@ export const Request = async <T>(method: string, api: string, data?: unknown, ca
         };
 
         if (caching) {
-            fetchOptions.next = { revalidate: cachingTime };
+            // customRevalidate 优先级最高，未传则回退到环境变量配置
+            fetchOptions.next = { revalidate: customRevalidate ?? cachingTime };
         } else {
             fetchOptions.cache = 'no-store';
         }

@@ -4,18 +4,20 @@ import { getWebConfigDataAPI } from '@/api/config';
 import { Web } from '@/types/app/config';
 import { Article } from '@/types/app/article';
 
-// 网站配置依赖实时接口，强制动态渲染，避免构建时 DYNAMIC_SERVER_USAGE
-export const dynamic = 'force-dynamic';
+// SEO 路由 ISR 策略：1 小时重新生成一次，兼顾性能与内容更新及时性
+// - 首次访问：请求后端生成并缓存
+// - 后续访问：直接返回缓存，后台到点自动重新生成
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // 获取网站配置
-  const webResponse = await getWebConfigDataAPI<{ value: Web }>('web');
+  // 获取网站配置，使用与路由一致的 1 小时缓存，避免每次请求都打后端
+  const webResponse = await getWebConfigDataAPI<{ value: Web }>('web', { revalidate: 3600 });
   const webConfig = webResponse?.data?.value as Web;
 
   const baseUrl = webConfig?.url ?? 'https://liuyuyang.net';
 
-  // 获取所有文章
-  const res = await getArticleListAPI();
+  // 获取所有文章，同样使用 1 小时缓存
+  const res = await getArticleListAPI({ revalidate: 3600 });
   // 防御式处理：后端异常时 result 可能不是数组
   const articles = Array.isArray((res?.data as { result?: Article[] })?.result)
     ? (res?.data as { result: Article[] }).result

@@ -2,7 +2,9 @@ import { Request } from '@/utils';
 import { Config } from '@/types/app/config';
 
 // 获取网站配置
-export const getWebConfigDataAPI = <T>(name: string) => Request<T>('GET', `/config/web/${name}`, undefined, false)
+// options.revalidate: 自定义缓存时间（秒），用于 SEO 路由等长缓存场景
+export const getWebConfigDataAPI = <T>(name: string, options?: { revalidate?: number }) =>
+    Request<T>('GET', `/config/web/${name}`, undefined, options?.revalidate !== undefined, options?.revalidate)
 
 // 修改网站配置
 export const editWebConfigDataAPI = (name: string, data: object) => Request<Config>('PATCH', `/config/web`, { [name]: data })
