@@ -40,10 +40,20 @@ ehthumbs.db
 .env.local
 .env.*.local
 
+# SQL 数据与种子文件（防止隐私泄露）
+*.sql
+ThriveX-Server-Node/thrivex_pg.sql
+ThriveX-Server-Node/update-config.js
+
+# 上传的文件目录
+ThriveX-Server-Node/uploads/
+
 # 日志
 *.log
 npm-debug.log*
 pnpm-debug.log*
+logs/
+ThriveX-Server-Node/logs/
 
 # 构建产物
 *.exe

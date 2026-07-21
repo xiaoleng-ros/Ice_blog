@@ -8,8 +8,8 @@ const router: Router = Router();
 router.post('/', apiLimiter, CommentController.addComment);
 router.delete('/:id', authMiddleware, CommentController.deleteComment);
 router.patch('/audit/:id', authMiddleware, CommentController.auditComment);
-router.get('/:id', CommentController.getComment);
-router.get('/', CommentController.getCommentList);
+router.get('/:id', authMiddleware, CommentController.getComment);
+router.get('/', authMiddleware, CommentController.getCommentList);
 router.get('/article/:articleId', CommentController.getArticleComments);
 
 export default router;

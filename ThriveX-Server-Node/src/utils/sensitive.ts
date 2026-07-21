@@ -53,16 +53,39 @@ function buildTrie(words: string[]): TrieNode {
   return root;
 }
 
+function loadDataDir(): string {
+  // 修复 P0 问题：tsc 编译后 dist 目录下没有 src/data/*.txt 文件
+  // 部署后无法找到词库导致敏感词过滤失效（违禁内容绕过审核）
+  // 优先查找编译后相邻的 data 目录，其次回退到 src/data
+  const candidates = [
+    path.resolve(process.cwd(), 'data'),          // 生产部署：dist 同级的 data 目录
+    path.resolve(process.cwd(), 'src', 'data'),  // 开发环境：src/data
+    path.resolve(__dirname, 'data'),              // 编译后 __dirname/dist 下的 data
+    path.resolve(__dirname, '..', 'data'),        // 编译后 dist 同级的 data
+  ];
+
+  for (const dir of candidates) {
+    if (fs.existsSync(dir)) {
+      const txtFiles = fs.readdirSync(dir).filter(f => f.endsWith('.txt'));
+      if (txtFiles.length > 0) {
+        return dir;
+      }
+    }
+  }
+  return '';
+}
+
 function loadFiles(): string[] {
-  const dataDir = path.resolve(process.cwd(), 'src', 'data');
-  if (!fs.existsSync(dataDir)) {
-    console.warn(`[sensitive] Data directory not found: ${dataDir}`);
+  const dataDir = loadDataDir();
+  if (!dataDir) {
+    // 路径不打印具体目录，避免泄露服务器目录结构
+    console.warn('[sensitive] No data directory with .txt files found, falling back to curated words only');
     return [];
   }
 
   const files = fs.readdirSync(dataDir).filter(f => f.endsWith('.txt'));
   if (files.length === 0) {
-    console.warn(`[sensitive] No .txt files found in ${dataDir}`);
+    console.warn('[sensitive] No .txt files found in data directory');
     return [];
   }
 
@@ -71,6 +94,7 @@ function loadFiles(): string[] {
     const content = fs.readFileSync(path.join(dataDir, file), 'utf-8');
     const lines = content.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('//') && !l.startsWith('#'));
     words.push(...lines);
+    // 路径脱敏：只打印文件名，不打印完整路径
     console.log(`[sensitive] Loaded ${lines.length} words from ${file}`);
   }
 

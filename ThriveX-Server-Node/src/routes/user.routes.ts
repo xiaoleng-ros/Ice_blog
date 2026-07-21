@@ -12,8 +12,10 @@ router.get(
   UserController.getAuthor
 );
 
+// checkToken 加限流，防止 token 枚举攻击
 router.get(
   '/check',
+  apiLimiter,
   UserController.checkToken
 );
 

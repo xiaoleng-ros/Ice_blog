@@ -16,8 +16,8 @@ const router: Router = Router();
 router.post('/upload', authMiddleware, upload.any(), FileController.uploadFile);
 router.delete('/:id', authMiddleware, FileController.deleteFile);
 router.get('/', authMiddleware, FileController.getFileList);
-router.get('/info/:id', FileController.getFileInfo);
-router.get('/dir', FileController.getDirList);
+router.get('/info/:id', authMiddleware, FileController.getFileInfo);
+router.get('/dir', authMiddleware, FileController.getDirList);
 router.get('/:id', authMiddleware, FileController.getFile);
 
 export default router;

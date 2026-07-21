@@ -49,13 +49,20 @@ class AuthController {
     }
   }
 
-  /** GitHub 账号绑定 — 将 GitHub ID 保存到用户记录 */
+  /** GitHub 账号绑定 — 将 GitHub ID 保存到当前登录用户记录（从 JWT 中取 userId，防止越权） */
   async githubBind(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { githubId, userId } = req.body;
+      const { githubId } = req.body;
+      // 强制使用 JWT 中的 userId，防止越权给其他用户绑定 GitHub
+      const userId = req.user?.userId;
 
-      if (!githubId || !userId) {
-        sendError(res, '缺少 githubId 或 userId', 400);
+      if (!githubId) {
+        sendError(res, '缺少 githubId', 400);
+        return;
+      }
+
+      if (!userId) {
+        sendError(res, '未登录', 401);
         return;
       }
 

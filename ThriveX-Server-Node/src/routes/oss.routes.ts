@@ -5,8 +5,8 @@ import { authMiddleware } from '../middlewares/auth.middleware';
 const router: Router = Router();
 
 router.get('/', authMiddleware, OssController.getOssList);
-router.get('/platforms', OssController.getOssPlatforms);
-router.get('/enabled', OssController.getEnabledOss);
+router.get('/platforms', authMiddleware, OssController.getOssPlatforms);
+router.get('/enabled', authMiddleware, OssController.getEnabledOss);
 router.post('/test/:id', authMiddleware, OssController.testOssConnection);
 router.post('/enable/:id', authMiddleware, OssController.enableOss);
 router.post('/', authMiddleware, OssController.addOss);

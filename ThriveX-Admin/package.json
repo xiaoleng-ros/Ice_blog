@@ -10,9 +10,8 @@
     "lint": "eslint ."
   },
   "author": {
-    "name": "刘宇阳",
-    "email": "1873048956@qq.com",
-    "url": "https://liuyuyang.net"
+    "name": "Iceuu",
+    "url": "https://github.com/xiaoleng-ros"
   },
   "engines": {
     "node": ">=20",

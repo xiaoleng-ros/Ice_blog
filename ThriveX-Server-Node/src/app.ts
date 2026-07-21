@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
+import helmet from 'helmet';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import path from 'path';
@@ -11,6 +12,14 @@ import { logRequest } from './middlewares/logger.middleware';
 import { apiCache, cacheStatsHandler } from './middlewares/cache.middleware';
 
 const app: express.Application = express();
+
+// 修复 P1：信任反向代理，让 req.ip 取到真实客户端 IP 而非反代内网 IP
+// 否则 IP 黑名单失效、日志记录的 IP 全部错误
+// 'loopback' 仅信任本机回环代理（开发环境），生产环境可通过 TRUST_PROXY_NUM 设置信任层数
+const trustProxy = process.env.TRUST_PROXY !== undefined
+  ? (process.env.TRUST_PROXY === 'true' ? true : parseInt(process.env.TRUST_PROXY, 10))
+  : 'loopback';
+app.set('trust proxy', trustProxy);
 
 const swaggerOptions = {
   definition: {
@@ -32,6 +41,32 @@ const swaggerOptions = {
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
+// 修复 P2：使用 helmet 添加安全 HTTP 头
+// - Content-Security-Policy：限制脚本来源，防止 XSS 注入外链恶意脚本
+// - X-Frame-Options: SAMEORIGIN：防止博客被任意站点 iframe 嵌套（点击劫持）
+// - Strict-Transport-Security：强制 HTTPS
+// - X-Content-Type-Options: nosniff：防止 MIME 嗅探
+// - X-DNS-Prefetch-Control: off：关闭 DNS 预取，减少隐私泄露
+app.use(helmet({
+  contentSecurityPolicy: config.server.env === 'production' ? {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+      connectSrc: ["'self'"],
+      frameSrc: ["'self'", 'https://open.douyin.com'],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'"],
+    },
+  } : false, // 开发环境关闭 CSP，避免影响 Vite/HMR
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
 app.use(cors({
   origin: config.cors.origin,
   credentials: true,
@@ -44,13 +79,18 @@ app.set('json replacer', (key: string, value: unknown) =>
   typeof value === 'bigint' ? Number(value) : value
 );
 
-app.use(express.json({ limit: '100mb' }));
-app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+// 修复 P2：降低 body limit 防止 DoS
+// 普通业务接口 1MB 足够，文件上传走单独的 /api/file 路由（multer 单独限制）
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads'), {
   maxAge: '7d',
   etag: true,
   lastModified: true,
+  // 修复 P2：关闭目录遍历（默认即为 false，显式声明以防配置漂移）
+  dotfiles: 'ignore',
+  index: false,
 }));
 
 app.use((req, res, next) => {

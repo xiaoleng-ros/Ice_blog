@@ -4,12 +4,12 @@ import { authMiddleware } from '../middlewares/auth.middleware';
 
 const router: Router = Router();
 
-router.get('/', AssistantController.getAssistantList);
+router.get('/', authMiddleware, AssistantController.getAssistantList);
 router.get('/default', AssistantController.getDefaultAssistant);
 router.post('/', authMiddleware, AssistantController.addAssistant);
 router.delete('/:id', authMiddleware, AssistantController.deleteAssistant);
 router.patch('/', authMiddleware, AssistantController.editAssistant);
 router.patch('/default/:id', authMiddleware, AssistantController.setDefault);
-router.post('/chat', AssistantController.chat);
+router.post('/chat', authMiddleware, AssistantController.chat);
 
 export default router;
