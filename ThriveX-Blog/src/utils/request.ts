@@ -119,7 +119,9 @@ export const Request = async <T>(method: string, api: string, data?: unknown, ca
         // 出现 "Body has already been read" 错误
         if (method === 'GET') {
             if (inflightRequests.has(fullUrl)) {
-                return inflightRequests.get(fullUrl)! as Promise<ResponseData<T>>;
+                // 必须使用 return await，否则 rejected promise 的错误
+                // 会逃逸外层 try-catch，导致 Server Components prerendering 失败
+                return (await inflightRequests.get(fullUrl)!) as ResponseData<T>;
             } else {
                 const promise = (async () => {
                     const res = await fetchWithTimeout(fullUrl, fetchOptions, REQUEST_TIMEOUT);
